@@ -18,7 +18,7 @@ import os
 from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
-from cup_of_coffee.database_management.management import display_current_default_language
+from pycafee.database_management.management import display_current_default_language
 os.system('cls')
 
 class TestDisplayDefaultLanguage(TestCase):

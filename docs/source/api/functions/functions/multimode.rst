@@ -3,6 +3,6 @@ Multimode
 
 
 
-.. currentmodule:: cup_of_coffee.functions.functions
+.. currentmodule:: pycafee.functions.functions
 
-.. autofunction:: cup_of_coffee.functions.functions.multimode
+.. autofunction:: pycafee.functions.functions.multimode

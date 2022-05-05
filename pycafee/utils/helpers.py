@@ -58,9 +58,9 @@ import numpy as np
 import pandas as pd
 
 ###### Home made ######
-from cup_of_coffee.database_management import management
-from cup_of_coffee.utils import general
-from cup_of_coffee.utils import checkers
+from pycafee.database_management import management
+from pycafee.utils import general
+from pycafee.utils import checkers
 
 
 ###########################################

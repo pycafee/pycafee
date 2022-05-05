@@ -17,7 +17,7 @@ Command to run at the prompt:
 """
 import os
 import unittest
-from cup_of_coffee.database_management.management import set_default_language
+from pycafee.database_management.management import set_default_language
 os.system('cls')
 
 class Test_set_default_language(unittest.TestCase):

@@ -18,7 +18,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.checkers import _check_data_in_range
+from pycafee.utils.checkers import _check_data_in_range
 import numpy as np
 os.system('cls')
 

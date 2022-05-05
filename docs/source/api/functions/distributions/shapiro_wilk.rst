@@ -3,7 +3,7 @@ Shapiro Wilk Normality Test
 
 
 
-.. currentmodule:: cup_of_coffee.functions.distributions
+.. currentmodule:: pycafee.functions.distributions
 
-.. autoclass:: cup_of_coffee.functions.distributions.ShapiroWilkNormalityTest
+.. autoclass:: pycafee.functions.distributions.ShapiroWilkNormalityTest
     :members:

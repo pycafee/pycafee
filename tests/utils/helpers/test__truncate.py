@@ -15,7 +15,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _truncate
+from pycafee.utils.helpers import _truncate
 os.system("cls")
 
 class Test_truncate(unittest.TestCase):

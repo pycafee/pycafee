@@ -2,7 +2,7 @@ LanguageManagement
 ------------------
 
 
-.. currentmodule:: cup_of_coffee.utils.helpers
+.. currentmodule:: pycafee.utils.helpers
 
-.. autoclass:: cup_of_coffee.utils.helpers.LanguageManagement
+.. autoclass:: pycafee.utils.helpers.LanguageManagement
     :members:

@@ -18,7 +18,7 @@ Command to run at the prompt:
 import os
 import unittest
 import sqlite3
-from cup_of_coffee.database_management.management import _connecting_to_database
+from pycafee.database_management.management import _connecting_to_database
 os.system('cls')
 
 class TestDatabaseConnection(unittest.TestCase):

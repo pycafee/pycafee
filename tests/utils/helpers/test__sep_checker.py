@@ -15,7 +15,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _sep_checker
+from pycafee.utils.helpers import _sep_checker
 os.system("cls")
 
 class Test_sep_checker(unittest.TestCase):

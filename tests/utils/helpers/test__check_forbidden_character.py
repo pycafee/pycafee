@@ -17,7 +17,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _check_forbidden_character
+from pycafee.utils.helpers import _check_forbidden_character
 import string
 import random
 os.system('cls')

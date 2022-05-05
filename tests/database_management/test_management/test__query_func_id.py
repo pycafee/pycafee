@@ -17,7 +17,7 @@ Command to run at the prompt:
 """
 import os
 import unittest
-from cup_of_coffee.database_management.management import _query_func_id
+from pycafee.database_management.management import _query_func_id
 os.system('cls')
 
 class Test_query_func_id(unittest.TestCase):

@@ -14,7 +14,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.checkers import _check_is_positive
+from pycafee.utils.checkers import _check_is_positive
 import numpy as np
 os.system('cls')
 

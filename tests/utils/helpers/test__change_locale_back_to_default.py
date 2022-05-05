@@ -21,7 +21,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _change_locale_back_to_default
+from pycafee.utils.helpers import _change_locale_back_to_default
 os.system('cls')
 
 class Test_change_locale_back_to_default(unittest.TestCase):

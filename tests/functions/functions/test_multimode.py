@@ -18,7 +18,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.functions.functions import multimode
+from pycafee.functions.functions import multimode
 import numpy as np
 os.system('cls')
 

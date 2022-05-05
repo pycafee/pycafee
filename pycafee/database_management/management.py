@@ -29,7 +29,7 @@ import traceback
 
 
 ###### Home made ######
-from cup_of_coffee.utils import general
+from pycafee.utils import general
 
 
 ###########################################

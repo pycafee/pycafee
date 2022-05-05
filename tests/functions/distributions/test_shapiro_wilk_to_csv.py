@@ -18,8 +18,8 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.functions.distributions import ShapiroWilkNormalityTest
-from cup_of_coffee.utils.helpers import _check_file_exists
+from pycafee.functions.distributions import ShapiroWilkNormalityTest
+from pycafee.utils.helpers import _check_file_exists
 import numpy as np
 from pathlib import Path
 import pandas as pd

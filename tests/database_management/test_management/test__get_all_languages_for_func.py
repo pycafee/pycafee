@@ -17,7 +17,7 @@ Command to run at the prompt:
 """
 import os
 import unittest
-from cup_of_coffee.database_management.management import _get_all_languages_for_func
+from pycafee.database_management.management import _get_all_languages_for_func
 os.system('cls')
 
 class Test_get_all_languages_for_func(unittest.TestCase):

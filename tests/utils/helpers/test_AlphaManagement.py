@@ -20,7 +20,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import AlphaManagement
+from pycafee.utils.helpers import AlphaManagement
 os.system("cls")
 
 

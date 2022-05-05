@@ -20,7 +20,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _change_locale
+from pycafee.utils.helpers import _change_locale
 import locale
 os.system('cls')
 

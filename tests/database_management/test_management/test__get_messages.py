@@ -19,7 +19,7 @@ import os
 import unittest
 import sqlite3
 from collections import defaultdict
-from cup_of_coffee.database_management.management import _get_messages
+from pycafee.database_management.management import _get_messages
 os.system('cls')
 
 class Test__get_messages(unittest.TestCase):

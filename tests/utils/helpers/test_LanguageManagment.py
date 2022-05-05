@@ -19,7 +19,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import LanguageManagement
+from pycafee.utils.helpers import LanguageManagement
 os.system("cls")
 
 

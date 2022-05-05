@@ -20,11 +20,11 @@ import pandas as pd
 from tabulate import tabulate
 
 ###### Home made ######
-from cup_of_coffee.utils import helpers
-from cup_of_coffee.utils import general
-from cup_of_coffee.utils.helpers import LanguageManagment
-from cup_of_coffee.functions import functions
-from cup_of_coffee.functions.functions import MakePlots
+from pycafee.utils import helpers
+from pycafee.utils import general
+from pycafee.utils.helpers import LanguageManagment
+from pycafee.functions import functions
+from pycafee.functions.functions import MakePlots
 
 
 

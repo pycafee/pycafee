@@ -15,7 +15,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _check_file_exists
+from pycafee.utils.helpers import _check_file_exists
 import csv
 from pathlib import Path
 os.system("cls")

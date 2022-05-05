@@ -15,7 +15,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _check_blank_space
+from pycafee.utils.helpers import _check_blank_space
 os.system("cls")
 class Test_check_blank_space(unittest.TestCase):
 

@@ -18,9 +18,9 @@ from itertools import takewhile
 
 
 ###### Home made ######
-from cup_of_coffee.database_management import management
-from cup_of_coffee.utils import checkers
-from cup_of_coffee.utils import general
+from pycafee.database_management import management
+from pycafee.utils import checkers
+from pycafee.utils import general
 
 
 

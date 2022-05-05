@@ -19,7 +19,7 @@ import os
 from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
-from cup_of_coffee.database_management.management import display_all_available_languages
+from pycafee.database_management.management import display_all_available_languages
 os.system('cls')
 
 class Testdisplay_all_available_languages(TestCase):

@@ -15,7 +15,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _flat_list_of_lists
+from pycafee.utils.helpers import _flat_list_of_lists
 import numpy as np
 os.system('cls')
 

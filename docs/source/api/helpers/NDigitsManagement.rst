@@ -2,7 +2,7 @@ NDigitsManagement
 -----------------
 
 
-.. currentmodule:: cup_of_coffee.utils.helpers
+.. currentmodule:: pycafee.utils.helpers
 
-.. autoclass:: cup_of_coffee.utils.helpers.NDigitsManagement
+.. autoclass:: pycafee.utils.helpers.NDigitsManagement
     :members:

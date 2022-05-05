@@ -2,7 +2,7 @@ Make Plots
 ==========
 
 
-.. currentmodule:: cup_of_coffee.functions.plots
+.. currentmodule:: pycafee.functions.plots
 
-.. autoclass:: cup_of_coffee.functions.plots.MakePlots
+.. autoclass:: pycafee.functions.plots.MakePlots
     :members:

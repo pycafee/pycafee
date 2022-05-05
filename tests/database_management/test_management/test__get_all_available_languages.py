@@ -18,7 +18,7 @@ Command to run at the prompt:
 import os
 import unittest
 import sqlite3
-from cup_of_coffee.database_management.management import _get_all_available_languages
+from pycafee.database_management.management import _get_all_available_languages
 os.system('cls')
 
 class TestGetAllAvailableLanguages(unittest.TestCase):

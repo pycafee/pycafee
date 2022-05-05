@@ -40,12 +40,12 @@ import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde as parametric_gaussian
 
 ###### Home made ######
-from cup_of_coffee.database_management import management
-from cup_of_coffee.functions import functions
-from cup_of_coffee.utils import checkers
-from cup_of_coffee.utils import helpers
-from cup_of_coffee.utils import general
-from cup_of_coffee.utils.helpers import AlphaManagement
+from pycafee.database_management import management
+from pycafee.functions import functions
+from pycafee.utils import checkers
+from pycafee.utils import helpers
+from pycafee.utils import general
+from pycafee.utils.helpers import AlphaManagement
 
 
 

@@ -2,7 +2,7 @@ AlphaManagement
 ---------------
 
 
-.. currentmodule:: cup_of_coffee.utils.helpers
+.. currentmodule:: pycafee.utils.helpers
 
-.. autoclass:: cup_of_coffee.utils.helpers.AlphaManagement
+.. autoclass:: pycafee.utils.helpers.AlphaManagement
     :members:

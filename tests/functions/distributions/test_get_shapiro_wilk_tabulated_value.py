@@ -18,7 +18,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.functions.distributions import ShapiroWilkNormalityTest
+from pycafee.functions.distributions import ShapiroWilkNormalityTest
 import numpy as np
 os.system('cls')
 

@@ -14,7 +14,7 @@ Command to run at the prompt:
 
 import os
 import unittest
-from cup_of_coffee.utils.helpers import _check_plot_design
+from pycafee.utils.helpers import _check_plot_design
 import numpy as np
 os.system('cls')
 
