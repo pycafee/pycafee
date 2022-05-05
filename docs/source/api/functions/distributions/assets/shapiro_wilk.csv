@@ -1,0 +1,18 @@
+﻿Parameters,ShapiroWilkResult
+Statistic,0.9698116779327393
+Tabulated,0.842
+p_value,0.8890941739082336
+Alpha,0.05
+Message,Data is Normal at a  95.0% of confidence level.
+-,-
+Data,Values
+1,5.1
+2,4.9
+3,4.7
+4,4.6
+5,5.0
+6,5.4
+7,4.6
+8,5.0
+9,4.4
+10,4.9
