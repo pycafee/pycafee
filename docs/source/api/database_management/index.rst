@@ -1,7 +1,7 @@
 Language Management
 ===================
 
-**Cup-of-Coffee** provides some ways to control the language in most of the outputs. Almost all functions and classes have a ``language`` parameter to change the language. By default, Cup-of-Coffee uses ``"en"``, but is possible to change to ``"pt-br"`` (other languages will be supported in the future. Do you want to help with the translation?).
+**PyCafee** provides some ways to control the language in most of the outputs. Almost all functions and classes have a ``language`` parameter to change the language. By default, **PyCafee** uses ``"en"``, but is possible to change to ``"pt-br"`` (other languages will be supported in the future. Do you want to help with the translation?).
 
 This change can be made locally for each function/class, but it can also be made persistently.
 

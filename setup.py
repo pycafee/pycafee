@@ -21,7 +21,7 @@ setup(
     version="0.0.1",
     author="Anderson Marcos Dias Canteli",
     author_email="andersonmdcanteli@gmail.com",
-    description="A package to make life easy",
+    description="A package to make scientific researchers easy",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/pycafee/pycafee",
@@ -33,6 +33,6 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
-    packages=["pycafee"],
-    keywords="statistics, data analisys, sample",  # Optional
+    include_package_data=True,
+    keywords="statistics, sample analisys",  # Optional
 )

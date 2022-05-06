@@ -1,7 +1,7 @@
 Distributions
 =============
 
-Cup of Coffee provides some ways to use the functions.
+**PyCafee** provides some ways to use the functions.
 
 
 
