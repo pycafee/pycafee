@@ -228,7 +228,7 @@ class ShapiroWilkNormalityTest(AlphaManagement, NDigitsManagement):
                 xy=(17.5, -0.075 ), xycoords=trans, fontsize='x-small')
         ax.legend()
         ax.set_title(messages[3][0][0])
-        ax.set_xticks([3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],fontsize='xx-large')
+        ax.set_xticks([3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
         fig.tight_layout()
 
 

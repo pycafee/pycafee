@@ -4,19 +4,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-from easy_stat.functions import functions
-from easy_stat.utils import helpers
-from easy_stat.utils import general
-from easy_stat.utils import checkers
-from easy_stat.functions.distributions import ShapiroWilkNormalityTest
-from easy_stat.functions.functions import multimode
+from pycafee.functions import functions
+from pycafee.utils import helpers
+from pycafee.utils import general
+from pycafee.utils import checkers
+from pycafee.functions.distributions import ShapiroWilkNormalityTest
+from pycafee.functions.functions import multimode
 
 os.system('cls')
 print(">>>")
 
+x = np.array([1,2,3,4,5,6,5,5,3,4,6,7,8])
+teste = ShapiroWilkNormalityTest()
+print(teste.shapiro_wilk(x))
 
-test = helpers.NDigitsManagement()
-print(test.__str__())
+teste.draw_shapiro_wilk_tabulated_values()
+plt.show()
+
 
 # print(test.language)
 # print(test.get_language())
