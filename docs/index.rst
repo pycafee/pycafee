@@ -18,10 +18,10 @@ Welcome to PyCafee's documentation!
    source/examples/example
    source/contribute
 
+..
+    Indices and tables
+    ==================
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`

@@ -80,7 +80,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/<your-org>/https://github.com/andersonmdcanteli/cup-of-coffee",
+            "url": "https://github.com/pycafee/pycafee",
             "icon": "fab fa-github-square",
             "type": "fontawesome",
         },
