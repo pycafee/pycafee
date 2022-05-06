@@ -1,5 +1,6 @@
 alabaster==0.7.12
 Babel==2.10.1
+beautifulsoup4==4.11.1
 bleach==5.0.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
@@ -23,6 +24,7 @@ packaging==21.3
 pandas==1.3.5
 patsy==0.5.2
 pkginfo==1.8.2
+pydata-sphinx-theme==0.8.1
 Pygments==2.12.0
 pyparsing==3.0.8
 python-dateutil==2.8.2
@@ -36,6 +38,7 @@ rich==12.3.0
 scipy==1.4.1
 six==1.16.0
 snowballstemmer==2.2.0
+soupsieve==2.3.2.post1
 Sphinx==4.5.0
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
