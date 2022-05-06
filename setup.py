@@ -12,7 +12,7 @@ HERE = path.abspath(path.dirname(__file__))
 with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-requirements = ["colorama>=0.4.4", "matplotlib>=3.5.2", "numpy>=1.22.3", "openpyxl>=3.0.9", "pandas>=1.4.2",
+requirements = ["colorama>=0.4.4", "matplotlib>=3.5.2", "numpy>=1.21.0", "openpyxl>=3.0.9", "pandas>=1.4.2",
                 "scipy>=1.7.0", "statsmodels>=0.13.2", "tabulate>=0.8.9"
 ]
 
