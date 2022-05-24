@@ -74,7 +74,7 @@ intersphinx_mapping = {
         }
 
 
-html_logo = "_static/logo.png"
+html_logo = "_static/logo.svg"
 
 
 html_theme_options = {
