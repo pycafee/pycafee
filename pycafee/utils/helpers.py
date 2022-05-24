@@ -37,6 +37,7 @@
 #     - _export_to_csv(df, file_name="my_data", sep=',', language)
 #     - _export_to_xlsx(df_list, language, file_name=None, sheet_names=[None,None])
 #     - _flat_list_of_lists(my_list, param_name, language)
+#     - _raises_when_fit_was_not_applied(func_name, language, name)
 #     - _sep_checker(sep, language)
 #     - _truncate(value, language, decs=None)
 
@@ -71,7 +72,8 @@ from pycafee.utils import checkers
 
 # with test, with database, with docstring
 class LanguageManagement:
-    """Instantiates a class for language management. This class is primarily for internal use.
+    """Instantiates a class for ``language`` management. This class is primarily for internal use.
+
 
     """
 
@@ -120,7 +122,7 @@ class LanguageManagement:
                 self.language = language
 
     def get_language(self):
-        """Gets the current language
+        """Returns the current language
         """
         return self.language
 
@@ -170,7 +172,7 @@ class LanguageManagement:
 
 # with test, with database, with docstring
 class AlphaManagement(LanguageManagement):
-    """Instanciates a class for alpha managment.
+    """Instanciates a class for ``alpha`` managment. This class inherits from :class:`.LanguageManagement` and it is primarily for internal use.
 
     """
 
@@ -197,7 +199,7 @@ class AlphaManagement(LanguageManagement):
             self.alfa = alfa
 
     def get_alfa(self):
-        """Gets the current ``alpha`` value
+        """Returns the current ``alpha`` value
         """
         return self.alfa
 
@@ -228,7 +230,7 @@ class AlphaManagement(LanguageManagement):
 
 # with test, with database, with docstring
 class NDigitsManagement(LanguageManagement):
-    """Instanciates a class for n_digits managment.
+    """Instanciates a class for ``n_digits`` managment. This class inherits from :class:`.LanguageManagement` and it is primarily for internal use.
 
     """
     def __init__(self, n_digits=None, **kwargs):
@@ -238,7 +240,7 @@ class NDigitsManagement(LanguageManagement):
         Parameters
         ----------
         n_digits : ``int``
-            The maximum number of decimal places that the calculated parameters can have, ``default = 4``.
+            The maximum number of decimal places that the calculated parameters can have, ``default = 3``.
 
         Notes
         -----
@@ -246,14 +248,14 @@ class NDigitsManagement(LanguageManagement):
 
         """
         if n_digits is None:
-            self.n_digits = 4
+            self.n_digits = 3
         else:
             checkers._check_is_integer(n_digits, "n_digits", self.language)
             checkers._check_is_positive(n_digits, "n_digits", self.language)
             self.n_digits = n_digits
 
     def get_n_digits(self):
-        """Gets the ``n_digits`` parameter
+        """Returns the ``n_digits`` parameter
         """
         return self.n_digits
 
@@ -278,7 +280,133 @@ class NDigitsManagement(LanguageManagement):
         messages = management._get_messages(fk_id_function, self.language)
         return f"{messages[1][0][0]} '{self.n_digits}'"
 
-# with tests, with text, with database, with docstring
+
+
+class PlotsManagement:
+    """This class just instantiates the default values for ploting and add methods to get/control these default values. It is primarily for internal use.
+
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # enviar estes valores para a database e permiter a alteração(?)
+        self.width = 12
+        self.height = 6
+        self.export = False
+        self.extension = "png"
+        self.dpi = 100
+        self.tight = True
+        self.transparent = False
+        self.legend = True
+        self.decimal_separator = "."
+        self.local = "pt_BR"
+        self.legend_label = "data"
+        self.x_label = "data"
+        self.y_label = "data"
+
+
+    def _get_default_width(self,width):
+        if width == 'default':
+            width = self.width
+        else:
+            checkers._check_is_float_or_int(width, "width", self.language)
+        return width
+
+    def _get_default_height(self,height):
+        if height == 'default':
+            height = self.height
+        else:
+            checkers._check_is_float_or_int(height, "height", self.language)
+        return height
+
+    def _get_default_export(self,export):
+        if export is None:
+            export = self.export
+        else:
+            checkers._check_is_bool(export, "export", self.language)
+        return export
+
+    def _get_default_extension(self, extension):
+
+        if extension is None:
+            extension = self.extension
+        else:
+            checkers._check_is_str(extension, "extension", self.language)
+            _check_forbidden_character(extension, "extension", self.language)
+            _check_figure_extension(extension, "extension", self.language)
+        return extension
+
+    def _get_default_dpi(self,dpi):
+        if dpi is None:
+            dpi = self.dpi
+        else:
+            checkers._check_is_float_or_int(dpi, "dpi", self.language)
+            checkers._check_is_positive(dpi, "dpi", self.language)
+        return dpi
+
+    def _get_default_tight(self,tight):
+        if tight is None:
+            tight = self.tight
+        else:
+            checkers._check_is_bool(tight, "tight", self.language)
+        return tight
+
+    def _get_default_transparent(self,transparent):
+        if transparent is None:
+            transparent = self.transparent
+        else:
+            checkers._check_is_bool(transparent, "transparent", self.language)
+        return transparent
+
+    def _get_default_legend(self,legend):
+        if legend is None:
+            legend = self.legend
+        else:
+            checkers._check_is_bool(legend, "legend", self.language)
+        return legend
+
+    def _get_default_x_label(self, x_label):
+        if x_label is None:
+            x_label = self.x_label
+        else:
+            checkers._check_is_str(x_label, "x_label", self.language)
+        return x_label
+
+    def _get_default_y_label(self, y_label):
+        if y_label is None:
+            y_label = self.y_label
+        else:
+            checkers._check_is_str(y_label, "y_label", self.language)
+        return y_label
+
+    def _get_default_decimal_separator(self, decimal_separator):
+        if decimal_separator is None:
+            decimal_separator = self.decimal_separator
+        else:
+            pass # o controle é feito em outra função
+        return decimal_separator
+
+    def _get_default_local(self, local):
+        if local is None:
+            local = self.local
+        else:
+            pass # o controle é feito em outra função
+        return local
+
+    def _get_default_legend_label(self, legend_label):
+        if legend_label is None:
+            legend_label = self.legend_label
+        else:
+            checkers._check_is_str(legend_label, "legend_label", self.language)
+        return legend_label
+
+
+
+
+
+
+
+
+# ESTA ERRADO!! VERFICAR NO SAPIRO WILK
 def _change_locale(language, decimal_separator=".", local="pt_BR"):
     """This function momentarily changes the decimal separator used in charts.
 
@@ -962,7 +1090,7 @@ def _export_to_csv(df, language, file_name="my_data", sep=','):
 
     try:
         df.to_csv(file_name, encoding='utf-8-sig', index=False, sep=sep)
-        general._display_one_line_attention(
+        general._display_one_line_success(
             text = f"{messages[3][0][0]} '{file_name}' {messages[3][2][0]}"
         )
     except PermissionError:
@@ -1066,6 +1194,7 @@ def _export_to_xlsx(df_list, language, file_name=None, sheet_names=[None,None]):
             msg = general._flatten_list_of_list_string(msg)
             msg = list(msg)
             general._display_n_line_attention(msg)
+            arquivo.close()
         else:
             pass # é pass pois caso o sheet name já exista, é apenas para avisar que o nome será alterado. É apenas um aviso
         # caso não tenha nenhum nome conflitante, inserir novas abas no arquivo fornecido
@@ -1073,7 +1202,7 @@ def _export_to_xlsx(df_list, language, file_name=None, sheet_names=[None,None]):
             with pd.ExcelWriter(file_name, mode="a", if_sheet_exists="new") as writer:
                 for i in range(len(df_list)):
                     df_list[i].to_excel(writer, sheet_name=sheet_names[i], index=False, engine="openpyxl")
-            general._display_one_line_attention(f"{messages[5][0][0]} '{file_name}'")
+            general._display_one_line_success(f"{messages[5][0][0]} '{file_name}' {messages[5][2][0]}")
         except PermissionError:
             general._display_two_line_attention(
                 text1 = f"{messages[6][0][0]} '{file_name}' {messages[6][2][0]}",
@@ -1093,7 +1222,7 @@ def _export_to_xlsx(df_list, language, file_name=None, sheet_names=[None,None]):
             with pd.ExcelWriter(file_name) as writer:
                 for i in range(len(df_list)):
                     df_list[i].to_excel(writer, sheet_name=sheet_names[i], index=False, engine="openpyxl")
-            general._display_one_line_attention(f"{messages[5][0][0]} {file_name}")
+            general._display_one_line_success(f"{messages[5][0][0]} '{file_name}' {messages[5][2][0]}")
         except PermissionError:
             general._display_two_line_attention(
                 text1 = f"{messages[6][0][0]} '{file_name}' {messages[6][2][0]}",
@@ -1147,6 +1276,45 @@ def _flat_list_of_lists(my_list, param_name, language):
                                 )
             raise
     return [item for sublist in my_list for item in sublist]
+
+# wtih tests, with text, the database is stored on func_name, with docstring
+def _raises_when_fit_was_not_applied(func_name, language, name):
+    """This function raises error when called
+
+    Parameters
+    ----------
+    func_name : ``str``
+        The name of the function sabed on the database
+    language : ``str``
+        The language code
+    name : ``str``
+        The sample name
+
+    Notes
+    -----
+    The parameter ``language`` isn't checked if it is a string.
+    The parameter ``name`` isn't checked if it is a string.
+
+    Returns
+    -------
+    ``ValueError``
+
+    Notes
+    -----
+    This function must always be used in conjunction with a fit function, where error and messages are at key 1 and 2.
+
+    """
+    fk_id_function = management._query_func_id(func_name)
+    messages = management._get_messages(fk_id_function, language)
+    try:
+        error = messages[1][0][0]
+        raise ValueError(error)
+    except ValueError:
+        general._display_one_line_attention(
+            f"{messages[2][0][0]} {name}",
+                            )
+        raise
+
 
 # with tests, with text, with database, with docstring
 def _sep_checker(sep, language):

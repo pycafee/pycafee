@@ -2,7 +2,7 @@
 
 """
 # Function list:
-#
+#     - _display_one_line_success(text)
 #     - _display_n_line_warn(flat_list)
 #     - _display_one_line_attention(text)
 #     - _display_n_line_attention(flat_list)
@@ -25,6 +25,22 @@ from colorama import Fore, Style, Back, init
 ###########################################
 ################ Functions ################
 ###########################################
+
+
+
+def _display_one_line_success(text):
+    """
+    This function prints text to the console in a simple way, but with some editing
+
+    Parameters
+    ----------
+    text: ``str``
+        The text to be printed
+
+    """
+    init()
+    print(Fore.BLUE, "    " + text)
+    print(Style.RESET_ALL)
 
 
 def _display_n_line_warn(flat_list):

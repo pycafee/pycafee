@@ -34,8 +34,6 @@ class Test_check_is_bool(unittest.TestCase):
         with self.assertRaises(ValueError, msg="Does not raised error when value is int"):
             _check_is_bool(1, param_name="parameter", language='en')
         with self.assertRaises(ValueError, msg="Does not raised error when value is int"):
-            _check_is_bool(np.int(1), param_name="parameter", language='en')
-        with self.assertRaises(ValueError, msg="Does not raised error when value is int"):
             _check_is_bool(np.int32(1), param_name="parameter", language='en')
         with self.assertRaises(ValueError, msg="Does not raised error when value is int"):
             _check_is_bool(np.int64(1), param_name="parameter", language='en')

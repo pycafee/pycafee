@@ -26,13 +26,13 @@ os.system("cls")
 
 class Test_init(unittest.TestCase):
 
-    def test_set_to_3(self):
-        teste = NDigitsManagement(3)
-        self.assertEqual(teste.n_digits, 3, msg="The n_digits is 3")
+    def test_set_to_4(self):
+        teste = NDigitsManagement(4)
+        self.assertEqual(teste.n_digits, 4, msg="The n_digits is 4")
 
     def test_default(self):
         teste = NDigitsManagement()
-        self.assertEqual(teste.n_digits, 4, msg="The default n_digits is not 4")
+        self.assertEqual(teste.n_digits, 3, msg="The default n_digits is not 3")
 
 class Test_set_n_digits(unittest.TestCase):
 
@@ -48,7 +48,7 @@ class Test_get_n_digits(unittest.TestCase):
     def test_default(self):
         teste = NDigitsManagement()
         result = teste.get_n_digits()
-        self.assertEqual(result, 4, msg="The default n_digits is not 4")
+        self.assertEqual(result, 3, msg="The default n_digits is not 3")
 
     def test_1(self):
         teste = NDigitsManagement()

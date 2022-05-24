@@ -4,7 +4,6 @@
 """
 
 # Function list:
-#
 #     - _check_data_in_range(value, param_name, min, max, language)
 #     - _check_is_bool(value, param_name, language)
 #     - _check_is_data_frame(df, param_name, language)
@@ -16,6 +15,9 @@
 #     - _check_is_numpy_1_D(value, param_name, language)
 #     - _check_is_positive(value, param_name, language)
 #     - _check_is_str(value, param_name, language)
+#     - _check_is_subplots(value, param_name, language)
+#     - _check_list_length(value, n, param_name, language)
+#     - _check_value_is_equal_or_higher_than(value, param_name, minimum, language)
 
 #########################################
 ################ Imports ################
@@ -26,7 +28,7 @@
 ###### Third part ######
 import numpy as np
 import pandas as pd
-
+import matplotlib
 ###### Home made ######
 from pycafee.database_management import management
 from pycafee.utils import  general
@@ -35,6 +37,7 @@ from pycafee.utils import  general
 ###########################################
 ################ Functions ################
 ###########################################
+
 
 # with tests, with text, with database
 def _check_data_in_range(value, param_name, lower, upper, language):
@@ -85,10 +88,6 @@ def _check_data_in_range(value, param_name, lower, upper, language):
         try:
             raise ValueError(messages[1][0][0])
         except ValueError:
-            message1 = "The"
-            message2 = "parameter must be a number between"
-            message3 = "and"
-            message4 = "but we got"
             general._display_one_line_attention(
                 f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{lower}' {messages[2][4][0]} '{upper}', {messages[2][6][0]} '{value}'",
                                 )
@@ -530,14 +529,140 @@ def _check_is_str(value, param_name, language):
     else:
         return True
 
+# with tests, with text, with database, with docstring
+def _check_is_subplots(value, param_name, language):
+    """This function checks if a ``value`` is a ``matplotlib.axes.SubplotBase``.
+
+    This function verifies if the parameter ``value`` is the type of ``matplotlib.axes.SubplotBase`` (``True`` or ``False``). If so, it returns ``True``. If it is not, the function raises a ``ValueError``.
+
+    Parameters
+    ----------
+    value : any type
+        The value to be evaluated.
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``value``.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+    ``True`` if ``value`` is a ``matplotlib.axes.SubplotBase``
+    ``ValueError`` if ``valuew`` is not a ``matplotlib.axes.SubplotBase``
 
 
+    """
+    ### quering ###
+    func_name = "_check_is_subplots"
+    fk_id_function = management._query_func_id(func_name)
+    messages = management._get_messages(fk_id_function, language, func_name)
+
+    if isinstance(value, matplotlib.axes.SubplotBase) == False:
+        try:
+            error = messages[1][0][0]
+            raise ValueError(error)
+        except ValueError:
+            general._display_one_line_attention(
+                                f"{messages[2][0][0]} '{param_name}'  {messages[2][2][0]} '{type(value).__name__}'",
+                                )
+            raise
+
+    return True
+
+# with tests, with text, with database, with docstring
+def _check_list_length(value, n, param_name, language):
+    """This function checks if a ``list`` (``value``) has len equals to ``n``.
+
+    Parameters
+    ----------
+    value : ``list``
+        The list to check its length
+    n : ``int``
+        The size that the list should have
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``value``.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``value`` isn't checked if it is a ``list``.
+    The parameter ``n`` isn't checked if it is a ``int``.
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+    ``True`` if ``len(value) == n``
+    Raises ``ValueError`` if ``len(value) != n``
+
+    """
+
+    if len(value) != n:
+        ### quering ###
+        func_name = "_check_list_length"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, language, func_name)
+        try:
+            raise ValueError(messages[1][0][0])
+        except ValueError:
+            general._display_one_line_attention(
+                        f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{n}' {messages[2][4][0]} '{len(value)}'"
+                                )
+            raise
+    return True
 
 
+# with tests, with text, with database
+def _check_value_is_equal_or_higher_than(value, param_name, minimum, language):
+    """This function checks if a ``value`` is equal or higher than ``minimum``.
 
+    Parameters
+    ----------
+    value : ``int`` or ``float``
+        The value to be evaluated
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``value``.
+    minimum : ``int`` or ``float``
+        the lower bound (closed)
+    language : ``str``
+        The language code
 
+    Notes
+    -----
+    The parameter ``param_name`` isn't checked if it is a ``str``.
 
+    The parameter ``language`` isn't checked if it is a ``str``.
 
+    Returns
+    -------
+    ``True`` if ``value`` is equal or higher than ``minimum``.
+    ``ValueError`` if ``value`` is lower than ``minimum``.
+
+    """
+    _check_is_float_or_int(value, "value", language)
+    _check_is_float_or_int(minimum, "minimum", language)
+
+    if value >= minimum:
+        pass
+    else:
+        ### quering ###
+        func_name = "_check_value_is_equal_or_higher_than"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, language, func_name)
+        try:
+            error = messages[1][0][0]
+            raise ValueError(error)
+        except ValueError:
+            general._display_one_line_attention(
+                f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{minimum}' {messages[2][4][0]}, '{value}'",
+                                )
+            raise
+    return True
 
 
 

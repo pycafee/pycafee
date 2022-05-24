@@ -8,5 +8,5 @@ Functions
 .. toctree::
    :maxdepth: 2
 
-   distributions/index
+
    functions/index

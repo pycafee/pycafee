@@ -1,7 +1,7 @@
 Functions
 =========
 
-**PyCafee** provides some ways to use the functions.
+|
 
 
 
@@ -9,3 +9,8 @@ Functions
    :maxdepth: 2
 
    multimode
+
+
+|
+|
+|
