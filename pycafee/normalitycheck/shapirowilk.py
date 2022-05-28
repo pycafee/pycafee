@@ -484,7 +484,7 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         References
         ----------
-        .. [1] SCIPY. scipy_stats_shapiro. Available at: `www.scipy.org <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html>`_. Access on: 10 May. 2022.
+        .. [1] SCIPY. scipy.stats.shapiro. Available at: `www.scipy.org <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html>`_. Access on: 10 May. 2022.
 
         .. [2] SHAPIRO, S. S.; WILK, M. B. An Analysis of Variance Test for Normality (Complete Samples). Biometrika, v. 52, n. 3, p. 591–611, 1965. DOI: `10.2307/2333709 <https://doi.org/10.2307/2333709>`_.
 

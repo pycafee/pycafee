@@ -668,6 +668,50 @@ def _check_value_is_equal_or_higher_than(value, param_name, minimum, language):
 
 
 
+# with tests, with text, with database
+def _check_array_lower_size(array, value, param_name, language):
+    """This function checks if a the size of a ndarray (``array``) is at least ``value``
+
+    Parameters
+    ----------
+    array : ``ndarray`` (1D)
+        The array to be to checked if it has at least ``value`` size.
+    value : ``int``
+        The minimum size that the array must have
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``array``.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``array`` isn't checked if it is a ``ndarray``.
+    The parameter ``value`` isn't checked if it is a ``int``.
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+    ``True`` if the size of the ``array`` is at least ``value``;
+    Raises ``ValueError`` if the size of the ``array`` is lower than ``value``;
+
+    """
+    ### quering ###
+    func_name = "_check_array_lower_size"
+    fk_id_function = management._query_func_id(func_name)
+    messages = management._get_messages(fk_id_function, language, func_name)
+
+    if array.size < value :
+        try:
+            error = messages[1][0][0]
+            raise ValueError(error)
+        except ValueError:
+            general._display_one_line_attention(
+                                f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{value}', {messages[2][4][0]} '{array.size}'",
+                                )
+            raise
+    else:
+        return True
 
 
 

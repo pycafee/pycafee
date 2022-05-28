@@ -238,10 +238,14 @@ class Sample(AlphaManagement, NDigitsManagement):
             return df
 
 
-    def compare(self, value, show=True, normality=None):
+    def compare(self, value, show=True, normality=None, which=None):
         """
         Esta função compara a amostra com um valor pré-definido.
         """
+        checkers._check_is_bool(show, "show", self.language)
+
+        if self.mean is None:
+            helpers._raises_when_fit_was_not_applied("Sample", self.language, self.name)
 
         if normality is None:
             normality = self.normality_conclusion

@@ -26,160 +26,240 @@ class Test_get_critical_value(unittest.TestCase):
         student = StudentDistribution()
         result = student.get_critical_value(5)
         self.assertIsInstance(result, tuple)
-        self.assertIsInstance(result[0], tuple)
-        self.assertIsInstance(result[1], list)
+        self.assertIsInstance(result[0], float)
+        self.assertIsInstance(result[1], float)
+        self.assertIsInstance(result[2], float)
+        self.assertIsInstance(result[3], str)
+        teste = False
+        if result[0] > 0:
+            teste = True
+        self.assertTrue(teste, msg="critical higher not positive")
+        teste = False
+        if result[1] < 0:
+            teste = True
+        self.assertTrue(teste, msg="critical lower not negative")
 
-    def test_result_a_b(self):
+    def test_lower_higher(self):
         student = StudentDistribution()
-        a, b = student.get_critical_value(5)
-        self.assertAlmostEqual(a[1], b[0], places=2)
-        self.assertAlmostEqual(a[0], b[1], places=2)
+        for i in range(2,10):
+            result = student.get_critical_value(i)
+            self.assertAlmostEqual(result[0], -1*result[1], msg="lower and higher does not match")
 
-    def test_result_inverse(self):
-        student = StudentDistribution()
-        a, b = student.get_critical_value(5)
-        self.assertAlmostEqual(a[0], -1*a[1])
-        self.assertAlmostEqual(b[0], -1*b[1])
+        for i in range(2,10):
+            result = student.get_critical_value(i, alfa=0.01)
+            self.assertAlmostEqual(result[0], -1*result[1], msg="lower and higher does not match")
 
-        student = StudentDistribution()
-        a, b = student.get_critical_value(5, which='one-side')
-        self.assertAlmostEqual(a[0], -1*a[1])
-        self.assertAlmostEqual(b[0], -1*b[1])
+        for i in range(2,10):
+            result = student.get_critical_value(i, alfa=0.1)
+            self.assertAlmostEqual(result[0], -1*result[1], msg="lower and higher does not match")
 
     def test_pass_two_side_alfa_5(self):
         student = StudentDistribution()
-        a, b = student.get_critical_value(1, alfa=None)
-        self.assertEqual(a[0], 12.706)
+        a = student.get_critical_value(1, alfa=None)
+        self.assertAlmostEqual(a[0], 12.706, places=3)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(2, alfa=None)
-        self.assertEqual(a[0], 4.302)
+        a = student.get_critical_value(2, alfa=None)
+        self.assertAlmostEqual(a[0], 4.302, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(3, alfa=None)
-        self.assertEqual(a[0], 3.182)
+        a = student.get_critical_value(3, alfa=None)
+        self.assertAlmostEqual(a[0], 3.182, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(4, alfa=None)
-        self.assertEqual(a[0], 2.776)
+        a = student.get_critical_value(4, alfa=None)
+        self.assertAlmostEqual(a[0], 2.776, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(5, alfa=None)
-        self.assertEqual(a[0], 2.570)
+        a = student.get_critical_value(5, alfa=None)
+        self.assertAlmostEqual(a[0], 2.570, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(6, alfa=None)
-        self.assertEqual(a[0], 2.446)
+        a = student.get_critical_value(6, alfa=None)
+        self.assertAlmostEqual(a[0], 2.446, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(7, alfa=None)
-        self.assertEqual(a[0], 2.364)
+        a = student.get_critical_value(7, alfa=None)
+        self.assertAlmostEqual(a[0], 2.364, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(8, alfa=None)
-        self.assertEqual(a[0], 2.306)
+        a = student.get_critical_value(8, alfa=None)
+        self.assertAlmostEqual(a[0], 2.306, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(9, alfa=None)
-        self.assertEqual(a[0], 2.262)
+        a = student.get_critical_value(9, alfa=None)
+        self.assertAlmostEqual(a[0], 2.262, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(10, alfa=None)
-        self.assertEqual(a[0], 2.228)
-
+        a = student.get_critical_value(10, alfa=None)
+        self.assertAlmostEqual(a[0], 2.228, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'two-side')
+        
     def test_pass_two_side_alfa_10(self):
         student = StudentDistribution()
-        a, b = student.get_critical_value(1, alfa=0.1)
-        self.assertEqual(a[0], 6.313)
+        a = student.get_critical_value(1, alfa=0.1)
+        self.assertAlmostEqual(a[0], 6.313, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(2, alfa=0.1)
-        self.assertEqual(a[0], 2.919)
+        a = student.get_critical_value(2, alfa=0.1)
+        self.assertAlmostEqual(a[0], 2.919, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(3, alfa=0.1)
-        self.assertEqual(a[0], 2.353)
+        a = student.get_critical_value(3, alfa=0.1)
+        self.assertAlmostEqual(a[0], 2.353, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(4, alfa=0.1)
-        self.assertEqual(a[0], 2.131)
+        a = student.get_critical_value(4, alfa=0.1)
+        self.assertAlmostEqual(a[0], 2.131, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(5, alfa=0.1)
-        self.assertEqual(a[0], 2.015)
+        a = student.get_critical_value(5, alfa=0.1)
+        self.assertAlmostEqual(a[0], 2.015, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(6, alfa=0.1)
-        self.assertEqual(a[0], 1.943)
+        a = student.get_critical_value(6, alfa=0.1)
+        self.assertAlmostEqual(a[0], 1.943, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(7, alfa=0.1)
-        self.assertEqual(a[0], 1.894)
+        a = student.get_critical_value(7, alfa=0.1)
+        self.assertAlmostEqual(a[0], 1.894, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(8, alfa=0.1)
-        self.assertEqual(a[0], 1.859)
+        a = student.get_critical_value(8, alfa=0.1)
+        self.assertAlmostEqual(a[0], 1.859, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(9, alfa=0.1)
-        self.assertEqual(a[0], 1.833)
+        a = student.get_critical_value(9, alfa=0.1)
+        self.assertAlmostEqual(a[0], 1.833, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
-        a, b = student.get_critical_value(10, alfa=0.1)
-        self.assertEqual(a[0], 1.812)
+        a = student.get_critical_value(10, alfa=0.1)
+        self.assertAlmostEqual(a[0], 1.812, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'two-side')
 
     def test_pass_one_side_alfa_5(self):
         student = StudentDistribution()
-        a, b = student.get_critical_value(1, alfa=None, which='one-side')
-        self.assertEqual(a[0], 6.313)
+        a = student.get_critical_value(1, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 6.313, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(2, alfa=None, which='one-side')
-        self.assertEqual(a[0], 2.919)
+        a = student.get_critical_value(2, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 2.919, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(3, alfa=None, which='one-side')
-        self.assertEqual(a[0], 2.353)
+        a = student.get_critical_value(3, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 2.353, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(4, alfa=None, which='one-side')
-        self.assertEqual(a[0], 2.131)
+        a = student.get_critical_value(4, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 2.131, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(5, alfa=None, which='one-side')
-        self.assertEqual(a[0], 2.015)
+        a = student.get_critical_value(5, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 2.015, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(6, alfa=None, which='one-side')
-        self.assertEqual(a[0], 1.943)
+        a = student.get_critical_value(6, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 1.943, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(7, alfa=None, which='one-side')
-        self.assertEqual(a[0], 1.894)
+        a = student.get_critical_value(7, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 1.894, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(8, alfa=None, which='one-side')
-        self.assertEqual(a[0], 1.859)
+        a = student.get_critical_value(8, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 1.859, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(9, alfa=None, which='one-side')
-        self.assertEqual(a[0], 1.833)
+        a = student.get_critical_value(9, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 1.833, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(10, alfa=None, which='one-side')
-        self.assertEqual(a[0], 1.812)
+        a = student.get_critical_value(10, alfa=None, which='one-side')
+        self.assertAlmostEqual(a[0], 1.812, places=2)
+        self.assertEqual(a[2], 0.05)
+        self.assertEqual(a[3], 'one-side')
 
     def test_pass_one_side_alfa_10(self):
         student = StudentDistribution()
-        a, b = student.get_critical_value(1, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 3.077)
+        a = student.get_critical_value(1, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 3.077, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(2, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.885)
+        a = student.get_critical_value(2, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.885, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(3, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.637)
+        a = student.get_critical_value(3, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.637, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(4, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.533)
+        a = student.get_critical_value(4, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.533, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(5, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.475)
+        a = student.get_critical_value(5, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.475, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(6, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.439)
+        a = student.get_critical_value(6, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.439, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(7, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.414)
+        a = student.get_critical_value(7, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.414, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(8, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.396)
+        a = student.get_critical_value(8, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.396, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(9, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.383)
+        a = student.get_critical_value(9, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.383, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
-        a, b = student.get_critical_value(10, alfa=0.1, which='one-side')
-        self.assertEqual(a[0], 1.372)
-
-
-
-
-
-
-
+        a = student.get_critical_value(10, alfa=0.1, which='one-side')
+        self.assertAlmostEqual(a[0], 1.372, places=2)
+        self.assertEqual(a[2], 0.1)
+        self.assertEqual(a[3], 'one-side')
 
 
 if __name__ == "__main__":

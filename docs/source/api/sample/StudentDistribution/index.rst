@@ -8,6 +8,7 @@ StudentDistribution
 
    draw
    get_critical_value
+   compare_with_constant
 
 |
 |
