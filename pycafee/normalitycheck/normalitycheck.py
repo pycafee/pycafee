@@ -256,7 +256,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
                     ])
 
             result, conclusion = normality_test.fit(
-                        x_exp=x_exp, alfa=alfa, n_digits=n_digits, details=details
+                        x_exp=x_exp, alfa=alfa, details=details
                     )
             self.normality_test = "Abdi-Molin"
 
