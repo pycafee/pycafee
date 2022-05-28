@@ -531,7 +531,7 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         Since the critical value (0.241) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the AbdiMolin test at a 90.0% of confidence level.
 
 
-        **Applying the test **with** ``details="full"``
+        **Applying the test with** ``details="full"``
 
         >>> from pycafee.normalitycheck import AbdiMolin
         >>> import numpy as np
