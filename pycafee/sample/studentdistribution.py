@@ -785,10 +785,9 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         return result(t_student[1], t_student[0], alfa, which)
 
-
+    # with tests, with databse (but at StudentDistribution), with docstring
     def compare_with_constant(self, x_exp, value, alfa=None, which=None, comparison=None, details=None):
-        """
-        This function is a wraper around ``scipy.stats.ttest_1samp`` [1]_ to compare the mean of a sample with a constant using the Student's t-test (one-sided or two-sided).
+        """This function is a wraper around ``scipy.stats.ttest_1samp`` [1]_ to compare the mean of a sample with a constant using the Student's t-test (one-sided or two-sided).
 
         The test is performed using:
 
@@ -799,7 +798,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         x_exp : ``numpy array``
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 2 sample data.
         value : ``int`` or ``float``
-            The value that will be compared to the ``x_exp`` average. This value is treated as a constant.
+            The value that will be used as a reference. This value is treated as a constant.
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
         which : ``str``, optional
@@ -819,9 +818,9 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         details : ``str``, optional
             The ``details`` parameter determines the amount of information presented about the hypothesis test.
 
-            * If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned.
+            * If ``details = "short"`` (or ``None``, e.g., the default), a simplified version of the test result is returned.
             * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
-            * if ``details = "binary``", the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
 
         Returns
         -------
@@ -851,7 +850,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         Notes
         -----
-        The parameter ``comparison`` uses the hypothesis test to compare the means as follows
+        The parameter ``comparison`` uses the hypothesis test to compare the means as follows:
 
         .. admonition:: \u2615
 
@@ -864,7 +863,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
            :math:`H_1:` the mean is greater than the constant ``(3)``
 
 
-        The parameter ``which`` controls which alternative hypothesis will be used. If ``which = "two-side"`` the relation ``(1)`` will be used as the alternative hypothesis. When ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the ``critical`` values (at alpha significance level) as follows:
+        The parameter ``which`` controls which alternative hypothesis will be used. If ``which = "two-side"`` the relation ``(1)`` will be used as the alternative hypothesis. In this case, when ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the ``critical`` values (at alpha significance level) as follows:
 
 
         .. code:: python
@@ -874,7 +873,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
            else:
                The mean is different from the constant
 
-        The lower critical value is obtained with ``alfa/2`` and the upper critical value is obtained with ``1 - alfa/2`` significance level (two side distribution).
+        The lower critical value is obtained with ``alfa/2`` and the upper critical value is obtained with ``1 - alfa/2`` significance level (e.g., two side distribution).
 
         When ``comparison = "p-value"``, the comparison is performed between the calculated ``p-value`` and the adopted significance level) as follows:
 
@@ -886,7 +885,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
            else:
                The mean is different from the constant
 
-        If ``which = "one-side"`` the relation ``(2)`` or ``(3)`` will be used as the alternative hypothesis, which will depend on the difference between the sample ``mean`` and the value of the ``constant``. If this difference is lower than zero, the alternative hypothesis ``(2)`` will be used. When ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the lower ``critical`` value (at alpha significance level) as follows:
+        If ``which = "one-side"`` the relation ``(2)`` or ``(3)`` will be used as the alternative hypothesis, which will depend on the difference between the sample ``mean`` and the value of the ``constant``. If this difference is lower than zero (negative), the alternative hypothesis ``(2)`` will be used. In this case, when ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the lower ``critical`` value (at alpha significance level) as follows:
 
 
         .. code:: python
@@ -910,7 +909,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
                The mean is lower than the constant
 
 
-        If the difference between the sample ``mean`` and the value of the ``constant`` is higher than zero, the alternative hypothesis ``(3)`` will be used. When ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the upper ``critical`` value (at alpha significance level) as follows:
+        If the difference between the sample ``mean`` and the value of the ``constant`` is higher than zero (positive), the alternative hypothesis ``(3)`` will be used. In this case, when ``comparison = "critical"``, the comparison is performed between the calculated test ``statistic`` and the upper ``critical`` value (at alpha significance level) as follows:
 
 
         .. code:: python
@@ -953,7 +952,8 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> print(result)
         OneSampleStudentComparison(statistic=3.187090493341284, critical=[2.7764451051977987, -2.7764451051977996], p_value=0.03330866140058606, which='two-side', alpha=0.05)
         >>> print(conclusion)
-        The mean (3.28) and the constant (3.2) are different (with 95.0% confidence).
+        The mean (3.28) is different from the constant (3.2) (with 95.0% confidence).
+
 
 
         >>> from pycafee.sample import StudentDistribution
@@ -965,7 +965,8 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> print(result)
         OneSampleStudentComparison(statistic=3.187090493341284, critical=[2.7764451051977987, -2.7764451051977996], p_value=0.03330866140058606, which='two-side', alpha=0.05)
         >>> print(conclusion)
-        Since the p-value (0.033) is lower than the adopted significance level (0.05), we have evidence to reject the hypothesis of equality between the mean (3.28) and the constant (3.2) (with 95.0% confidence).
+        Since the p-value (0.033) is lower than the adopted significance level (0.05), we have evidence to reject the null hypothesis of equality of means, and we can say that the mean (3.28) is different from the constant (3.2) (with 95.0% confidence).
+
 
 
         **One side t test**
@@ -979,7 +980,8 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> print(result)
         OneSampleStudentComparison(statistic=0.5520741745513498, critical=[2.015048372669157, -2.0150483726691575], p_value=0.3023326513892771, which='one-side', alpha=0.05)
         >>> print(conclusion)
-        The mean (3468.333) and the constant (3450) are equals (with 95.0% confidence).
+        The mean (3468.333) is equal to the constant (3450) (with 95.0% confidence).
+
 
 
         >>> from pycafee.sample import StudentDistribution
@@ -991,8 +993,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> print(result)
         OneSampleStudentComparison(statistic=0.5520741745513498, critical=[3.3649299989072743, -3.3649299989072756], p_value=0.3023326513892771, which='one-side', alpha=0.01)
         >>> print(conclusion)
-        Since the test statistic (0.552) is less than the upper critical value (3.364), we have no evidence to reject the null hypothesis of equality between the mean (3468.333) and the constant (3450) (with 99.0% confidence)
-
+        Since the test statistic (0.552) is lower than the upper critical value (3.364), we have no evidence to reject the null hypothesis of equality between the means, and we can say that the mean (3468.333) is equal to the constant (3450) (with 99.0% confidence)
 
 
         """
