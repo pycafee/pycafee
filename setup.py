@@ -1,6 +1,8 @@
 from setuptools import setup, find_packages
 import pathlib
 
+exec(open('pycafee/version.py').read())
+
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -17,9 +19,9 @@ requirements = ["colorama>=0.4.4", "matplotlib>=3.2.2", "numpy>=1.21.6", "openpy
 ]
 
 setup(
-    name="pycafee",
-    version="0.0.4",
-    author="Anderson Marcos Dias Canteli",
+    name=__name__,
+    version=__version__,
+    author=__author__,
     author_email="andersonmdcanteli@gmail.com",
     description="A package to make scientific research easier",
     long_description=long_description,
