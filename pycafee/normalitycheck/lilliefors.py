@@ -7,7 +7,7 @@
 ##########################################
 
 # - Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement)
-#         - fit(x_exp, alfa=None, n_digits=None, conclusion=None, details=None)
+#         - fit(x_exp, alfa=None, n_digits=None, comparison=None, details=None)
 #         - to_csv(file_name=None, sep=",")
 #         - to_xlsx(file_name=None, sheet_names=None)
 #         - get_critical_value(n_rep, alfa=None)
@@ -71,7 +71,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
 
     Methods
     -------
-    fit(x_exp, alfa=None, n_digits=None, conclusion=None, details=None)
+    fit(x_exp, alfa=None, n_digits=None, comparison=None, details=None)
         Performs the Lilliefors test.
     to_csv(file_name=None, sep=",")
         Exports the results to a pre-formatted csv file.
@@ -406,7 +406,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
         return axes
 
     # with tests, with text, with database, with NO docstring
-    def fit(self, x_exp, alfa=None, n_digits=None, conclusion=None, details=None):
+    def fit(self, x_exp, alfa=None, comparison=None, details=None):
         """This function is a wraper around ``statsmodels.stats.diagnostic.lilliefors()`` [1]_ to perform the **Lilliefors Normality test**, but with some facilities.
 
         The main difference between this method and the original one is that this wrap only allows the comparison of a sample with the Normal distribution, using ``dist="norm"``. Also, the method to estimate the p-value is set to table, using ``pvalmethod="table"``. Hence:
@@ -419,13 +419,19 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least ``4`` sample data.
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
-        n_digits : ``int``, optional
-            The maximum number of decimal places be shown. Default is ``None`` which results in ``3`` decimal places.
-        conclusion : ``str``, optional
-            This parameter determines how to perform the comparison test to evaluate the Normality test. If ``conclusion = "critical"`` (or ``None``), the comparison test is made by comparing the critical value (with ``ɑ`` significance level) with the test statistic. If ``conclusion="p-value"``, the comparison test is performed comparing the p-value with the adopted significance level (``ɑ``).
-            **Both results should lead to the same conclusion**.
+        comparison : ``str``, optional
+            This parameter determines how to perform the comparison test to evaluate the Normality test.
+
+            * If ``comparison = "critical"`` (or ``None``), the comparison test is performed by comparing the critical value (with ``ɑ`` significance level) with the test statistic.
+            * If ``comparison="p-value"``, the comparison test is performed comparing the ``p-value`` with the adopted significance level (``ɑ``).
+
+            **Both results should lead to the same comparison**.
         details : ``str``, optional
-            The ``details`` parameter determines the amount of information presented about the hypothesis test. If ``details = "short"`` (or ``None``), a simplified version of the test result is returned. If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
 
 
         Returns
@@ -437,7 +443,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
                 The tabulated value for alpha equal to ``1%``, ``5%``, ``10%``, ``15%`` or ``20%``. Other values will return ``None``.
             p_value : ``float``
                 The p-value for the hypothesis test.
-        conclusion : ``str``
+        conclusion : ``str`` or ``int``
             The test conclusion (e.g, Normal/ not Normal).
 
 
@@ -467,7 +473,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
 
            :math:`H_1:` data *does* **not** *come from Normal* distribution.
 
-        By default (``conclusion="critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test. In summary:
+        By default (``comparison="critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test. In summary:
 
         .. code:: python
 
@@ -476,7 +482,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-        The other option (``conclusion="p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``:
+        The other option (``comparison="p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``:
 
         .. code:: python
 
@@ -485,9 +491,8 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-        If ``conclusion="critical"`` and ``ɑ`` is not ``0.01``, ``0.05``, ``0.10``, ``0.15`` or ``0.20``, the function will raise ``ValueError``.
+        If ``comparison="critical"`` and ``ɑ`` is not ``0.01``, ``0.05``, ``0.10``, ``0.15`` or ``0.20``, the function will raise ``ValueError``.
 
-        The ``n_digits`` parameter does not influence any calculation, it just truncates the number of decimal places returned for the ``statistic``, ``tabulated`` and ``p_value`` parameters.
 
         References
         ----------
@@ -499,45 +504,72 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
         Examples
         --------
 
+        **Applying the test with default values**
+
         >>> from pycafee.normalitycheck.lilliefors import Lilliefors
         >>> import scipy.stats as stats
         >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
-        >>> lilliefors_test = Lilliefors()
-        >>> result, conclusion = lilliefors_test.fit(x)
+        >>> li_test = Lilliefors()
+        >>> result, conclusion = li_test.fit(x)
         >>> print(result)
-        LillieforsResult(Statistic=0.051, Tabulated=0.086, p_value=0.737, Alpha=0.05)
+        LillieforsResult(Statistic=0.05177647360597687, Critical=0.0866, p_value=0.7370142762533124, Alpha=0.05)
         >>> print(conclusion)
         Data is Normal at a 95.0% of confidence level.
+
+
+        **Applying the test using the** ``p-value`` **to make the conclusion**
+
+        >>> from pycafee.normalitycheck.lilliefors import Lilliefors
+        >>> import scipy.stats as stats
+        >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
+        >>> li_test = Lilliefors()
+        >>> result, conclusion = li_test.fit(x, comparison='p-value')
+        >>> print(result)
+        LillieforsResult(Statistic=0.05177647360597687, Critical=0.0866, p_value=0.7370142762533124, Alpha=0.05)
+        >>> print(conclusion)
+        Data is Normal at a 95.0% of confidence level.
+
+
+
+        **Applying the test at** ``1%`` **of significance level**
 
         >>> from pycafee.normalitycheck.lilliefors import Lilliefors
         >>> import numpy as np
         >>> x = np.array([1.90642, 2.22488, 2.10288, 1.69742, 1.52229, 3.15435, 2.61826, 1.98492, 1.42738, 1.99568])
-        >>> lilliefors_test = Lilliefors()
-        >>> result, conclusion = lilliefors_test.fit(x, alfa=0.01)
+        >>> li_test = Lilliefors()
+        >>> result, conclusion = li_test.fit(x, alfa=0.01)
         >>> print(result)
-        LillieforsResult(Statistic=0.177, Tabulated=0.294, p_value=0.497, Alpha=0.01)
+        LillieforsResult(Statistic=0.17709753067016487, Critical=0.294, p_value=0.4976450090923252, Alpha=0.01)
         >>> print(conclusion)
         Data is Normal at a 99.0% of confidence level.
+
+
+        **Applying the test with a detailed conclusion**
+
 
         >>> from pycafee.normalitycheck.lilliefors import Lilliefors
         >>> import numpy as np
         >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
-        >>> lilliefors_test = Lilliefors()
-        >>> result, conclusion = lilliefors_test.fit(x, alfa=0.10, details="full")
+        >>> li_test = Lilliefors()
+        >>> result, conclusion = li_test.fit(x, alfa=0.10, details="full")
         >>> print(result)
-        LillieforsResult(Statistic=0.154, Tabulated=0.239, p_value=0.71, Alpha=0.1)
+        LillieforsResult(Statistic=0.15459867079959644, Critical=0.239, p_value=0.7104644322958894, Alpha=0.1)
         >>> print(conclusion)
         Since the critical value (0.239) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 90.0% of confidence level.
 
+
+
+        **Applying the test using a not Normal data**
+
         >>> from pycafee.normalitycheck.lilliefors import Lilliefors
         >>> import numpy as np
-        >>> x = np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
-        >>> lilliefors_test = Lilliefors()
-        >>> result, conclusion = lilliefors_test.fit(x, details="full")
+        >>> x =  np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
+        >>> li_test = Lilliefors()
+        >>> result, conclusion = li_test.fit(x, alfa = 0.05, comparison = "p-value", details="full")
         >>> print(result)
-        LillieforsResult(Statistic=0.307, Tabulated=0.195, p_value=0.0, Alpha=0.05)
+        LillieforsResult(Statistic=0.3072356484569813, Critical=0.195, p_value=0.0009999999999998899, Alpha=0.05)
         >>> print(conclusion)
-        Since the critical value (0.195) < statistic (0.307), we HAVE evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.
+        Since p-value (0.0) < alpha (0.05), we HAVE evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.
 
 
         """
@@ -552,32 +584,25 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
             checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
             self.alfa = alfa
 
-        ### getting the default n_digits value ###
-        if n_digits is None:
-            n_digits = self.n_digits
-        else:
-            checkers._check_is_integer(n_digits, "n_digits", self.language)
-            checkers._check_is_positive(n_digits, "n_digits", self.language)
-
         ### checking input data ###
         checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
         self.x_exp = x_exp
 
-        ### checking the conclusion parameter ###
-        if conclusion is None:
-            conclusion = "critical"
+        ### checking the comparison parameter ###
+        if comparison is None:
+            comparison = "critical"
         else:
-            checkers._check_is_str(conclusion, "conclusion", self.language)
-            if conclusion == "critical":
-                conclusion = "critical"
-            elif conclusion == "p-value":
-                conclusion = "p-value"
+            checkers._check_is_str(comparison, "comparison", self.language)
+            if comparison == "critical":
+                comparison = "critical"
+            elif comparison == "p-value":
+                comparison = "p-value"
             else:
                 try:
                     error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[15][0][0]} '{conclusion}'",)
+                    general._display_one_line_attention(f"{messages[15][0][0]} '{comparison}'",)
                     raise
 
         ### checking the details parameter ###
@@ -589,12 +614,14 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
                 details = "short"
             elif details == "full":
                 details = "full"
+            elif details == "binary":
+                details = "binary"
             else:
                 try:
                     error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[2][0][0]} {details}")
+                    general._display_one_line_attention(f"{messages[2][0][0]} '{details}'")
                     raise
 
         ### checking the correction parameter ###
@@ -607,17 +634,23 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
         ### calculating the test statistic value ###
         statistic, p_value = lilliefors_statsmodel(x_exp, dist='norm', pvalmethod='table')
 
+        aceita = 0
+        rejeita = 1
 
-        # ### writing the test conclusion ###
-        if conclusion == "p-value":
+        # ### writing the test comparison ###
+        if comparison == "p-value":
             if p_value >= alfa:
                 if details == 'full':
-                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} Lilliefors {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} Lilliefors {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                elif details == 'binary':
+                    msg = aceita
                 else:
                     msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
             else:
                 if details == 'full':
-                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} Lilliefors {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} Lilliefors {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                elif details == 'binary':
+                    msg = rejeita
                 else:
                     msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
         else:
@@ -638,12 +671,16 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
             else: # if there is a tabulated value
                 if critical >= statistic:
                     if details == 'full':
-                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[4][4][0]} Lilliefors {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[4][4][0]} Lilliefors {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                    elif details == 'binary':
+                        msg = aceita
                     else:
                         msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
                 else:
                     if details == 'full':
-                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[6][4][0]} Lilliefors {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[6][4][0]} Lilliefors {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                    elif details == 'binary':
+                        msg = rejeita
                     else:
                         msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
 
@@ -653,7 +690,7 @@ class Lilliefors(AlphaManagement, NDigitsManagement, PlotsManagement):
         self.statistic = statistic
         self.critical = critical
         self.p_value = p_value
-        return result(helpers._truncate(statistic, self.language, decs=n_digits), helpers._truncate(critical, self.language, decs=n_digits), helpers._truncate(p_value, self.language, decs=n_digits), self.alfa), self.msg
+        return result(self.statistic, self.critical, self.p_value, self.alfa), self.msg
 
     # with tests, with text, with database, with docstring
     def to_xlsx(self, file_name=None, sheet_names=None):

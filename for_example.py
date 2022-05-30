@@ -3,15 +3,14 @@ os.system('cls')
 print(">>>")
 
 
-from pycafee.sample import StudentDistribution
+
+
+from pycafee.normalitycheck import NormalityCheck
 import numpy as np
-x = np.array([3380, 3500, 3600, 3450, 3490, 3390])
-constant = 3450
-comparison_test = StudentDistribution()
-result, conclusion = comparison_test.compare_with_constant(x, constant, which="one-side", alfa=0.01, details='full')
+x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
+normality_test = NormalityCheck()
+result, conclusion = normality_test.fit(x, test="am")
 print(result)
-
+# AbdiMolinResult(Statistic=0.154, Critical=0.261, p_value=None, Alpha=0.05)
 print(conclusion)
-
-
-ahhhhhhhhhhhhhhhhhhhhhhhhhhh
+# Data is Normal at a 95.0% of confidence level.

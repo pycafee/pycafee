@@ -20,6 +20,8 @@ import os
 import unittest
 from pycafee.normalitycheck.lilliefors import Lilliefors
 import numpy as np
+import sys
+import io
 os.system('cls')
 
 class Test_fit(unittest.TestCase):
@@ -32,28 +34,22 @@ class Test_fit(unittest.TestCase):
     def test_alfa_0_05(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x)
-        self.assertEqual(resultado[0], 0.154, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
         self.assertEqual(resultado[1], 0.258, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.71, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "Data is Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Normal at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_alfa_0_10(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x, alfa=0.10)
-        self.assertEqual(resultado[0], 0.154, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
         self.assertEqual(resultado[1], 0.239, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.71, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
         self.assertEqual(resultado[3], 0.10, "wrong alfa value")
-        if "Data is Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Normal at a 90.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_alfa_0_12(self):
         with self.assertRaises(ValueError, msg="Does not raised error when alfa=0.12 with default paramters"):
@@ -62,30 +58,133 @@ class Test_fit(unittest.TestCase):
 
         with self.assertRaises(ValueError, msg="Does not raised error when alfa=0.12 with conclusion='critical'"):
             result = Lilliefors()
-            resultado, conclusao = result.fit(self.x, alfa=0.12, conclusion="critical")
+            resultado, conclusao = result.fit(self.x, alfa=0.12, comparison="critical")
 
         with self.assertRaises(ValueError, msg="Does not raised error when alfa=0.12"):
             result = Lilliefors()
             resultado, conclusao = result.fit(self.x, alfa=0.12)
 
 
-    def test_conclusion(self):
+    def test_alfa_0_12_output(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            resultado, conclusao = result.fit(self.x, alfa=0.12)
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The critical value for alpha '0.12' is not available. The available alpha values are:"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            resultado, conclusao = result.fit(self.x, alfa=0.12, comparison="critical")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The critical value for alpha '0.12' is not available. The available alpha values are:"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            resultado, conclusao = result.fit(self.x, alfa=0.12)
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The critical value for alpha '0.12' is not available. The available alpha values are:"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+
+    def test_comparison(self):
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid"):
             result = Lilliefors()
-            result.fit(self.x, conclusion="any")
+            result.fit(self.x, comparison="any")
 
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid"):
             result = Lilliefors()
-            result.fit(self.x, conclusion="tabulated")
+            result.fit(self.x, comparison="tabulated")
 
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid"):
             result = Lilliefors()
-            result.fit(self.x, conclusion="p_value")
+            result.fit(self.x, comparison="p_value")
+
+
+    def test_comparison_output(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, comparison="any")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, comparison="tabulated")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, comparison="p_value")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
 
     def test_details(self):
         with self.assertRaises(ValueError, msg="Does not raised error when details is not valid"):
             result = Lilliefors()
-            result.fit(self.x, details="shorte")
+            result.fit(self.x, details="binario")
 
         with self.assertRaises(ValueError, msg="Does not raised error when details is not valid"):
             result = Lilliefors()
@@ -95,70 +194,129 @@ class Test_fit(unittest.TestCase):
             result = Lilliefors()
             result.fit(self.x, details="ful")
 
+
+    def test_details_output(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, details="binario")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'binario'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, details="shot")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'shot'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x, details="ful")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'ful'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+
     def test_pass_normal_conclusion_p_value(self):
         result = Lilliefors()
-        resultado, conclusao = result.fit(self.x, conclusion="p-value")
-        self.assertEqual(resultado[0], 0.154, "wrong statistic value")
+        resultado, conclusao = result.fit(self.x, comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
         self.assertEqual(resultado[1], 0.258, "wrong critical value")
-        self.assertEqual(resultado[2], 0.71, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "Data is Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Normal at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_pass_normal_details_full(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x, details="full")
-        self.assertEqual(resultado[0], 0.154, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
         self.assertEqual(resultado[1], 0.258, "wrong critical value")
-        self.assertEqual(resultado[2], 0.71, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "critical" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'critical' not in conclusion when it should")
+        self.assertEqual(conclusao, "Since the critical value (0.258) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_pass_normal_details_full_conclusion_p_value(self):
         result = Lilliefors()
-        resultado, conclusao = result.fit(self.x, details="full", conclusion="p-value")
-        self.assertEqual(resultado[0], 0.154, "wrong statistic value")
+        resultado, conclusao = result.fit(self.x, details="full", comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
         self.assertEqual(resultado[1], 0.258, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.71, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "p-value" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'p-value' not in conclusion when it should")
+        self.assertEqual(conclusao, "Since p-value (0.71) >= alpha (0.05), we have NO evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.", msg='wrong conclusion')
+
+
+    def test_pass_normal_details_binary_p_value(self):
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x, details="binary", comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertEqual(resultado[1], 0.258, "wrong tabulated value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
+        self.assertEqual(resultado[3], 0.05, "wrong alfa value")
+        self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
+        self.assertEqual(conclusao, 0, msg="conclusion not 0 when binary and data not normal")
+
+
+    def test_pass_normal_details_binary(self):
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x, details="binary")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertEqual(resultado[1], 0.258, "wrong tabulated value")
+        self.assertAlmostEqual(resultado[2], 0.7104644322958894, "wrong P-value value")
+        self.assertEqual(resultado[3], 0.05, "wrong alfa value")
+        self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
+        self.assertEqual(conclusao, 0, msg="conclusion not 0 when binary and data not normal")
+
 
     def test_alfa_0_05_not_normal(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x_not_normal)
-        self.assertEqual(resultado[0], 0.332, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
         self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.005, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "Data is Not Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Not Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Not Normal at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_alfa_0_10_not_normal(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x_not_normal, alfa=0.10)
-        self.assertEqual(resultado[0], 0.332, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
         self.assertEqual(resultado[1], 0.249, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.005, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
         self.assertEqual(resultado[3], 0.10, "wrong alfa value")
-        if "Data is Not Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Not Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Not Normal at a 90.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_alfa_0_12_not_normal(self):
         with self.assertRaises(ValueError, msg="Does not raised error when alfa=0.12 with default parameters, not normal data"):
@@ -167,27 +325,111 @@ class Test_fit(unittest.TestCase):
 
         with self.assertRaises(ValueError, msg="Does not raised error when alfa=0.12 with conclusion='tabulate', not normal data"):
             result = Lilliefors()
-            resultado, conclusao = result.fit(self.x_not_normal, alfa=0.12, conclusion="critical")
+            resultado, conclusao = result.fit(self.x_not_normal, alfa=0.12, comparison="critical")
 
+
+    def test_alfa_0_12_output_not_normal(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            resultado, conclusao = result.fit(self.x_not_normal, alfa=0.12)
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The critical value for alpha '0.12' is not available. The available alpha values are:"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            resultado, conclusao = result.fit(self.x_not_normal, alfa=0.12, comparison="critical")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The critical value for alpha '0.12' is not available. The available alpha values are:"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
 
 
     def test_conclusion_not_normal(self):
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid, not normal"):
             result = Lilliefors()
-            result.fit(self.x_not_normal, conclusion="any")
+            result.fit(self.x_not_normal, comparison="any")
 
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid, not normal"):
             result = Lilliefors()
-            result.fit(self.x_not_normal, conclusion="tabulated")
+            result.fit(self.x_not_normal, comparison="tabulated")
 
         with self.assertRaises(ValueError, msg="Does not raised error when conclusion is not valid, not normal"):
             result = Lilliefors()
-            result.fit(self.x_not_normal, conclusion="p_value")
+            result.fit(self.x_not_normal, comparison="p_value")
+
+
+    def test_conclusion_output_not_normal(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, comparison="any")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, comparison="tabulated")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, comparison="p_value")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
 
     def test_details_not_normal(self):
         with self.assertRaises(ValueError, msg="Does not raised error when details is not valid, not normal"):
             result = Lilliefors()
-            result.fit(self.x_not_normal, details="shorte")
+            result.fit(self.x_not_normal, details="binario")
 
         with self.assertRaises(ValueError, msg="Does not raised error when details is not valid, not normal"):
             result = Lilliefors()
@@ -197,47 +439,142 @@ class Test_fit(unittest.TestCase):
             result = Lilliefors()
             result.fit(self.x_not_normal, details="ful")
 
+
+    def test_details_output(self):
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, details="binario")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'binario'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, details="shot")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'shot'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+        try:
+            result = Lilliefors()
+            result.fit(self.x_not_normal, details="ful")
+        except ValueError:
+            pass
+        sys.stdout = sys.__stdout__
+        expected = "The 'details' parameter only accepts 'short', 'full' or 'binary' as values, but we got 'ful'"
+        result = False
+        if expected in capturedOutput.getvalue():
+            result = True
+        self.assertTrue(result, msg="wrong output when Raising Error")
+
+        ################
+
+
     def test_pass_normal_conclusion_p_value_not_normal(self):
         result = Lilliefors()
-        resultado, conclusao = result.fit(self.x_not_normal, conclusion="p-value")
-        self.assertEqual(resultado[0], 0.332, "wrong statistic value")
+        resultado, conclusao = result.fit(self.x_not_normal, comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
         self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.005, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "Data is Not Normal" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'Data is Not Normal' not in conclusion when it should")
+        self.assertEqual(conclusao, "Data is Not Normal at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_pass_normal_details_full_not_normal(self):
         result = Lilliefors()
         resultado, conclusao = result.fit(self.x_not_normal, details="full")
-        self.assertEqual(resultado[0], 0.332, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
         self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.005, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "HAVE" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'HAVE' not in conclusion when it should")
+        self.assertEqual(conclusao, "Since the critical value (0.271) < statistic (0.332), we HAVE evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.", msg='wrong conclusion')
+
 
     def test_pass_normal_details_full_conclusion_p_value_not_normal(self):
         result = Lilliefors()
-        resultado, conclusao = result.fit(self.x_not_normal, details="full", conclusion="p-value")
-        self.assertEqual(resultado[0], 0.332, "wrong statistic value")
+        resultado, conclusao = result.fit(self.x_not_normal, details="full", comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
         self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
-        self.assertEqual(resultado[2], 0.005, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
-        if "HAVE" in conclusao:
-            result = True
-        else:
-            result = False
-        self.assertTrue(result, "'HAVE' not in conclusion when it should")
+        self.assertEqual(conclusao, "Since p-value (0.005) < alpha (0.05), we HAVE evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.", msg='wrong conclusion')
 
 
+    def test_pass_not_normal_details_binary_p_value(self):
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x_not_normal, details="binary", comparison="p-value")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
+        self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
+        self.assertEqual(resultado[3], 0.05, "wrong alfa value")
+        self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
+        self.assertEqual(conclusao, 1, msg="conclusion not 1 when binary and data not normal")
 
+
+    def test_pass_not_normal_details_binary(self):
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x_not_normal, details="binary")
+        self.assertAlmostEqual(resultado[0], 0.33246821361586026, "wrong statistic value")
+        self.assertEqual(resultado[1], 0.271, "wrong tabulated value")
+        self.assertAlmostEqual(resultado[2], 0.005203341800231138, "wrong P-value value")
+        self.assertEqual(resultado[3], 0.05, "wrong alfa value")
+        self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
+        self.assertEqual(conclusao, 1, msg="conclusion not 1 when binary and data not normal")
+
+
+    def test_binary(self):
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x_not_normal, details="binary")
+        result_2 = Lilliefors()
+        resultado_2, conclusao_2 = result_2.fit(self.x_not_normal, details="binary", comparison='p-value')
+        self.assertEqual(conclusao_2, conclusao, msg="binary conclusion not equal when changing the comparison method")
+
+
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x, details="binary")
+        result_2 = Lilliefors()
+        resultado_2, conclusao_2 = result_2.fit(self.x, details="binary", comparison='p-value')
+        self.assertEqual(conclusao_2, conclusao, msg="binary conclusion not equal when changing the comparison method")
+
+
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x_not_normal, details="binary")
+        result_2 = Lilliefors()
+        resultado_2, conclusao_2 = result_2.fit(self.x, details="binary")
+        teste = False
+        if conclusao_2 == conclusao:
+            teste = True
+        self.assertFalse(teste, msg="binary conclusion leading to errors")
+
+        result = Lilliefors()
+        resultado, conclusao = result.fit(self.x_not_normal, details="binary", comparison='p-value')
+        result_2 = Lilliefors()
+        resultado_2, conclusao_2 = result_2.fit(self.x, details="binary", comparison='p-value')
+        teste = False
+        if conclusao_2 == conclusao:
+            teste = True
+        self.assertFalse(teste, msg="binary conclusion leading to errors")
 
 
 
