@@ -22,7 +22,7 @@ copyright = '2022, Anderson Canteli'
 author = 'Anderson Canteli'
 
 # The full version, including alpha/beta/rc tags
-release = 'Alpha 0.0.1'
+release = 'Alpha 0.0.4'
 
 
 # -- General configuration ---------------------------------------------------
