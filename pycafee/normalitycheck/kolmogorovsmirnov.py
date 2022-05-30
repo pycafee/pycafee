@@ -10,7 +10,7 @@
 #     - __init__(self, alfa=None, language=None, n_digits=None, **kwargs)
 #     - get_critical_value(self, n_rep, alfa=None)
 #     - draw_critical_values(self, ax=None, export=None, extension=None, file_name=None, dpi=None, decimal_separator=None, local=None)
-#     - fit(self, x_exp, alfa=None, n_digits=None, conclusion=None, details=None)
+#     - fit(self, x_exp, alfa=None, n_digits=None, comparison=None, details=None)
 #     - to_xlsx(self, file_name=None, sheet_names=None)
 #     - to_csv(self, file_name=None, sep=",")
 #     - __str__(self)
@@ -71,7 +71,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
 
     Methods
     -------
-    fit(x_exp, alfa=None, n_digits=None, conclusion=None, details=None)
+    fit(x_exp, alfa=None, n_digits=None, comparison=None, details=None)
         Performs the Kolmogorov Smirnov test.
     to_csv(file_name=None, sep=",")
         Exports the results to a pre-formatted csv file.
@@ -421,7 +421,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         return axes
 
     # with docstring, with text, with database, with test,
-    def fit(self, x_exp, alfa=None, n_digits=None, conclusion=None, details=None):
+    def fit(self, x_exp, alfa=None, comparison=None, details=None):
         """This function is just a wraper around ``scipy.stats.kstest()`` [1]_ to perform the Kolmogorov Smirnov normality test, but with some facilities.
 
         The main difference between this method and the original one is that this wrap only allows the comparison of a sample with the Normal distribution, using ``cdf="norm"``, with the data beeing considered **sample data**, e.g:
@@ -438,13 +438,20 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 3 sample data.
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
-        n_digits : ``int``, optional
-            The maximum number of decimal places be shown. Default is ``None`` which results in ``3`` decimal places.
-        conclusion : ``str``, optional
-            This parameter determines how to perform the comparison test to perform the Normality test. If ``conclusion = 'critical'`` (or ``None``, e.g, the default), the comparison test is made between the critical value (with ``ɑ`` significance level) and the calculated value of the test statistic. If ``"p-value"``, the comparison test is performed between the p-value and the adopted significance level (*ɑ*).
+        comparison : ``str``, optional
+            This parameter determines how to perform the comparison test to perform the Normality test.
+
+            * If ``comparison = "critical"`` (or ``None``, e.g., the default), the comparison test is made between the critical value (with ``ɑ`` significance level) and the calculated value of the test statistic.
+            * If ``"p-value"``, the comparison test is performed between the ``p-value`` and the adopted significance level (``ɑ``).
+
             **Both results should lead to the same conclusion.**
+
         details : ``str``, optional
-            The ``details`` parameter determines the amount of information presented about the hypothesis test. If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned. If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
 
         Returns
         -------
@@ -468,9 +475,9 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         Notes
         -----
-        The tabulated values [2]_ include samples with sizes between ``2`` and ``35``, for ``ɑ`` equal to ``1%``, ``5%``, ``10%``, ``15%`` or ``20%``. For data with a sample size higher than ``55``, the critical value returned is an aproximation.
+        The tabulated values [2]_ include samples with sizes between ``2`` and ``35``, for ``ɑ`` equal to ``1%``, ``5%``, ``10%``, ``15%`` or ``20%``. For data with a sample size higher than ``35``, the critical value returned is an aproximation.
 
-        The parameter ``conclusion`` uses the hypothesis test for normality test as follows:
+        The **Kolmogorov Smirnov Normality test** has the following premise:
 
         .. admonition:: \u2615
 
@@ -478,7 +485,8 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
 
            :math:`H_1:` data *does* **not** *come from Normal* distribution.
 
-        By default (``conclusion = "critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
+
+        By default (``comparison = "critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
 
         .. code:: python
 
@@ -487,7 +495,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-        The other option (``conclusion = "p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``:
+        The other option (``comparison = "p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``:
 
         .. code:: python
 
@@ -496,9 +504,8 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-        If ``conclusion = "critical"`` and ``ɑ`` is not ``0.01``, ``0.05``, ``0.10``, ``0.15`` or ``0.20``, the function will raise ``ValueError``.
+        If ``comparison = "critical"`` and ``ɑ`` is not ``0.01``, ``0.05``, ``0.10``, ``0.15`` or ``0.20``, the function will raise ``ValueError``.
 
-        The ``n_digits`` parameter does not influence any calculation, it just truncates the number of decimal places returned for the ``statistic``, ``critical`` and ``p_value`` parameters.
 
         References
         ----------
@@ -506,18 +513,37 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         .. [2] FRANK J. MASSEY, J. The Kolmogorov-Smirnov Test for Goodness of Fit. Journal of the American Statistical Association, v. 46, n. 253, p. 68–78, 1951. DOI: `10.2307/2280095 <http://www.jstor.org/stable/2280095>`_.
 
+
         Examples
         --------
+
+        **Applying the test with default values**
+
+
         >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
         >>> import scipy.stats as stats
         >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
         >>> ks_test = KolmogorovSmirnov()
         >>> result, conclusion = ks_test.fit(x)
         >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.051, Critical=0.136, p_value=0.951, Alpha=0.05)
+        KolmogorovSmirnovResult(Statistic=0.05177647360597687, Critical=0.136, p_value=0.9514328623966609, Alpha=0.05)
         >>> print(conclusion)
         Data is Normal at a 95.0% of confidence level.
 
+        **Applying the test using the** ``p-value`` **to make the conclusion**
+
+        >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
+        >>> import scipy.stats as stats
+        >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
+        >>> ks_test = KolmogorovSmirnov()
+        >>> result, conclusion = ks_test.fit(x, comparison='p-value')
+        >>> print(result)
+        KolmogorovSmirnovResult(Statistic=0.05177647360597687, Critical=0.136, p_value=0.9514328623966609, Alpha=0.05)
+        >>> print(conclusion)
+        Data is Normal at a 95.0% of confidence level.
+
+
+        **Applying the test at** ``1%`` **of significance level**
 
         >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
         >>> import numpy as np
@@ -525,9 +551,12 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         >>> ks_test = KolmogorovSmirnov()
         >>> result, conclusion = ks_test.fit(x, alfa=0.01)
         >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.177, Critical=0.49, p_value=0.912, Alpha=0.01)
+        KolmogorovSmirnovResult(Statistic=0.17709753067016487, Critical=0.49, p_value=0.9123891112746063, Alpha=0.01)
         >>> print(conclusion)
         Data is Normal at a 99.0% of confidence level.
+
+
+        **Applying the test with a detailed conclusion**
 
 
         >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
@@ -536,30 +565,25 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         >>> ks_test = KolmogorovSmirnov()
         >>> result, conclusion = ks_test.fit(x, alfa=0.10, details="full")
         >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.154, Critical=0.368, p_value=0.97, Alpha=0.1)
+        KolmogorovSmirnovResult(Statistic=0.15459867079959644, Critical=0.368, p_value=0.9706128123504146, Alpha=0.1)
         >>> print(conclusion)
-        Since the tabulated value (0.368) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 90.0% of confidence level.
+        Since the critical value (0.368) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 90.0% of confidence level.
 
 
-        >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
-        >>> import numpy as np
-        >>> x = np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
-        >>> ks_test = KolmogorovSmirnov()
-        >>> result, conclusion = ks_test.fit(x, details="full")
-        >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.307, Critical=0.301, p_value=0.043, Alpha=0.05)
-        >>> print(conclusion)
-        Since the tabulated value (0.301) < statistic (0.307), we HAVE evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level.
+        **Applying the test using a not Normal data**
 
         >>> from pycafee.normalitycheck.kolmogorovsmirnov import KolmogorovSmirnov
         >>> import numpy as np
         >>> x =  np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
         >>> ks_test = KolmogorovSmirnov()
-        >>> result, conclusion = ks_test.fit(x, alfa = 0.025, conclusion = "p-value", details="full")
+        >>> result, conclusion = ks_test.fit(x, alfa = 0.05, comparison = "p-value", details="full")
         >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.307, Critical=None, p_value=0.043, Alpha=0.025)
+        KolmogorovSmirnovResult(Statistic=0.3072356484569813, Critical=0.301, p_value=0.04334566682403149, Alpha=0.05)
         >>> print(conclusion)
-        Since p-value (0.043) >= alpha (0.025), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 97.5% of confidence level.
+        Since p-value (0.043) < alpha (0.05), we HAVE evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level.
+
+
+
 
         """
         fk_id_function = management._query_func_id("normalitycheck_fit")
@@ -573,32 +597,26 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
             checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
             self.alfa = alfa
 
-        ### getting the default n_digits value ###
-        if n_digits is None:
-            n_digits = self.n_digits
-        else:
-            checkers._check_is_integer(n_digits, "n_digits", self.language)
-            checkers._check_is_positive(n_digits, "n_digits", self.language)
 
         ### checking input data ###
         checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
         self.x_exp = x_exp
 
-        ### checking the conclusion parameter ###
-        if conclusion is None:
-            conclusion = "critical"
+        ### checking the comparison parameter ###
+        if comparison is None:
+            comparison = "critical"
         else:
-            checkers._check_is_str(conclusion, "conclusion", self.language)
-            if conclusion == "critical":
-                conclusion = "critical"
-            elif conclusion == "p-value":
-                conclusion = "p-value"
+            checkers._check_is_str(comparison, "comparison", self.language)
+            if comparison == "critical":
+                comparison = "critical"
+            elif comparison == "p-value":
+                comparison = "p-value"
             else:
                 try:
                     error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[15][0][0]} '{conclusion}'",)
+                    general._display_one_line_attention(f"{messages[15][0][0]} '{comparison}'",)
                     raise
 
         ### checking the details parameter ###
@@ -610,12 +628,14 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
                 details = "short"
             elif details == "full":
                 details = "full"
+            elif details == "binary":
+                details = "binary"
             else:
                 try:
                     error = messages[3][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[2][0][0]} {details}")
+                    general._display_one_line_attention(f"{messages[2][0][0]} '{details}'")
                     raise
 
         ### getting the tabulated value ###
@@ -626,17 +646,23 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         # statistic, p_value = kolmolgorov_smirnov_scipy(x_exp, cdf='norm', args=(x_exp.mean(), x_exp.std(ddof=1)), N = x_exp.size)
         statistic, p_value = kolmolgorov_smirnov_scipy(x_exp, cdf='norm', args=(x_exp.mean(), x_exp.std(ddof=1)))
 
-        ### writing the test conclusion ###
-        ### writing the test conclusion ###
-        if conclusion == "p-value":
+        aceita = 0
+        rejeita = 1
+
+        ### writing the test comparison ###
+        if comparison == "p-value":
             if p_value >= alfa:
                 if details == 'full':
-                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} Kolmogorov Smirnov {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} Kolmogorov Smirnov {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                elif details == 'binary':
+                    msg = aceita
                 else:
                     msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
             else:
                 if details == 'full':
-                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} Kolmogorov Smirnov {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} Kolmogorov Smirnov {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                elif details == 'binary':
+                    msg = rejeita
                 else:
                     msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
         else:
@@ -657,12 +683,16 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
             else: # if there is a tabulated value
                 if critical >= statistic:
                     if details == 'full':
-                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[4][4][0]} Kolmogorov Smirnov {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[4][4][0]} Kolmogorov Smirnov {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                    elif details == 'binary':
+                        msg = aceita
                     else:
                         msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
                 else:
                     if details == 'full':
-                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[6][4][0]} Kolmogorov Smirnov {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[6][4][0]} Kolmogorov Smirnov {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                    elif details == 'binary':
+                        msg = rejeita
                     else:
                         msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
 
@@ -672,7 +702,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         self.statistic = statistic
         self.critical = critical
         self.p_value = p_value
-        return result(helpers._truncate(statistic, self.language, decs=n_digits), helpers._truncate(critical, self.language, decs=n_digits), helpers._truncate(p_value, self.language, decs=n_digits), self.alfa), self.msg
+        return result(self.statistic, self.critical, self.p_value, self.alfa), self.msg
 
     # with docstring, with text, with database, with test,
     def to_xlsx(self, file_name=None, sheet_names=None):

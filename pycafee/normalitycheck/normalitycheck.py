@@ -8,7 +8,7 @@
 
 # - NormalityCheck(AlphaManagement, NDigitsManagement)
 #     - __init__(self, alfa=None, language=None, n_digits=None, **kwargs)
-#     - fit(self, x_exp, test=None, alfa=None, n_digits=None, conclusion=None, details=None)
+#     - fit(self, x_exp, test=None, alfa=None, n_digits=None, comparison=None, details=None)
 #     - __str__(self)
 #     - __repr__(self)
 
@@ -72,7 +72,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         self.normality_test = None
 
 
-    def fit(self, x_exp, test=None, alfa=None, n_digits=None, conclusion=None, details=None):
+    def fit(self, x_exp, test=None, alfa=None, n_digits=None, comparison=None, details=None):
         """This function aggregates all available Normality tests.
 
         Parameters
@@ -80,24 +80,30 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         x_exp : ``numpy array``
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least ``3`` sample data, except for the Lilliefors and Abdi-Molin tests, which must have at least ``4`` samples.
         test : ``str``, optional
-            The test that will be applied. If:
+            The test that will be applied:
 
-            * ``shapiro-wilk``, ``sw`` or ``None``, the function will apply the :ref:`Shapiro Wilk normality <shapiro_wilk>` test;
-            * ``abdi-molin`` or ``am``, the function will apply the :ref:`Abdi Molin normality <abdi_molin>` test;
-            * ``anderson-darling`` or ``ad``, the function will apply the :ref:`Anderson Darling normality <anderson_darling>` test;
-            * ``kolmogorov-smirnov`` or ``ks``, the function will apply the :ref:`Kolmogorov Smirnov normality <kolmogorov_smirnov>` test;
-            * ``lilliefors`` or ``li``, the function will apply the :ref:`Lilliefors normality <lilliefors>` test;
+            * If ``"shapiro-wilk"``, ``"sw"`` or ``None``, the function will apply the :ref:`Shapiro Wilk normality <shapiro_wilk>` test;
+            * If ``"abdi-molin"`` or ``"am"``, the function will apply the :ref:`Abdi Molin normality <abdi_molin>` test;
+            * If ``"anderson-darling"`` or ``"ad"``, the function will apply the :ref:`Anderson Darling normality <anderson_darling>` test;
+            * If ``"kolmogorov-smirnov"`` or ``"ks"``, the function will apply the :ref:`Kolmogorov Smirnov normality <kolmogorov_smirnov>` test;
+            * If ``"lilliefors"`` or ``"li"``, the function will apply the :ref:`Lilliefors normality <lilliefors>` test;
 
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
-        n_digits : ``int``, optional
-            The maximum number of decimal places be shown. Default is ``None`` which results in ``3`` decimal places.
-        details : ``str``, optional
-            The ``details`` parameter determines the amount of information presented about the hypothesis test. If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned. If ``details = "full"``, a detailed version of the hypothesis test result is returned.
-        conclusion : ``str``, optional
-            This parameter determines how to perform the comparison test to perform the Normality test. If ``conclusion = 'critical'`` (or ``None``, e.g, the default), the comparison test is made between the critical value (with ``ɑ`` significance level) and the calculated value of the test statistic. If ``"p-value"``, the comparison test is performed between the p-value and the adopted significance level (``ɑ``). This parameter does not influence the result if ``test = "abdi-molin"``.
+        comparison : ``str``, optional
+            This parameter determines how to perform the comparison test to perform the Normality test.
+
+            * If ``comparison = "critical"`` (or ``None``, e.g, the default), the comparison test is made between the critical value (with ``ɑ`` significance level) and the calculated value of the test statistic.
+            * If ``"p-value"``, the comparison test is performed between the p-value and the adopted significance level (``ɑ``). This parameter does not influence the result if ``test = "abdi-molin"``.
 
             **Both results should lead to the same conclusion.**
+
+        details : ``str``, optional
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
 
 
         Returns
@@ -106,10 +112,10 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
             statistic : ``float``
                 The test statistic.
             critical : ``float`` or ``None``
-                Each test has a different set of critical values, but all contain critical values for alpha equal to ``1%``, ``5%`` or ``10%``. See specific details for each test in its respective documentation.
+                Each test has a different set of critical values, but all contain critical values for alpha equal to ``1%``, ``5%`` or ``10%``. For more details, see the specific details for each test in its respective documentation.
             p_value : ``float`` or ``None``
                 The p-value for the hypothesis test.
-        conclusion : ``str``
+        conclusion : ``str`` or ``int``
             The test conclusion (e.g, Normal/ not Normal).
 
         See Also
@@ -132,7 +138,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> normality_test = NormalityCheck()
         >>> result, conclusion = normality_test.fit(x)
         >>> print(result)
-        ShapiroWilkResult(Statistic=0.969, Critical=0.842, p_value=0.889, Alpha=0.05)
+        ShapiroWilkResult(Statistic=0.9698116779327393, Critical=0.842, p_value=0.8890941739082336, Alpha=0.05)
         >>> print(conclusion)
         Data is Normal at a 95.0% of confidence level.
 
@@ -146,7 +152,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> normality_test = NormalityCheck(language="pt-br")
         >>> result, conclusion = normality_test.fit(x, test="sw", alfa=0.1)
         >>> print(result)
-        ShapiroWilkResultado(Estatistica=0.969, Critico=0.869, p_valor=0.889, Alfa=0.1)
+        ShapiroWilkResultado(Estatistica=0.9698116779327393, Critico=0.869, p_valor=0.8890941739082336, Alfa=0.1)
         >>> print(conclusion)
         Os dados são Normais com 90.0% de confiança.
 
@@ -161,7 +167,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> normality_test = NormalityCheck()
         >>> result, conclusion = normality_test.fit(x, test="li", details="full")
         >>> print(result)
-        LillieforsResult(Statistic=0.154, Critical=0.258, p_value=0.71, Alpha=0.05)
+        LillieforsResult(Statistic=0.15459867079959644, Critical=0.258, p_value=0.7104644322958894, Alpha=0.05)
         >>> print(conclusion)
         Since the critical value (0.258) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Lilliefors test at a 95.0% of confidence level.
 
@@ -173,11 +179,12 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> import numpy as np
         >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
         >>> normality_test = NormalityCheck()
-        >>> result, conclusion = normality_test.fit(x, test="ad", details="full", conclusion="p-value")
+        >>> result, conclusion = normality_test.fit(x, test="ad", details="full", comparison="p-value")
         >>> print(result)
-        AndersonDarlingResult(Statistic=0.226, Critical=None, p_value=0.747, Alpha=0.05)
+        AndersonDarlingResult(Statistic=0.22687861079050364, Critical=None, p_value=0.7479231606974011, Alpha=0.05)
         >>> print(conclusion)
         Since p-value (0.747) >= alpha (0.05), we have NO evidence to reject the hypothesis of data normality, according to the AndersonDarling test at a 95.0% of confidence level.
+
 
         |
 
@@ -187,11 +194,12 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> import numpy as np
         >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
         >>> normality_test = NormalityCheck()
-        >>> result, conclusion = normality_test.fit(x, test="ad", details="full", conclusion="p-value")
+        >>> result, conclusion = normality_test.fit(x, test="ks", details="full", comparison="p-value")
         >>> print(result)
-        KolmogorovSmirnovResult(Statistic=0.154, Critical=0.49, p_value=0.97, Alpha=0.01)
+        KolmogorovSmirnovResult(Statistic=0.15459867079959644, Critical=0.41, p_value=0.9706128123504146, Alpha=0.05)
         >>> print(conclusion)
-        Data is Normal at a 99.0% of confidence level.
+        Since p-value (0.97) >= alpha (0.05), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level.
+
 
         |
 
@@ -203,9 +211,9 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> normality_test = NormalityCheck()
         >>> result, conclusion = normality_test.fit(x, test="am")
         >>> print(result)
-        AbdiMolinResult(Statistic=0.154, Critical=0.261, p_value=None, Alpha=0.05)
+        AbdiMolinResult(Statistic=0.15459867079959644, Critical=0.2616, p_value=None, Alpha=0.05)
         >>> print(conclusion)
-        Data is Normal at a 95.0% of confidence level.
+        Data is Normal at a 95.0% of confidence level.        
 
 
 
@@ -239,15 +247,15 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
                     general._display_n_line_attention(msg)
                     raise
         if (test is None or test == "sw" or test == "shapiro-wilk"):
-            normality_test = ShapiroWilk(language=self.language)
+            normality_test = ShapiroWilk(language=self.language, n_digits=self.n_digits)
             result, conclusion = normality_test.fit(
-                        x_exp=x_exp, alfa=alfa, n_digits=n_digits, conclusion=conclusion, details=details
+                        x_exp=x_exp, alfa=alfa, comparison=comparison, details=details
                     )
             self.normality_test = "Shapiro-Wilk"
 
         elif (test == "am" or test == "abdi-molin"):
-            normality_test = AbdiMolin(language=self.language)
-            if conclusion is not None:
+            normality_test = AbdiMolin(language=self.language, n_digits=self.n_digits)
+            if comparison is not None:
                 general._display_n_line_warn(
                     [
                     messages[5][0][0],
@@ -261,23 +269,23 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
             self.normality_test = "Abdi-Molin"
 
         elif (test == "ad" or test == "anderson-darling"):
-            normality_test = AndersonDarling(language=self.language)
+            normality_test = AndersonDarling(language=self.language, n_digits=self.n_digits)
             result, conclusion = normality_test.fit(
-                        x_exp=x_exp, alfa=alfa, n_digits=n_digits, conclusion=conclusion, details=details
+                        x_exp=x_exp, alfa=alfa, comparison=comparison, details=details
                     )
             self.normality_test = "Anderson-Darling"
 
         elif (test == "ks" or test == "kolmogorov-smirnov"):
-            normality_test = KolmogorovSmirnov(language=self.language)
+            normality_test = KolmogorovSmirnov(language=self.language, n_digits=self.n_digits)
             result, conclusion = normality_test.fit(
-                        x_exp=x_exp, alfa=alfa, n_digits=n_digits, conclusion=conclusion, details=details
+                        x_exp=x_exp, alfa=alfa, comparison=comparison, details=details
                     )
             self.normality_test = "Kolmogorov-Smirnov"
 
         else:
-            normality_test = Lilliefors(language=self.language)
+            normality_test = Lilliefors(language=self.language, n_digits=self.n_digits)
             result, conclusion = normality_test.fit(
-                        x_exp=x_exp, alfa=alfa, n_digits=n_digits, conclusion=conclusion, details=details
+                        x_exp=x_exp, alfa=alfa, comparison=comparison, details=details
                     )
             self.normality_test = "Lilliefors"
 

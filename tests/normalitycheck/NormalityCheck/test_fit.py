@@ -46,7 +46,7 @@ class Test_fit(unittest.TestCase):
         cls.x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
         cls.x_not_normal = np.array([1, 1, 1, 1.1, 1.2, 5.3, 10.1, 10.2, 10.3])
 
-    def test_conclusion(self):
+    def test_testes(self):
         with self.assertRaises(ValueError, msg="Does not raised error when test is not valid"):
             result = NormalityCheck()
             result.fit(self.x, test="any")
@@ -83,11 +83,11 @@ class Test_fit_default(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_conclusion_p_value(self):
+    def test_pass_normal_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, conclusion='p-value')
+        resultado_esperado, conclusao_esperado = result.fit(self.x, comparison='p-value')
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, conclusion='p-value')
+        resultado, conclusao = result.fit(self.x, comparison='p-value')
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -107,11 +107,11 @@ class Test_fit_default(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_details_full_conclusion_p_value(self):
+    def test_pass_normal_details_full_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x, details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -121,9 +121,9 @@ class Test_fit_default(unittest.TestCase):
 
     def test_pass_normal_alfa(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value", alfa=0.10)
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value", alfa=0.10)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, details="full", conclusion="p-value", alfa=0.10)
+        resultado, conclusao = result.fit(self.x, details="full", comparison="p-value", alfa=0.10)
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -144,11 +144,11 @@ class Test_fit_default(unittest.TestCase):
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
 
-    def test_pass_not_normal_conclusion_p_value(self):
+    def test_pass_not_normal_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -168,11 +168,11 @@ class Test_fit_default(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_not_normal_details_full_conclusion_p_value(self):
+    def test_pass_not_normal_details_full_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -182,9 +182,9 @@ class Test_fit_default(unittest.TestCase):
 
     def test_pass_alfa_not_normal(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value", alfa=0.10)
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value", alfa=0.10)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, details="full", conclusion="p-value", alfa=0.10)
+        resultado, conclusao = result.fit(self.x_not_normal, details="full", comparison="p-value", alfa=0.10)
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -212,11 +212,11 @@ class Test_fit_sw(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_conclusion_p_value(self):
+    def test_pass_normal_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, conclusion='p-value')
+        resultado_esperado, conclusao_esperado = result.fit(self.x, comparison='p-value')
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="sw", conclusion='p-value')
+        resultado, conclusao = result.fit(self.x, test="sw", comparison='p-value')
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -236,11 +236,11 @@ class Test_fit_sw(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_details_full_conclusion_p_value(self):
+    def test_pass_normal_details_full_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="sw", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x, test="sw", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -250,9 +250,9 @@ class Test_fit_sw(unittest.TestCase):
 
     def test_pass_normal_alfa(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value", alfa=0.10)
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value", alfa=0.10)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="sw", details="full", conclusion="p-value", alfa=0.10)
+        resultado, conclusao = result.fit(self.x, test="sw", details="full", comparison="p-value", alfa=0.10)
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -273,11 +273,11 @@ class Test_fit_sw(unittest.TestCase):
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
 
-    def test_pass_not_normal_conclusion_p_value(self):
+    def test_pass_not_normal_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="sw", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="sw", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -297,11 +297,11 @@ class Test_fit_sw(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_not_normal_details_full_conclusion_p_value(self):
+    def test_pass_not_normal_details_full_comparison_p_value(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="sw", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="sw", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -311,9 +311,9 @@ class Test_fit_sw(unittest.TestCase):
 
     def test_pass_alfa_not_normal(self):
         result = self.ShapiroWilk()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value", alfa=0.10)
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value", alfa=0.10)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="sw", details="full", conclusion="p-value", alfa=0.10)
+        resultado, conclusao = result.fit(self.x_not_normal, test="sw", details="full", comparison="p-value", alfa=0.10)
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -341,17 +341,17 @@ class Test_fit_am(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_conclusion_p_value(self):
+    def test_pass_normal_comparison_p_value(self):
         result = self.AbdiMolin()
         resultado_esperado, conclusao_esperado = result.fit(self.x)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="am", conclusion='p-value')
+        resultado, conclusao = result.fit(self.x, test="am", comparison='p-value')
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
         self.assertEqual(resultado_esperado[2], resultado[2], "p dos not match")
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
-        self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
+        self.assertEqual(conclusao_esperado, conclusao, "comparison does not match")
 
     def test_pass_normal_details_full(self):
         result = self.AbdiMolin()
@@ -365,11 +365,11 @@ class Test_fit_am(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_details_full_conclusion_p_value(self):
+    def test_pass_normal_details_full_comparison_p_value(self):
         result = self.AbdiMolin()
         resultado_esperado, conclusao_esperado = result.fit(self.x, details="full")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="am", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x, test="am", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -402,11 +402,11 @@ class Test_fit_am(unittest.TestCase):
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
 
-    def test_pass_not_normal_conclusion_p_value(self):
+    def test_pass_not_normal_comparison_p_value(self):
         result = self.AbdiMolin()
         resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal)
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="am", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="am", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -426,17 +426,17 @@ class Test_fit_am(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_not_normal_details_full_conclusion_p_value(self):
+    def test_pass_not_normal_details_full_comparison_p_value(self):
         result = self.AbdiMolin()
         resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="am", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="am", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
         self.assertEqual(resultado_esperado[2], resultado[2], "p dos not match")
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
-        self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
+        self.assertEqual(conclusao_esperado, conclusao, "comparison does not match")
 
     def test_pass_alfa_not_normal(self):
         result = self.AbdiMolin()
@@ -470,11 +470,11 @@ class Test_fit_ad(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_conclusion_p_value(self):
+    def test_pass_normal_comparison_p_value(self):
         result = self.AndersonDarling()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, conclusion='p-value')
+        resultado_esperado, conclusao_esperado = result.fit(self.x, comparison='p-value')
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="ad", conclusion='p-value')
+        resultado, conclusao = result.fit(self.x, test="ad", comparison='p-value')
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -494,11 +494,11 @@ class Test_fit_ad(unittest.TestCase):
         self.assertEqual(resultado_esperado[3], resultado[3], "alfa does not match")
         self.assertEqual(conclusao_esperado, conclusao, "conclusion does not match")
 
-    def test_pass_normal_details_full_conclusion_p_value(self):
+    def test_pass_normal_details_full_comparison_p_value(self):
         result = self.AndersonDarling()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="ad", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x, test="ad", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -533,9 +533,9 @@ class Test_fit_ad(unittest.TestCase):
 
     def test_pass_not_normal_conclusion_p_value(self):
         result = self.AndersonDarling()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="ad", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="ad", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -557,9 +557,9 @@ class Test_fit_ad(unittest.TestCase):
 
     def test_pass_not_normal_details_full_conclusion_p_value(self):
         result = self.AndersonDarling()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="ad", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="ad", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -730,9 +730,9 @@ class Test_fit_ks(unittest.TestCase):
 
     def test_pass_normal_conclusion_p_value(self):
         result = self.Lilliefors()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, conclusion='p-value')
+        resultado_esperado, conclusao_esperado = result.fit(self.x, comparison='p-value')
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="li", conclusion='p-value')
+        resultado, conclusao = result.fit(self.x, test="li", comparison='p-value')
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -754,9 +754,9 @@ class Test_fit_ks(unittest.TestCase):
 
     def test_pass_normal_details_full_conclusion_p_value(self):
         result = self.Lilliefors()
-        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x, test="li", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x, test="li", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -791,9 +791,9 @@ class Test_fit_ks(unittest.TestCase):
 
     def test_pass_not_normal_conclusion_p_value(self):
         result = self.Lilliefors()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="li", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="li", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")
@@ -815,9 +815,9 @@ class Test_fit_ks(unittest.TestCase):
 
     def test_pass_not_normal_details_full_conclusion_p_value(self):
         result = self.Lilliefors()
-        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", conclusion="p-value")
+        resultado_esperado, conclusao_esperado = result.fit(self.x_not_normal, details="full", comparison="p-value")
         result = NormalityCheck()
-        resultado, conclusao = result.fit(self.x_not_normal, test="li", details="full", conclusion="p-value")
+        resultado, conclusao = result.fit(self.x_not_normal, test="li", details="full", comparison="p-value")
 
         self.assertEqual(resultado_esperado[0], resultado[0], "statistic does not match")
         self.assertEqual(resultado_esperado[1], resultado[1], "critical value does not match")

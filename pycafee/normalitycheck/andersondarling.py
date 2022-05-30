@@ -68,7 +68,7 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
 
     Methods
     -------
-    fit(x_exp, alfa=None, n_digits=None, conclusion=None, details=None)
+    fit(x_exp, alfa=None, n_digits=None, comparison=None, details=None)
         Performs the AndersonDarling test.
     to_csv(file_name=None, sep=",")
         Exports the results to a pre-formatted csv file.
@@ -88,11 +88,11 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
 
 
 
-    # with tests, with text, with database, with NO docstring
-    def fit(self, x_exp, alfa=None, n_digits=None, conclusion=None, details=None):
+    # with tests, with text, with database, with docstring
+    def fit(self, x_exp, alfa=None, comparison=None, details=None):
         """This function is a wraper around ``scipy.stats.anderson()`` [1]_ and ``statsmodels.stats.diagnostic.normal_ad()`` [2]_ to perform the **AndersonDarling Normality test** [3]_, but with some facilities.
 
-        The method used to perform the test depends on the ``conclusion`` parameter, but both models are fixed to compare a sample with the Normal distribution. Hence, we use:
+        The method used to perform the test depends on the ``comparison`` parameter, but both models are fixed to compare a sample with the Normal distribution. Hence, we use:
 
         >>> scipy.stats.anderson(x, dist='norm')
 
@@ -107,13 +107,20 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least ``4`` sample data.
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
-        n_digits : ``int``, optional
-            The maximum number of decimal places be shown. Default is ``None`` which results in ``3`` decimal places.
-        conclusion : ``str``, optional
-            This parameter determines how to perform the comparison test to evaluate the Normality test and which api to use. If ``conclusion = "critical"`` (or ``None``), the comparison test is made by comparing the critical value (with ``ɑ`` significance level) with the test statistic, using the SciPy method. If ``conclusion = "p-value"``, the comparison test is performed comparing the p-value with the adopted significance level (``ɑ``), using the statsmodels method.
+        comparison : ``str``, optional
+            This parameter determines how to perform the comparison test to evaluate the Normality test and which api to use.
+
+            * If ``comparison = "critical"`` (or ``None``), the comparison test is performed by comparing the critical value (with ``ɑ`` significance level) with the test statistic, using the ``SciPy`` method [1]_.
+            * If ``comparison = "p-value"``, the comparison test is performed comparing the ``p-value`` with the adopted significance level (``ɑ``), using the statsmodels method [2]_.
+
             **Both results should lead to the same conclusion**.
+
         details : ``str``, optional
-            The ``details`` parameter determines the amount of information presented about the hypothesis test. If ``details = "short"`` (or ``None``), a simplified version of the test result is returned. If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
 
         Returns
         -------
@@ -154,7 +161,7 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
 
            :math:`H_1:` data *does* **not** *come from Normal* distribution.
 
-        By default (``conclusion = "critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test. The results are calculated using ``scipy.stats.anderson()``, and the ``p-value`` will be ``None``. In summary:
+        By default (``comparison = "critical"``), the conclusion is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test. The results are calculated using ``scipy.stats.anderson()``, and the ``p-value`` will be ``None``. In summary:
 
         .. code:: python
 
@@ -163,7 +170,7 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-        The other option (``conclusion="p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``. The results are calculated using ``statsmodels.stats.diagnostic.normal_ad`` and the ``critical`` value will be ``None``. In summary:
+        The other option (``comparison="p-value"``) makes the conclusion comparing the ``p-value`` with ``ɑ``. The results are calculated using ``statsmodels.stats.diagnostic.normal_ad()`` and the ``critical`` value will be ``None``. In summary:
 
         .. code:: python
 
@@ -172,8 +179,6 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
            else:
                Data is not Normal
 
-
-        The ``n_digits`` parameter does not influence any calculation, it just truncates the number of decimal places returned for the ``statistic``, ``critical`` and ``p_value`` parameters.
 
         References
         ----------
@@ -189,36 +194,33 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
         Examples
         --------
 
+        **Applying the test with default values**
+
         >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
         >>> import scipy.stats as stats
         >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
         >>> andersondarling_test = AndersonDarling()
         >>> result, conclusion = andersondarling_test.fit(x)
         >>> print(result)
-        AndersonDarlingResult(Statistic=0.253, Critical=0.759, p_value=None, Alpha=0.05)
+        AndersonDarlingResult(Statistic=0.25343395875111696, Critical=0.759, p_value=None, Alpha=0.05)
         >>> print(conclusion)
         Data is Normal at a 95.0% of confidence level.
+
+
+        **Applying the test using the** ``p-value`` **to make the conclusion**
 
         >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
         >>> import scipy.stats as stats
         >>> x = stats.norm.rvs(loc=5, scale=3, size=100, random_state=42)
         >>> andersondarling_test = AndersonDarling()
-        >>> result, conclusion = andersondarling_test.fit(x, conclusion="p-value")
+        >>> result, conclusion = andersondarling_test.fit(x, comparison="p-value")
         >>> print(result)
-        AndersonDarlingResult(Statistic=0.253, Critical=None, p_value=0.726, Alpha=0.05)
+        AndersonDarlingResult(Statistic=0.25343395875111696, Critical=None, p_value=0.7268427515457196, Alpha=0.05)
         >>> print(conclusion)
         Data is Normal at a 95.0% of confidence level.
 
 
-        >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
-        >>> import numpy as np
-        >>> x = np.array([1.90642, 2.22488, 2.10288, 1.69742, 1.52229, 3.15435, 2.61826, 1.98492, 1.42738, 1.99568])
-        >>> andersondarling_test = AndersonDarling()
-        >>> result, conclusion = andersondarling_test.fit(x, alfa=0.01)
-        >>> print(result)
-        AndersonDarlingResult(Statistic=0.341, Critical=0.95, p_value=None, Alpha=0.01)
-        >>> print(conclusion)
-        Data is Normal at a 99.0% of confidence level.
+        **Applying the test at** ``1%`` **of significance level**
 
         >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
         >>> import numpy as np
@@ -226,10 +228,12 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
         >>> andersondarling_test = AndersonDarling()
         >>> result, conclusion = andersondarling_test.fit(x, alfa=0.01)
         >>> print(result)
-        AndersonDarlingResult(Statistic=0.341, Critical=None, p_value=0.414, Alpha=0.01)
+        AndersonDarlingResult(Statistic=0.3416856332675007, Critical=0.95, p_value=None, Alpha=0.01)
         >>> print(conclusion)
         Data is Normal at a 99.0% of confidence level.
 
+
+        **Applying the test with a detailed conclusion**
 
         >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
         >>> import numpy as np
@@ -237,41 +241,23 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
         >>> andersondarling_test = AndersonDarling()
         >>> result, conclusion = andersondarling_test.fit(x, alfa=0.10, details="full")
         >>> print(result)
-        AndersonDarlingResult(Statistic=0.226, Critical=0.57, p_value=None, Alpha=0.1)
+        AndersonDarlingResult(Statistic=0.22687861079050364, Critical=0.57, p_value=None, Alpha=0.1)
         >>> print(conclusion)
         Since the critical value (0.57) >= statistic (0.226), we have NO evidence to reject the hypothesis of data normality, according to the AndersonDarling test at a 90.0% of confidence level.
 
 
-        >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
-        >>> import numpy as np
-        >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
-        >>> andersondarling_test = AndersonDarling()
-        >>> result, conclusion = andersondarling_test.fit(x, alfa=0.10, details="full", conclusion="p-value")
-        >>> print(result)
-        AndersonDarlingResult(Statistic=0.226, Critical=None, p_value=0.747, Alpha=0.1)
-        >>> print(conclusion)
-        Since p-value (0.747) >= alpha (0.1), we have NO evidence to reject the hypothesis of data normality, according to the AndersonDarling test at a 90.0% of confidence level.
+        **Applying the test using a not Normal data**
 
         >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
         >>> import numpy as np
         >>> x = np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
         >>> andersondarling_test = AndersonDarling()
-        >>> result, conclusion = andersondarling_test.fit(x, alfa=0.10, details="full", conclusion='p-value')
+        >>> result, conclusion = andersondarling_test.fit(x, alfa=0.10, details="full", comparison='p-value')
         >>> print(result)
-        AndersonDarlingResult(Statistic=2.553, Critical=0.575, p_value=None, Alpha=0.1)
-        >>> print(conclusion)
-        Since the critical value (0.575) < statistic (2.553), we HAVE evidence to reject the hypothesis of data normality, according to the AndersonDarling test at a 90.0% of confidence level.
-
-
-        >>> from pycafee.normalitycheck.andersondarling import AndersonDarling
-        >>> import numpy as np
-        >>> x = np.array([0.8, 1, 1.1, 1.15, 1.15, 1.2, 1.2, 1.2, 1.2, 1.6, 1.8, 2, 2.2, 3, 5, 8.2, 8.4, 8.6, 9])
-        >>> andersondarling_test = AndersonDarling()
-        >>> result, conclusion = andersondarling_test.fit(x, alfa=0.10, details="full", conclusion='p-value')
-        >>> print(result)
-        AndersonDarlingResult(Statistic=2.553, Critical=None, p_value=0.0, Alpha=0.1)
+        AndersonDarlingResult(Statistic=2.5532223880710276, Critical=None, p_value=9.992220237231388e-07, Alpha=0.1)
         >>> print(conclusion)
         Since p-value (0.0) < alpha (0.1), we HAVE evidence to reject the hypothesis of data normality, according to the AndersonDarling test at a 90.0% of confidence level.
+
 
         """
         fk_id_function = management._query_func_id("normalitycheck_fit")
@@ -285,32 +271,26 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
             checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
             self.alfa = alfa
 
-        ### getting the default n_digits value ###
-        if n_digits is None:
-            n_digits = self.n_digits
-        else:
-            checkers._check_is_integer(n_digits, "n_digits", self.language)
-            checkers._check_is_positive(n_digits, "n_digits", self.language)
 
         ### checking input data ###
         checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
         self.x_exp = x_exp
 
-        ### checking the conclusion parameter ###
-        if conclusion is None:
-            conclusion = "critical"
+        ### checking the comparison parameter ###
+        if comparison is None:
+            comparison = "critical"
         else:
-            checkers._check_is_str(conclusion, "conclusion", self.language)
-            if conclusion == "critical":
-                conclusion = "critical"
-            elif conclusion == "p-value":
-                conclusion = "p-value"
+            checkers._check_is_str(comparison, "comparison", self.language)
+            if comparison == "critical":
+                comparison = "critical"
+            elif comparison == "p-value":
+                comparison = "p-value"
             else:
                 try:
                     error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[15][0][0]} '{conclusion}'",)
+                    general._display_one_line_attention(f"{messages[15][0][0]} '{comparison}'",)
                     raise
 
         ### checking the details parameter ###
@@ -322,27 +302,35 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
                 details = "short"
             elif details == "full":
                 details = "full"
+            elif details == "binary":
+                details = "binary"
             else:
                 try:
                     error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[2][0][0]} {details}")
+                    general._display_one_line_attention(f"{messages[2][0][0]} '{details}'")
                     raise
 
+        aceita = 0
+        rejeita = 1
 
         # ### writing the test conclusion ###
-        if conclusion == "p-value":
+        if comparison == "p-value":
             critical = None
             statistic, p_value = ad_statsmodel(x_exp)
             if p_value >= alfa:
                 if details == 'full':
-                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} AndersonDarling {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                    msg = f"{messages[8][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[8][2][0]}{alfa}{messages[8][4][0]} AndersonDarling {messages[8][6][0]} {100*(1-alfa)}{messages[8][8][0]}"
+                elif details == "binary":
+                    msg = aceita
                 else:
                     msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
             else:
                 if details == 'full':
-                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} AndersonDarling {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                    msg = f"{messages[9][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[9][2][0]}{alfa}{messages[9][4][0]} AndersonDarling {messages[9][6][0]} {100*(1-alfa)}{messages[9][8][0]}"
+                elif details == "binary":
+                    msg = rejeita
                 else:
                     msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
         else:
@@ -373,12 +361,16 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
                 p_value = None
                 if critical >= statistic:
                     if details == 'full':
-                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[4][4][0]} AndersonDarling {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                        msg = f"{messages[4][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[4][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[4][4][0]} AndersonDarling {messages[4][6][0]} {100*(1-alfa)}{messages[4][8][0]}"
+                    elif details == "binary":
+                        msg = aceita
                     else:
                         msg = f"{messages[5][0][0]} {100*(1-alfa)}{messages[5][2][0]}"
                 else:
                     if details == 'full':
-                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=n_digits)}{messages[6][4][0]} AndersonDarling {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                        msg = f"{messages[6][0][0]}{helpers._truncate(critical, self.language, decs=self.n_digits)}{messages[6][2][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[6][4][0]} AndersonDarling {messages[6][6][0]} {100*(1-alfa)}{messages[6][8][0]}"
+                    elif details == "binary":
+                        msg = rejeita
                     else:
                         msg = f"{messages[7][0][0]} {100*(1-alfa)}{messages[7][2][0]}"
 
@@ -388,7 +380,7 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
         self.statistic = statistic
         self.critical = critical
         self.p_value = p_value
-        return result(helpers._truncate(statistic, self.language, decs=n_digits), helpers._truncate(critical, self.language, decs=n_digits), helpers._truncate(p_value, self.language, decs=n_digits), self.alfa), self.msg
+        return result(self.statistic, self.critical, self.p_value, self.alfa), self.msg
 
     # with tests, with text, with database, with docstring
     def to_xlsx(self, file_name=None, sheet_names=None):

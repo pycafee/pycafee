@@ -269,7 +269,7 @@ class Sample(AlphaManagement, NDigitsManagement):
         pass
 
 
-    def fit(self, x_exp, norm_test=None, alfa=None, conclusion=None, details=None):
+    def fit(self, x_exp, norm_test=None, alfa=None, comparison=None, details=None):
         """É o principal método onde a mágica não acontece.
 
         Parameters
@@ -332,7 +332,7 @@ class Sample(AlphaManagement, NDigitsManagement):
         self.normality_result, self.normality_conclusion = normality_test.fit(
                         x_exp=self.x_exp,
                         test=norm_test,
-                        conclusion=conclusion,
+                        comparison=comparison,
                         details=details,
                         alfa=self.alfa
                     )
