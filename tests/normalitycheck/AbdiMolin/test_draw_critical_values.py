@@ -111,6 +111,7 @@ class Test_None_draw_critical_values(unittest.TestCase):
             self.assertFalse(result, "File 'teste.pdf' was created even with export=False")
             plt.close()
 
+
     def test_decimal_separator(self):
         with patch('matplotlib.pyplot.show') as p:
             teste = AbdiMolin()

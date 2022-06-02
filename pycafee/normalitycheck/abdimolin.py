@@ -362,9 +362,11 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         ## decimal_separator ##
         decimal_separator = self._get_default_decimal_separator(decimal_separator)
+        checkers._check_is_str(decimal_separator, "decimal_separator", self.language)
+        helpers._check_decimal_separator(decimal_separator, self.language)
 
         ## local ##
-        local = self._get_default_local(local)
+        # local = self._get_default_local(local)
 
         fk_id_function = management._query_func_id("draw_critical_values")
         messages = management._get_messages(fk_id_function, self.language)
@@ -373,7 +375,7 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         ### The values tabled in a dictionary ###
         table = AbdiMolin.ABDIMOLIN_TABLE
 
-        default_locale = helpers._change_locale(self.language, decimal_separator, local)
+        # default_locale = helpers._change_locale(self.language, decimal_separator, local)
 
         ### Make the plot ###
         if ax is None:
@@ -392,18 +394,23 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         axes.set_ylabel(messages[4][0][0])
         axes.set_xticks([4, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 
+        # decimal separator
+        if ax is None:
+            axes = helpers._change_decimal_separator_x_axis(fig, axes, decimal_separator)
+            axes = helpers._change_decimal_separator_y_axis(fig, axes, decimal_separator)
 
         ## If show equals True, display the graph ##
         if ax is None:
             fig.tight_layout()
             if export:
                 ### Baptism of Fire ###
-                file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
+                exits, file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
                 plt.savefig(file_name, dpi=dpi, bbox_inches='tight')
                 general._display_one_line_success(f"{messages[5][0][0]} '{file_name}' {messages[5][2][0]}")
             plt.show()
 
-        helpers._change_locale_back_to_default(default_locale)
+        # helpers._change_locale_back_to_default(default_locale)
+
 
         return axes
 
