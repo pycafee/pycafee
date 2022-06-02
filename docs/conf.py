@@ -13,16 +13,19 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-
+import pycafee
+from datetime import date
 
 # -- Project information -----------------------------------------------------
 
-project = 'PyCafee'
-copyright = '2022, Anderson Canteli'
-author = 'Anderson Canteli'
+year = date.today()
+
+project = pycafee.__name__
+copyright = f'{year.year}, {pycafee.__author__}'
+author = pycafee.__author__
 
 # The full version, including alpha/beta/rc tags
-release = 'Alpha 0.0.4'
+release = 'Alpha ' + pycafee.__version__
 
 
 # -- General configuration ---------------------------------------------------
