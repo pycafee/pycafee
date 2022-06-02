@@ -39,7 +39,7 @@ class DotPlot(PlotsManagement, LanguageManagement):
         super().__init__(language=language,**kwargs)
 
     # with tests, with text, with docstring, with database
-    def draw(self, x_exp, ax=None, legend_label=None, x_label=None, width='auto', height='auto', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, n_ticks=None, legend=None, decimal_separator=None, local=None):
+    def draw(self, x_exp, ax=None, legend_label=None, x_label=None, width='auto', height='auto', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, n_ticks=None, legend=None, decimal_separator=None):
         """This function draws a dot plot with a predefined design
 
         Parameters
@@ -47,18 +47,30 @@ class DotPlot(PlotsManagement, LanguageManagement):
         x_exp : 1D :doc:`numpy array <numpy:reference/generated/numpy.array>`
             A ``1`` dimension numpy array with the dataset
         ax : ``None`` or ``matplotlib.axes.SubplotBase``
-            * If ``ax`` is ``None``, a figure is created with a preset design. The other parameters can be used to export the graph.
-            * If ``ax`` is a ``matplotlib.axes.SubplotBase``, the function returns a ``matplotlib.axes.SubplotBase`` with the dotplot axis. In this case, the other parameters do not affect the graph.
+
+            * If ``ax`` is ``None``, a figure is created with a preset design. The other parameters can be used to edit and export the graph.
+            * If ``ax`` is a ``matplotlib.axes.SubplotBase``, the function returns a ``matplotlib.axes.SubplotBase`` with the dotplot axis. In this case, parameters relatd to wht ``fig`` will not affect the graph.
+
         legend : ``bool``, optional
-            Whether the legend should be inserted into the chart (``True``) or not (``False``). The default value is ``None``, which implies ``False``.
+            Whether the legend should be add into the chart (``True``) or not (``False``). The default value is ``None``, which implies ``False``.
         legend_label : ``str``, optional
             The label to be displayed on the legend. Default is ``None``, which results in ``"data"``. Only valid if ``legend = True``.
         x_label : ``str``, optional
             The label to be displayed on x label. Default is ``None``, which results in a blank label.
         width : ``"auto"``, ``"default"``, ``int`` or ``float`` (positive), optional
-            The ``width`` of the figure. If it is ``"auto"``, it tries to figure out a nice ``width`` for the plot using the data range. If it is ``"default"``, it uses a pre-defined value. If it is a number, it defines the ``width`` of the chart (in inches).
+            The ``width`` of the figure.
+
+            * If it is ``"auto"``, it tries to figure out a nice ``width`` for the plot using the data range.
+            * If it is ``"default"``, it uses a pre-defined value.
+            * If it is a number, it defines the ``width`` of the chart (in inches).
+
         height : ``"auto"``, ``"default"``, ``int`` or ``float`` (positive), optional
-            The ``height`` of the figure. If it is ``"auto"``, it tries to figure out a nice height for the plot using the data range. If it is ``"default"``, it uses a pre-defined value. If it is a number, it defines the height of the chart (in inches).
+            The ``height`` of the figure.
+
+            * If it is ``"auto"``, it tries to figure out a nice height for the plot using the data range.
+            * If it is ``"default"``, it uses a pre-defined value.
+            * If it is a number, it defines the height of the chart (in inches).
+
         export : ``bool``, optional
             Whether the graph should be exported (``True``) or not (``False``). The default value is ``None``, which implies ``False``.
         file_name : ``str``, optional
@@ -75,8 +87,7 @@ class DotPlot(PlotsManagement, LanguageManagement):
             Whether the background of the graph should be transparent (``True``) or not (``False``). The default value is ``None``, which implies ``False`` (e.g, white background).
         decimal_separator : ``str``, optional
             The decimal separator symbol used in the chart. It can be the dot (``None`` or ``"."``) or the comma (``","``).
-        local : ``str``, optional
-            The alias for the desired locale. Only used if ``decimal_separator = ","`` to set the matplolib's default locale. Its only function is to change the decimal separator symbol and should be changed only if the ``"pt_BR"`` option is not available.
+
 
 
         Returns
@@ -197,9 +208,6 @@ class DotPlot(PlotsManagement, LanguageManagement):
         extension = self._get_default_extension(extension)
 
 
-        ### Baptism of Fire ###
-        file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
-
         ## dpi ##
         dpi = self._get_default_dpi(dpi)
 
@@ -221,9 +229,12 @@ class DotPlot(PlotsManagement, LanguageManagement):
 
         ## decimal_separator ##
         decimal_separator = self._get_default_decimal_separator(decimal_separator)
+        checkers._check_is_str(decimal_separator, "decimal_separator", self.language)
+        helpers._check_decimal_separator(decimal_separator, self.language)
 
+        ## This was removed due to local issue on colab ##
         ## local ##
-        local = self._get_default_local(local)
+        # local = self._get_default_local(local)
 
 
         ### drawing the graph ###
@@ -261,8 +272,9 @@ class DotPlot(PlotsManagement, LanguageManagement):
         else:
             marker_size = None
 
+        ## This was removed due to local issue on colab ##
         # cheking the decimal_separator #
-        default_locale = helpers._change_locale(self.language, decimal_separator, local)
+        # default_locale = helpers._change_locale(self.language, decimal_separator, local)
 
         # lists to export the data #
         axis_x = []
@@ -280,29 +292,37 @@ class DotPlot(PlotsManagement, LanguageManagement):
         ## Createing the dot plot with format ##
         if ax is None:
             fig, axes = plt.subplots(figsize=(width, height))
-            # ploting the data #
-            axes.scatter(x, y, marker='o', c="None", edgecolors="k",  s=marker_size, label=legend_label)
-            # removing spines #
-            for spine in ['top', 'right', 'left']:
-                axes.spines[spine].set_visible(False)
-            # improving y axis #
-            axes.yaxis.set_visible(False)
-            axes.set_ylim(-1, max(counts))
-            # formatting the axes #
-            if n_ticks is None:
-                pass
-            else:
-                ticks = np.linspace(min(values), max(values), n_ticks)#, dtype=int)
-                axes.set_xticks(ticks)
-            axes.tick_params(axis='x', length=5, pad=5)
-            # legend #
-            if legend:
-                axes.legend()
+        else:
+            checkers._check_is_subplots(ax, "ax", self.language)
+            axes = ax
+        # ploting the data #
+        axes.scatter(x, y, marker='o', c="None", edgecolors="k",  s=marker_size, label=legend_label)
+        # removing spines #
+        for spine in ['top', 'right', 'left']:
+            axes.spines[spine].set_visible(False)
+        # improving y axis #
+        axes.yaxis.set_visible(False)
+        axes.set_ylim(-1, max(counts))
+        # formatting the axes #
+        if n_ticks is None:
+            pass
+        else:
+            ticks = np.linspace(min(values), max(values), n_ticks)#, dtype=int)
+            axes.set_xticks(ticks)
+        axes.tick_params(axis='x', length=5, pad=5)
+        # legend #
+        if legend:
+            axes.legend()
 
-            # x label #
-            if x_label is not None:
-                axes.set_xlabel(x_label)
+        # decimal separator
+        if ax is None:
+            axes = helpers._change_decimal_separator_x_axis(fig, axes, decimal_separator)
 
+        # x label #
+        if x_label is not None:
+            axes.set_xlabel(x_label)
+
+        if ax is None:
             # making the graph "tight" #
             if tight:
                 tight = 'tight'
@@ -312,23 +332,22 @@ class DotPlot(PlotsManagement, LanguageManagement):
 
             # exporting the plot #
             if export:
+                ### Baptism of Fire ###
+                exits, file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
+
                 plt.savefig(file_name, dpi=dpi, transparent=transparent, bbox_inches=tight)
                 ### quering ###
-                func_name = "draw_density_function" # reaproveitando database
-                fk_id_function = management._query_func_id(func_name)
-                messages = management._get_messages(fk_id_function, self.language, func_name)
-                general._display_one_line_success(f"{messages[3][0][0]} '{file_name}' {messages[3][2][0]}")
-
+                if exits == False:
+                    func_name = "draw_density_function" # reaproveitando database
+                    fk_id_function = management._query_func_id(func_name)
+                    messages = management._get_messages(fk_id_function, self.language, func_name)
+                    general._display_one_line_success(f"{messages[1][0][0]} '{file_name}' {messages[1][2][0]}")
             # showing the plot #
             plt.show()
 
-        else:
-            checkers._check_is_subplots(ax, "ax", self.language)
-            axes = ax
-            axes.scatter(x, y)
 
-
-        helpers._change_locale_back_to_default(default_locale)
+        ## This was removed due to local issue on colab ##
+        # helpers._change_locale_back_to_default(default_locale)
 
         return x, y, axes
 

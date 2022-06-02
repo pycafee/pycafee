@@ -40,7 +40,7 @@ class DensityPlot(PlotsManagement, LanguageManagement):
         super().__init__(language=language,**kwargs)
 
     # with tests, with text, with docstring, with database
-    def draw(self, x_exp, ax=None, bw_method=None, which=None, x_label=None, y_label=None, width='default', height='default', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, plot_design='gray', legend=None, decimal_separator=None, local=None):
+    def draw(self, x_exp, ax=None, bw_method=None, which=None, x_label=None, y_label=None, width='default', height='default', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, plot_design='gray', legend=None, decimal_separator=None):
         """This function draws the non-parametric density plot with the option to add the central tendency measurements
 
         Parameters
@@ -48,18 +48,20 @@ class DensityPlot(PlotsManagement, LanguageManagement):
         x_exp : 1D :doc:`numpy array <numpy:reference/generated/numpy.array>`
             The data to be fitted
         ax : ``None`` or ``matplotlib.axes.SubplotBase``
+
             * If ``ax`` is ``None``, a figure is created with a preset design. The other parameters can be used to edit and export the graph.
             * If ``ax`` is a ``matplotlib.axes.SubplotBase``, the function returns a ``matplotlib.axes.SubplotBase`` with the DensityPlot axis. In this case, only the ``which`` and ``bw_method`` parameters affect the plot.
+
         bw_method : ``str``, optional
             The method used to calculate the estimator bandwidth. This can be ``"scott"`` or ``"silverman"``. If ``None`` (default), the ``"scott"`` method is used. This is the ``bw_method`` parameter from ``scipy.stats.gaussian_kde()``, but limited to ``"scott"`` or ``"silverman"`` options. For other options, use the original method [1]_.
         which : ``str``, optional
             The parameter which controls which measures of central tendency should be added to the graph. The options are:
 
-                - ``None`` (default): no measures of central tendency are included;
-                - ``"mean"``: adds the mean;
-                - ``"median"``: adds the median;
-                - ``"mode"``: adds the mode(s) (only if the data has a mode);
-                - ``"all"``: adds the mean, median and the mode(s) (if the data das a mode);
+            * ``None`` (default): no measures of central tendency are included;
+            * ``"mean"``: adds the mean;
+            * ``"median"``: adds the median;
+            * ``"mode"``: adds the mode(s) (only if the data has a mode);
+            * ``"all"``: adds the mean, median and the mode(s) (if the data das a mode);
 
             To add two measures of central tendency, combine their names separated by a comma (``","``). For example, to add the mean and the median, use ``which = "mean,median"``.
         legend : ``bool``, optional
@@ -87,9 +89,8 @@ class DensityPlot(PlotsManagement, LanguageManagement):
         plot_design : ``str`` or ``dict``, optional
             The plot desing. If ``"gray"``, uses a gray-scale desing (default). If ``"colored"``, uses a colored desing. If ``dict``, it must have five ``keys`` (``"kde"``, ``"Mean"``, ``"Median"``, ``"Mode"``, ``"Area"``), where each one defines the design of each element added to the chart.
         decimal_separator : ``str``, optional
-            The decimal separator symbol used in the chart. It can be the dot (``None`` or ``'.'``) or the comma (``','``).
-        local : ``str``, optional
-            The alias for the desired locale. Only used if ``decimal_separator = ','`` to set the matplolib's default ``locale``. Its only function is to change the decimal separator symbol and should be changed only if the ``"pt_BR"`` option is not available.
+            The decimal separator symbol used in the chart. It can be the dot (``None`` or ``"."``) or the comma (``","``).
+
 
 
         Returns
@@ -225,8 +226,9 @@ class DensityPlot(PlotsManagement, LanguageManagement):
 
         ## which ##
         if which is None:
-            which = "None" # importante, pois None não é subscritable
+            pass
         else:
+
             checkers._check_is_str(which, "which", self.language)
             which = helpers._check_which_density_gaussian_kernal_plot(which, self.language)
 
@@ -258,8 +260,6 @@ class DensityPlot(PlotsManagement, LanguageManagement):
         ## extension ##
         extension = self._get_default_extension(extension)
 
-        ## Baptism of fire ##
-        file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
 
         ## dpi ##
         dpi = self._get_default_dpi(dpi)
@@ -309,9 +309,11 @@ class DensityPlot(PlotsManagement, LanguageManagement):
 
         ## decimal_separator ##
         decimal_separator = self._get_default_decimal_separator(decimal_separator)
+        checkers._check_is_str(decimal_separator, "decimal_separator", self.language)
+        helpers._check_decimal_separator(decimal_separator, self.language)
 
         ## local ##
-        local = self._get_default_local(local)
+        # local = self._get_default_local(local)
 
         ### Getting the measures of central tendency ###
         mean = np.mean(x_exp)
@@ -330,40 +332,89 @@ class DensityPlot(PlotsManagement, LanguageManagement):
         ### calculating nonparametric density values ###
         kde_y = kde(kde_x)
 
+        ## This was removed due to local issue on colab ##
         ### cheking the decimal_separator ###
-        default_locale = helpers._change_locale(self.language, decimal_separator, local)
+        # default_locale = helpers._change_locale(self.language, decimal_separator, local)
 
         ### plotando o gráfico ##
         if ax is None:
             fig, axes = plt.subplots(figsize=(width,height))
+        else:
+            checkers._check_is_subplots(ax, "ax", self.language)
+            axes = ax
+        ## adding the predicted values ##
+        axes.plot(kde_x, kde_y,
+            color=plot_design["kde"][0],
+            ls = plot_design["kde"][1],
+            lw=plot_design["kde"][2],
+            label=messages[4][0][0]
+        )
+        ## adding background color ##
+        axes.fill_between(kde_x, kde_y, color=plot_design["Area"][0])
+        ## adding measures of central tendency ##
+        central_tendency = {}
+        if which is None:
+            pass
+        elif which[0] == "all":
+            axes.vlines(mean, 0, kde(mean),
+                        color=plot_design["Mean"][0],
+                        label=messages[4][1][0],
+                        ls=plot_design["Mean"][1],
+                        lw=plot_design["Mean"][2]
+                    )
+            central_tendency["mean"] = [mean, kde(mean)[0]]
+            axes.vlines(median, 0, kde(median),
+                        color=plot_design["Median"][0],
+                        label=messages[4][2][0],
+                        ls=plot_design["Median"][1],
+                        lw=plot_design["Median"][2]
+                    )
+            central_tendency["median"] = [median, kde(median)[0]]
+            # adding mode #
+            if None in modas[0]:
+                general._display_warn(
+                    aviso = messages[6][0][0],
+                    texto = messages[7][0][0],
+                )
+            else:
+                if len(modas) > 1:
+                    general._display_warn(
+                        aviso = messages[6][0][0],
+                        texto = messages[8][0][0],
+                    )
+                moda_aux = []
+                for i in range(len(modas)):
+                    moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
 
-            ## adding the predicted values ##
-            axes.plot(kde_x, kde_y,
-                color=plot_design["kde"][0],
-                ls = plot_design["kde"][1],
-                lw=plot_design["kde"][2],
-                label=messages[4][0][0]
-            )
-            ## adding background color ##
-            axes.fill_between(kde_x, kde_y, color=plot_design["Area"][0])
-            ## adding measures of central tendency ##
-            central_tendency = {}
-            if which[0] == "all":
+                    if i != len(modas)-1:
+                        axes.vlines(modas[i][0], 0, kde(modas[i][0]),
+                        color=plot_design["Mode"][0],
+                        ls=plot_design["Mode"][1],
+                        lw=plot_design["Mode"][2])
+                    else:
+                        axes.vlines(modas[i][0], 0, kde(modas[i][0]),
+                        color=plot_design["Mode"][0],
+                        label=messages[4][3][0],
+                        ls=plot_design["Mode"][1],
+                        lw=plot_design["Mode"][2])
+
+                central_tendency["mode"] = moda_aux
+        else:
+            if "mean" in which:
                 axes.vlines(mean, 0, kde(mean),
-                            color=plot_design["Mean"][0],
-                            label=messages[4][1][0],
-                            ls=plot_design["Mean"][1],
-                            lw=plot_design["Mean"][2]
-                        )
+                        color=plot_design["Mean"][0],
+                        label=messages[4][1][0],
+                        ls=plot_design["Mean"][1],
+                        lw=plot_design["Mean"][2])
                 central_tendency["mean"] = [mean, kde(mean)[0]]
+            if "median" in which:
                 axes.vlines(median, 0, kde(median),
-                            color=plot_design["Median"][0],
-                            label=messages[4][2][0],
-                            ls=plot_design["Median"][1],
-                            lw=plot_design["Median"][2]
-                        )
+                        color=plot_design["Median"][0],
+                        label=messages[4][2][0],
+                        ls=plot_design["Median"][1],
+                        lw=plot_design["Median"][2])
                 central_tendency["median"] = [median, kde(median)[0]]
-                # adding mode #
+            if "mode" in which:
                 if None in modas[0]:
                     general._display_warn(
                         aviso = messages[6][0][0],
@@ -378,74 +429,36 @@ class DensityPlot(PlotsManagement, LanguageManagement):
                     moda_aux = []
                     for i in range(len(modas)):
                         moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
-
                         if i != len(modas)-1:
                             axes.vlines(modas[i][0], 0, kde(modas[i][0]),
-                            color=plot_design["Mode"][0],
-                            ls=plot_design["Mode"][1],
-                            lw=plot_design["Mode"][2])
+                                    color=plot_design["Mode"][0],
+                                    ls=plot_design["Mode"][1],
+                                    lw=plot_design["Mode"][2])
                         else:
                             axes.vlines(modas[i][0], 0, kde(modas[i][0]),
-                            color=plot_design["Mode"][0],
-                            label=messages[4][3][0],
-                            ls=plot_design["Mode"][1],
-                            lw=plot_design["Mode"][2])
-
+                                    color=plot_design["Mode"][0],
+                                    label=messages[4][3][0],
+                                    ls=plot_design["Mode"][1],
+                                    lw=plot_design["Mode"][2])
                     central_tendency["mode"] = moda_aux
-            else:
-                if "mean" in which:
-                    axes.vlines(mean, 0, kde(mean),
-                            color=plot_design["Mean"][0],
-                            label=messages[4][1][0],
-                            ls=plot_design["Mean"][1],
-                            lw=plot_design["Mean"][2])
-                    central_tendency["mean"] = [mean, kde(mean)[0]]
-                if "median" in which:
-                    axes.vlines(median, 0, kde(median),
-                            color=plot_design["Median"][0],
-                            label=messages[4][2][0],
-                            ls=plot_design["Median"][1],
-                            lw=plot_design["Median"][2])
-                    central_tendency["median"] = [median, kde(median)[0]]
-                if "mode" in which:
-                    if None in modas[0]:
-                        general._display_warn(
-                            aviso = messages[6][0][0],
-                            texto = messages[7][0][0],
-                        )
-                    else:
-                        if len(modas) > 1:
-                            general._display_warn(
-                                aviso = messages[6][0][0],
-                                texto = messages[8][0][0],
-                            )
-                        moda_aux = []
-                        for i in range(len(modas)):
-                            moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
-                            if i != len(modas)-1:
-                                axes.vlines(modas[i][0], 0, kde(modas[i][0]),
-                                        color=plot_design["Mode"][0],
-                                        ls=plot_design["Mode"][1],
-                                        lw=plot_design["Mode"][2])
-                            else:
-                                axes.vlines(modas[i][0], 0, kde(modas[i][0]),
-                                        color=plot_design["Mode"][0],
-                                        label=messages[4][3][0],
-                                        ls=plot_design["Mode"][1],
-                                        lw=plot_design["Mode"][2])
-                        central_tendency["mode"] = moda_aux
 
-            # legend #
-            if legend:
-                axes.legend()
+        # legend #
+        if legend:
+            axes.legend()
 
-            # x label #
-            axes.set_xlabel(x_label)
+        # decimal separator
+        if ax is None:
+            axes = helpers._change_decimal_separator_x_axis(fig, axes, decimal_separator)
+            axes = helpers._change_decimal_separator_y_axis(fig, axes, decimal_separator)
 
-            # y label #
-            axes.set_ylabel(y_label)
-            axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
+        # x label #
+        axes.set_xlabel(x_label)
 
+        # y label #
+        axes.set_ylabel(y_label)
+        axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
+
+        if ax is None:
             # leaving the graph "tight" #
             if tight:
                 tight = 'tight'
@@ -455,76 +468,85 @@ class DensityPlot(PlotsManagement, LanguageManagement):
 
             # exporting the plot #
             if export:
+                ## Baptism of fire ##
+                exits, file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
+
                 plt.savefig(file_name, dpi=dpi, transparent=transparent, bbox_inches=tight)
-                general._display_one_line_success(f"{messages[1][0][0]} '{file_name}' {messages[1][2][0]}")
+                ### quering ###
+                if exits == False:
+                    func_name = "draw_density_function"
+                    fk_id_function = management._query_func_id(func_name)
+                    messages = management._get_messages(fk_id_function, self.language, func_name)
+                    general._display_one_line_success(f"{messages[1][0][0]} '{file_name}' {messages[1][2][0]}")
 
             plt.show()
-        else:
-            checkers._check_is_subplots(ax, "ax", self.language)
-            axes = ax
-            axes.plot(kde_x, kde_y)
-            ## adding background color ##
-            axes.fill_between(kde_x, kde_y)
-            ## adding measures of central tendency ##
-            central_tendency = {}
-            if which[0] == "all":
-                axes.vlines(mean, 0, kde(mean),)
-                central_tendency["mean"] = [mean, kde(mean)[0]]
-                axes.vlines(median, 0, kde(median))
-                central_tendency["median"] = [median, kde(median)[0]]
-                # adding mode #
-                if None in modas[0]:
-                    general._display_warn(
-                        aviso = messages[6][0][0],
-                        texto = messages[7][0][0],
-                    )
-                else:
-                    if len(modas) > 1:
-                        general._display_warn(
-                            aviso = messages[6][0][0],
-                            texto = messages[8][0][0],
-                        )
-                    moda_aux = []
-                    for i in range(len(modas)):
-                        moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
+        #
+        # else:
+        #     checkers._check_is_subplots(ax, "ax", self.language)
+        #     axes = ax
+        #     axes.plot(kde_x, kde_y)
+        #     ## adding background color ##
+        #     axes.fill_between(kde_x, kde_y)
+        #     ## adding measures of central tendency ##
+        #     central_tendency = {}
+        #     if which[0] == "all":
+        #         axes.vlines(mean, 0, kde(mean),)
+        #         central_tendency["mean"] = [mean, kde(mean)[0]]
+        #         axes.vlines(median, 0, kde(median))
+        #         central_tendency["median"] = [median, kde(median)[0]]
+        #         # adding mode #
+        #         if None in modas[0]:
+        #             general._display_warn(
+        #                 aviso = messages[6][0][0],
+        #                 texto = messages[7][0][0],
+        #             )
+        #         else:
+        #             if len(modas) > 1:
+        #                 general._display_warn(
+        #                     aviso = messages[6][0][0],
+        #                     texto = messages[8][0][0],
+        #                 )
+        #             moda_aux = []
+        #             for i in range(len(modas)):
+        #                 moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
+        #
+        #                 if i != len(modas)-1:
+        #                     axes.vlines(modas[i][0], 0, kde(modas[i][0]))
+        #                 else:
+        #                     axes.vlines(modas[i][0], 0, kde(modas[i][0]))
+        #
+        #             central_tendency["mode"] = moda_aux
+        #     else:
+        #         if "mean" in which:
+        #             axes.vlines(mean, 0, kde(mean))
+        #             central_tendency["mean"] = [mean, kde(mean)[0]]
+        #         if "median" in which:
+        #             axes.vlines(median, 0, kde(median))
+        #             central_tendency["median"] = [median, kde(median)[0]]
+        #         if "mode" in which:
+        #             if None in modas[0]:
+        #                 general._display_warn(
+        #                     aviso = messages[6][0][0],
+        #                     texto = messages[7][0][0],
+        #                 )
+        #             else:
+        #                 if len(modas) > 1:
+        #                     general._display_warn(
+        #                         aviso = messages[6][0][0],
+        #                         texto = messages[8][0][0],
+        #                     )
+        #                 moda_aux = []
+        #                 for i in range(len(modas)):
+        #                     moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
+        #                     if i != len(modas)-1:
+        #                         axes.vlines(modas[i][0], 0, kde(modas[i][0]))
+        #                     else:
+        #                         axes.vlines(modas[i][0], 0, kde(modas[i][0]))
+        #                 central_tendency["mode"] = moda_aux
+        #
 
-                        if i != len(modas)-1:
-                            axes.vlines(modas[i][0], 0, kde(modas[i][0]))
-                        else:
-                            axes.vlines(modas[i][0], 0, kde(modas[i][0]))
-
-                    central_tendency["mode"] = moda_aux
-            else:
-                if "mean" in which:
-                    axes.vlines(mean, 0, kde(mean))
-                    central_tendency["mean"] = [mean, kde(mean)[0]]
-                if "median" in which:
-                    axes.vlines(median, 0, kde(median))
-                    central_tendency["median"] = [median, kde(median)[0]]
-                if "mode" in which:
-                    if None in modas[0]:
-                        general._display_warn(
-                            aviso = messages[6][0][0],
-                            texto = messages[7][0][0],
-                        )
-                    else:
-                        if len(modas) > 1:
-                            general._display_warn(
-                                aviso = messages[6][0][0],
-                                texto = messages[8][0][0],
-                            )
-                        moda_aux = []
-                        for i in range(len(modas)):
-                            moda_aux.append([modas[i][0], kde(modas[i][0])[0]])
-                            if i != len(modas)-1:
-                                axes.vlines(modas[i][0], 0, kde(modas[i][0]))
-                            else:
-                                axes.vlines(modas[i][0], 0, kde(modas[i][0]))
-                        central_tendency["mode"] = moda_aux
-
-
-
-        helpers._change_locale_back_to_default(default_locale)
+        ## This was removed due to local issue on colab ##
+        # helpers._change_locale_back_to_default(default_locale)
         return kde_x, kde_y, central_tendency, axes
 
 

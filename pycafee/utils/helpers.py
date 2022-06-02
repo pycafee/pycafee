@@ -23,11 +23,13 @@
 #         - set_n_digits(self, n_digits)
 #         - __str__(self)
 #         - __repr__(self)
-#
+
+#     - _change_decimal_separator_x_axis(fig, axes, decimal_separator)
 #     - _change_locale(language, decimal_separator=".", local="pt_BR")
 #     - _change_locale_back_to_default(default_locale)
 #     - _check_blank_space(value, param_name, language)
 #     - _check_conflicting_filename(file_name, extension, language)
+#     - _check_decimal_separator(decimal_separator, language)
 #     - _check_figure_extension(value, param_name, language)
 #     - _check_file_exists(file_name)
 #     - _check_file_name_is_str(file_name, language)
@@ -38,6 +40,7 @@
 #     - _export_to_xlsx(df_list, language, file_name=None, sheet_names=[None,None])
 #     - _flat_list_of_lists(my_list, param_name, language)
 #     - _raises_when_fit_was_not_applied(func_name, language, name)
+#     - _replace_last_occurrence(value, old, new, occurrence)
 #     - _sep_checker(sep, language)
 #     - _truncate(value, language, decs=None)
 
@@ -385,12 +388,12 @@ class PlotsManagement:
             pass # o controle é feito em outra função
         return decimal_separator
 
-    def _get_default_local(self, local):
-        if local is None:
-            local = self.local
-        else:
-            pass # o controle é feito em outra função
-        return local
+    # def _get_default_local(self, local):
+    #     if local is None:
+    #         local = self.local
+    #     else:
+    #         pass # o controle é feito em outra função
+    #     return local
 
     def _get_default_legend_label(self, legend_label):
         if legend_label is None:
@@ -400,13 +403,41 @@ class PlotsManagement:
         return legend_label
 
 
+# with some test, no text, no database, with docstring
+def _change_decimal_separator_x_axis(fig, axes, decimal_separator):
+    """Esta função altera o separador de casa decimal através da mudança do seu label
+    """
+    if decimal_separator != ".":
+        new_x_ticks = []
+        fig.canvas.draw()
+        for text in axes.get_xticklabels():
+            result = _replace_last_occurrence(text.get_text(), '.', decimal_separator, 1)
+            new_x_ticks.append(result)
+        axes.set_xticklabels(new_x_ticks)
+        for text in axes.get_xticklabels():
+            temp = text.get_text()
+        return axes
+    else:
+        return axes
 
+# with some test, no text, no database, with docstring
+def _change_decimal_separator_y_axis(fig, axes, decimal_separator):
+    """Esta função altera o separador de casa decimal através da mudança do seu label
+    """
+    if decimal_separator != ".":
+        new_y_ticks = []
+        fig.canvas.draw()
+        for text in axes.get_yticklabels():
+            result = _replace_last_occurrence(text.get_text(), '.', decimal_separator, 1)
+            new_y_ticks.append(result)
+        axes.set_yticklabels(new_y_ticks)
+        for text in axes.get_yticklabels():
+            temp = text.get_text()
+        return axes
+    else:
+        return axes
 
-
-
-
-
-# ESTA ERRADO!! VERFICAR NO SAPIRO WILK
+## This is current not used due to an issue on google colab ##
 def _change_locale(language, decimal_separator=".", local="pt_BR"):
     """This function momentarily changes the decimal separator used in charts.
 
@@ -460,11 +491,16 @@ def _change_locale(language, decimal_separator=".", local="pt_BR"):
             general._display_one_line_attention(
                 f"{messages[3][0][0]} {local} {messages[3][2][0]}"
             )
+            if 'google.colab' in str(get_ipython()):
+              print('Running on CoLab')
+            else:
+              print('Not running on CoLab')
             raise
     else:
         default_locale = None
     return default_locale
 
+## This is current not used due to an issue on google colab ##
 # with a test, no text, no database, with docstring
 def _change_locale_back_to_default(default_locale):
     """This function restores the local parameter to its default value.
@@ -535,26 +571,28 @@ def _check_conflicting_filename(file_name, extension, language):
 
     Paramters
     ---------
-    file_name : string
+    file_name : ``str``
         The name of the file to be exported, without its extension
-    extension : string
+    extension : ``str``
         The file extension
-    language : string
+    language : ``str``
         The language code
 
     Notes
     -----
-    The parameter 'file_name' isn't checked if it is a string.
-    The parameter 'extension' isn't checked if it is a string.
-    The parameter 'language' isn't checked if it is a string.
+    The parameter ``file_name`` isn't checked if it is a string.
+    The parameter ``extension`` isn't checked if it is a string.
+    The parameter ``language`` isn't checked if it is a string.
 
     If the file_name + extension does not exists in the current directory, the output os file_name + "." + extension
     If the file_name + extension exists in the current directory, a string ("_n") is inserted at the end od the file_name (where n is a number). Is this is true, the user is wanrned about it.
 
     Returns
     -------
-    file_name : string
+    file_name : ``str``
         The file name that does not exists in the current directory
+    exitis : ``bool``
+        Whether the file already exists (``True``) or not (``False``)
 
     """
     ### Baptism of Fire ###
@@ -562,6 +600,7 @@ def _check_conflicting_filename(file_name, extension, language):
     # if the file already exists, create a new name for the file
     file_exists = _check_file_exists(file)
     if file_exists:
+        exitis = True
         ### quering ###
         func_name = "_check_conflicting_filename"
         fk_id_function = management._query_func_id(func_name)
@@ -583,7 +622,66 @@ def _check_conflicting_filename(file_name, extension, language):
                         ])
     else:
         file_name = file
-    return file_name
+        exitis = False
+    return exitis, file_name
+
+# with tests, with text, with database, with docstring
+def _check_decimal_separator(decimal_separator, language):
+    """This function checks if decimal_separator is valid
+
+    Parameters
+    ----------
+    decimal_separator : ``str``
+        The value to check if it valied.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+
+    The allowed decimal separators are:
+
+        ".": "dot",
+        ",": "comma",
+
+
+    Returns
+    -------
+    True if decimal_separator is valid.
+    Raises ValueError is decimal_separator is not a valid.
+
+
+
+    """
+    list_of_allowed = [".", ","]
+
+
+    if decimal_separator not in list_of_allowed:
+        ### quering ###
+        func_name = "_check_decimal_separator"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, language, func_name)
+        try:
+            error = messages[1][0][0]
+            raise ValueError(error)
+        except ValueError:
+            all_formated_characters = [f"    --->    '{charcater}'" for charcater in list_of_allowed]
+            msg = [
+                f"{messages[2][0][0]} '{decimal_separator}' {messages[2][2][0]}",
+                f"{messages[3][0][0]}",
+                all_formated_characters
+                ]
+            flat_list = general._flatten_list_of_list_string(msg)
+            flat_list = list(flat_list)
+            general._display_n_line_attention(
+                flat_list
+            )
+            raise
+    return True
+
 
 # with test, with text, with database, with docstring
 def _check_figure_extension(value, param_name, language):
@@ -955,14 +1053,8 @@ def _check_which_density_gaussian_kernal_plot(which, language):
     Raise ValueError if it was not considered correct
 
     """
-    accepted_keys = [
-            "    --->  'mean' adds the mean to the graph",
-            "    --->  'median' adds the median to the graph",
-            "    --->  'mode' adds the mode to the graph",
-            "         or",
-            "    --->  'all' adds the mean, median and mode to the graph",
-            ]
-
+    which_original = which
+    list_accepted_keys = ["mean", "median", "mode", "all"]
     # removando espaços em branco
     which = which.replace(" ", "")
     # verificando se tem apenas caracteres aceitos
@@ -975,33 +1067,33 @@ def _check_which_density_gaussian_kernal_plot(which, language):
             fk_id_function = management._query_func_id(func_name)
             messages = management._get_messages(fk_id_function, language, func_name)
             try:
-                raise ValueError(messages[1][0][0])
+                error = messages[1][0][0]
+                raise ValueError(error)
             except ValueError:
-
                 msg = [
-                        f"{messages[2][0][0]} '{word}'.",
+                        f"{messages[2][0][0]} '{which}' {messages[2][2][0]}.",
                         f"{messages[3][0][0]}",
-                        accepted_keys,
-                        f"{messages[4][0][0]}"
+                        [f"    --->  {chave}" for chave in list_accepted_keys],
                 ]
                 msg = general._flatten_list_of_list_string(msg)
                 msg = list(msg)
                 general._display_n_line_attention(msg)
                 raise
 
+
     which = which.split(",")
-    list_accepted_keys = ["mean", "median", "mode", "all"]
     for value in which:
         func_name = "_check_which_density_gaussian_kernal_plot"
         fk_id_function = management._query_func_id(func_name)
         messages = management._get_messages(fk_id_function, language, func_name)
         if value not in list_accepted_keys:
             try:
-                raise ValueError(messages[5][0][0])
+                error = messages[1][0][0]
+                raise ValueError(error)
             except ValueError:
                 msg = [
-                        f"{messages[6][0][0]} '{value}' {messages[6][2][0]}.",
-                        f"{messages[7][0][0]}",
+                        f"{messages[2][0][0]} '{value}' {messages[2][2][0]}.",
+                        f"{messages[3][0][0]}",
                         [f"    --->  {chave}" for chave in list_accepted_keys],
                 ]
                 msg = general._flatten_list_of_list_string(msg)
@@ -1014,15 +1106,14 @@ def _check_which_density_gaussian_kernal_plot(which, language):
         messages = management._get_messages(fk_id_function, language, func_name)
         if len(which) != 1:
             try:
-                raise ValueError(messages[8][0][0])
+                error = messages[4][0][0]
+                raise ValueError(error)
             except ValueError:
-                msg = [
-                        f"{messages[9][0][0]}",
-                        [f"    --->  {chave}" for chave in which],
-                ]
-                msg = general._flatten_list_of_list_string(msg)
-                msg = list(msg)
-                general._display_n_line_attention(msg)
+
+                general._display_two_line_attention(
+                    f"{messages[5][0][0]}",
+                    f"    ---->    '{which_original}'"
+                )
                 raise
 
     return which
@@ -1314,6 +1405,37 @@ def _raises_when_fit_was_not_applied(func_name, language, name):
             f"{messages[2][0][0]} {name}",
                             )
         raise
+
+# with some test, no text, no database, with docstring
+def _replace_last_occurrence(value, old, new, occurrence):
+    """This function replaces the last ``occurrence`` of ``old`` in ``value`` with the value passed in ``new``
+
+    Parameters
+    ----------
+    value : ``str``
+        The text to be changed
+    old : ``str``
+        The character(s) to be replaced
+    new : ``str``
+        The new characters
+    occurrence : ``int``
+        The number of occurrences that will be replaced
+
+    Returns
+    -------
+
+    value : ``str``
+        The changed text
+
+
+    References
+    ----------
+    .. [1] Adapted from mg. rreplace - How to replace the last occurrence of an expression in a string?. Available at: `stackoverflow.com <https://stackoverflow.com/a/2556252/17872198>`_. Access on: 10 May. 2022.
+
+    """
+    li = value.rsplit(old, occurrence)
+    return new.join(li)
+
 
 
 # with tests, with text, with database, with docstring
