@@ -41,7 +41,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
 
     # with tests, with databse (but at StudentDistribution), with docstring
-    def draw(self, gl, tcalc, alfa=None, ax=None, which=None, interval=None, legend=None, x_label=None, y_label=None, width='default', height='default', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, plot_design='gray', decimal_separator=None, local=None):
+    def draw(self, gl, tcalc, alfa=None, ax=None, which=None, interval=None, legend=None, x_label=None, y_label=None, width='default', height='default', export=None, file_name=None, extension=None, dpi=None, tight=None, transparent=None, plot_design='gray', decimal_separator=None):
         """This function draws a graph with the Student's t distribution (one-sided or two-sided) for a given degree of freedom, combined with the calculated value of the statistic of this test for a sample with an alpha level of significance.
 
         Parameters
@@ -94,8 +94,6 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
             The plot desing. If ``"gray"``, uses a gray-scale desing (default). If ``"colored"``, uses a colored desing. If ``dict``, it must have four ``keys`` (``"distribution"``, ``"area-rejection"``, ``"area-acceptance"``, ``"tcalc"``), where each one defines the design of each element added to the chart.
         decimal_separator : ``str``, optional
             The decimal separator symbol used in the chart. It can be the dot (``None`` or ``'.'``) or the comma (``','``).
-        local : ``str``, optional
-            The alias for the desired locale. Only used if ``decimal_separator = ','`` to set the matplolib's default ``locale``. Its only function is to change the decimal separator symbol and should be changed only if the ``"pt_BR"`` option is not available.
 
 
         Returns
@@ -267,7 +265,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         extension = self._get_default_extension(extension)
 
         ## Baptism of fire ##
-        file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
+        # file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
 
         ## dpi ##
         dpi = self._get_default_dpi(dpi)
@@ -313,13 +311,16 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         ## decimal_separator ##
         decimal_separator = self._get_default_decimal_separator(decimal_separator)
+        checkers._check_is_str(decimal_separator, "decimal_separator", self.language)
+        helpers._check_decimal_separator(decimal_separator, self.language)
+
 
         ## local ##
-        local = self._get_default_local(local)
+        # local = self._get_default_local(local)
 
 
         ### cheking the decimal_separator ###
-        default_locale = helpers._change_locale(self.language, decimal_separator, local)
+        # default_locale = helpers._change_locale(self.language, decimal_separator, local)
 
 
         ### cheking the interval ###
@@ -409,51 +410,59 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
             if ax is None:
                 fig, axes = plt.subplots(figsize=(width,height))
-                # adicionando a distribuição t
-                axes.plot(x_pred, y_pred,
-                            label=r'$gl=%i$' % (gl),
-                            c=plot_design['distribution'][0],
-                            ls=plot_design['distribution'][1],
-                            lw=plot_design['distribution'][2],
-                        )
+            else:
+                checkers._check_is_subplots(ax, "ax", self.language)
+                axes = ax
 
-                axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
-                                    color=plot_design['tcalc'][0],
-                                    marker=plot_design['tcalc'][1],
-                                    s=plot_design['tcalc'][2],
+
+            # adicionando a distribuição t
+            axes.plot(x_pred, y_pred,
+                        label=r'$gl=%i$' % (gl),
+                        c=plot_design['distribution'][0],
+                        ls=plot_design['distribution'][1],
+                        lw=plot_design['distribution'][2],
+                    )
+
+            axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
+                                color=plot_design['tcalc'][0],
+                                marker=plot_design['tcalc'][1],
+                                s=plot_design['tcalc'][2],
+                                )
+
+            axes.fill_between(x_esquerda, y_esquerda, interpolate=True, zorder=-1,
+                                label=messages[10][0][0],
+                                color=plot_design['area-rejection'][0],
+                                )
+
+            axes.fill_between(x_direita, y_direita, interpolate=True, zorder=-1,
+                                color=plot_design['area-rejection'][0]
+                                )
+
+
+            if plot_design['area-acceptance'][0] != "white":
+                # dicionando área de aceitação
+                x_centro = np.arange(t_student_esquerda, t_student_direita, 0.01)
+                y_centro = stats.t.pdf(x_centro, gl)
+                axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
+                                    label=messages[11][0][0],
+                                    color=plot_design['area-acceptance'][0],
                                     )
+            # adicionando reta em y = 0
+            axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
 
-                axes.fill_between(x_esquerda, y_esquerda, interpolate=True, zorder=-1,
-                                    label=messages[10][0][0],
-                                    color=plot_design['area-rejection'][0],
-                                    )
+            # legend #
+            if legend:
+                axes.legend()
 
-                axes.fill_between(x_direita, y_direita, interpolate=True, zorder=-1,
-                                    color=plot_design['area-rejection'][0]
-                                    )
+            # x label #
+            axes.set_xlabel(x_label)
+            # y label #
+            axes.set_ylabel(y_label)
+            # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
 
-
-                if plot_design['area-acceptance'][0] != "white":
-                    # dicionando área de aceitação
-                    x_centro = np.arange(t_student_esquerda, t_student_direita, 0.01)
-                    y_centro = stats.t.pdf(x_centro, gl)
-                    axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
-                                        label=messages[11][0][0],
-                                        color=plot_design['area-acceptance'][0],
-                                        )
-                # adicionando reta em y = 0
-                axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
-
-                # legend #
-                if legend:
-                    axes.legend()
-
-                # x label #
-                axes.set_xlabel(x_label)
-                # y label #
-                axes.set_ylabel(y_label)
-                # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
-
+            if ax is None:
+                axes = helpers._change_decimal_separator_x_axis(fig, axes, decimal_separator)
+                axes = helpers._change_decimal_separator_y_axis(fig, axes, decimal_separator)
                 # leaving the graph "tight" #
                 if tight:
                     tight = 'tight'
@@ -463,58 +472,13 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
                 # exporting the plot #
                 if export:
+                    exits, file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
                     plt.savefig(file_name, dpi=dpi, transparent=transparent, bbox_inches=tight)
                     fk_id_function = management._query_func_id('draw_density_function')
                     messages = management._get_messages(fk_id_function, self.language, 'draw_density_function')
                     general._display_one_line_success(f"{messages[1][0][0]} '{file_name}' {messages[1][2][0]}")
 
                 plt.show()
-            else:
-                checkers._check_is_subplots(ax, "ax", self.language)
-                axes = ax
-                # adicionando a distribuição t
-                axes.plot(x_pred, y_pred,
-                            label=r'$gl=%i$' % (gl),
-                            c=plot_design['distribution'][0],
-                            ls=plot_design['distribution'][1],
-                            lw=plot_design['distribution'][2],
-                        )
-
-                axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
-                                    color=plot_design['tcalc'][0],
-                                    marker=plot_design['tcalc'][1],
-                                    s=plot_design['tcalc'][2],
-                                    )
-
-                axes.fill_between(x_esquerda, y_esquerda, interpolate=True, zorder=-1,
-                                    label=messages[10][0][0],
-                                    color=plot_design['area-rejection'][0],
-                                    )
-
-                axes.fill_between(x_direita, y_direita, interpolate=True, zorder=-1,
-                                    color=plot_design['area-rejection'][0]
-                                    )
-
-                if plot_design['area-acceptance'][0] != "white":
-                    # dicionando área de aceitação
-                    x_centro = np.arange(t_student_esquerda, t_student_direita, 0.01)
-                    y_centro = stats.t.pdf(x_centro, gl)
-                    axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
-                                        label=messages[11][0][0],
-                                        color=plot_design['area-acceptance'][0],
-                                        )
-                # adicionando reta em y = 0
-                axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
-
-                # legend #
-                if legend:
-                    axes.legend()
-                # x label #
-                axes.set_xlabel(x_label)
-                # y label #
-                axes.set_ylabel(y_label)
-                # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
-
 
         else:
             # gerando dados de x dentro do intervalo estabelacido
@@ -546,50 +510,55 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
             if ax is None:
                 fig, axes = plt.subplots(figsize=(width,height))
-                # adicionando a distribuição t
-                axes.plot(x_pred, y_pred,
-                            label=r'$gl=%i$' % (gl),
-                            c=plot_design['distribution'][0],
-                            ls=plot_design['distribution'][1],
-                            lw=plot_design['distribution'][2],
-                        )
+            else:
+                checkers._check_is_subplots(ax, "ax", self.language)
+                axes = ax
+            # adicionando a distribuição t
+            axes.plot(x_pred, y_pred,
+                        label=r'$gl=%i$' % (gl),
+                        c=plot_design['distribution'][0],
+                        ls=plot_design['distribution'][1],
+                        lw=plot_design['distribution'][2],
+                    )
 
-                axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
-                                    color=plot_design['tcalc'][0],
-                                    marker=plot_design['tcalc'][1],
-                                    s=plot_design['tcalc'][2],
+            axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
+                                color=plot_design['tcalc'][0],
+                                marker=plot_design['tcalc'][1],
+                                s=plot_design['tcalc'][2],
+                                )
+
+            axes.fill_between(x, y, interpolate=True, zorder=-1,
+                                label=messages[10][0][0],
+                                color=plot_design['area-rejection'][0],
+                                )
+
+
+            if plot_design['area-acceptance'][0] != "white":
+                # dicionando área de aceitação
+                if t_student > 0:
+                    x_centro = np.arange(x_pred[0], t_student, 0.01)
+                else:
+                    x_centro = np.arange(t_student, x_pred[-1], 0.01)
+                y_centro = stats.t.pdf(x_centro, gl)
+                axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
+                                    label=messages[11][0][0],
+                                    color=plot_design['area-acceptance'][0],
                                     )
+            # adicionando reta em y = 0
+            axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
 
-                axes.fill_between(x, y, interpolate=True, zorder=-1,
-                                    label=messages[10][0][0],
-                                    color=plot_design['area-rejection'][0],
-                                    )
+            # legend #
+            if legend:
+                axes.legend()
 
-
-                if plot_design['area-acceptance'][0] != "white":
-                    # dicionando área de aceitação
-                    if t_student > 0:
-                        x_centro = np.arange(x_pred[0], t_student, 0.01)
-                    else:
-                        x_centro = np.arange(t_student, x_pred[-1], 0.01)
-                    y_centro = stats.t.pdf(x_centro, gl)
-                    axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
-                                        label=messages[11][0][0],
-                                        color=plot_design['area-acceptance'][0],
-                                        )
-                # adicionando reta em y = 0
-                axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
-
-                # legend #
-                if legend:
-                    axes.legend()
-
-                # x label #
-                axes.set_xlabel(x_label)
-                # y label #
-                axes.set_ylabel(y_label)
-                # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
-
+            # x label #
+            axes.set_xlabel(x_label)
+            # y label #
+            axes.set_ylabel(y_label)
+            # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
+            if ax is None:
+                axes = helpers._change_decimal_separator_x_axis(fig, axes, decimal_separator)
+                axes = helpers._change_decimal_separator_y_axis(fig, axes, decimal_separator)
                 # leaving the graph "tight" #
                 if tight:
                     tight = 'tight'
@@ -599,57 +568,16 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
                 # exporting the plot #
                 if export:
+                    exits, file_name = helpers._check_conflicting_filename(file_name, extension, self.language)
                     plt.savefig(file_name, dpi=dpi, transparent=transparent, bbox_inches=tight)
                     fk_id_function = management._query_func_id('draw_density_function')
                     messages = management._get_messages(fk_id_function, self.language, 'draw_density_function')
                     general._display_one_line_success(f"{messages[1][0][0]} '{file_name}' {messages[1][2][0]}")
 
-                plt.show()
-            else:
-                checkers._check_is_subplots(ax, "ax", self.language)
-                axes = ax
-                # adicionando a distribuição t
-                axes.plot(x_pred, y_pred,
-                            label=r'$gl=%i$' % (gl),
-                            c=plot_design['distribution'][0],
-                            ls=plot_design['distribution'][1],
-                            lw=plot_design['distribution'][2],
-                        )
-
-                axes.scatter(tcalc, y_tcalc,  label = r'$t_{calc} = $' + str(tcalc), zorder=10,
-                                    color=plot_design['tcalc'][0],
-                                    marker=plot_design['tcalc'][1],
-                                    s=plot_design['tcalc'][2],
-                                    )
-
-                axes.fill_between(x, y, interpolate=True, zorder=-1,
-                                    label=messages[10][0][0],
-                                    color=plot_design['area-rejection'][0],
-                                    )
+            plt.show()
 
 
-                if plot_design['area-acceptance'][0] != "white":
-                    # dicionando área de aceitação
-                    x_centro = np.arange(t_student, t_student, 0.01)
-                    y_centro = stats.t.pdf(x_centro, gl)
-                    axes.fill_between(x_centro, y_centro, interpolate=True, zorder=-1,
-                                        label=messages[11][0][0],
-                                        color=plot_design['area-acceptance'][0],
-                                        )
-                # adicionando reta em y = 0
-                axes.hlines(0, xmin=interval[0], xmax=interval[1], color='k')
-
-                # legend #
-                if legend:
-                    axes.legend()
-                # x label #
-                axes.set_xlabel(x_label)
-                # y label #
-                axes.set_ylabel(y_label)
-                # axes.set_ylim(bottom=0, top=None) # limiting to start at y = 0
-
-
-        helpers._change_locale_back_to_default(default_locale)
+        # helpers._change_locale_back_to_default(default_locale)
 
         return axes, output
 

@@ -491,10 +491,10 @@ def _change_locale(language, decimal_separator=".", local="pt_BR"):
             general._display_one_line_attention(
                 f"{messages[3][0][0]} {local} {messages[3][2][0]}"
             )
-            if 'google.colab' in str(get_ipython()):
-              print('Running on CoLab')
-            else:
-              print('Not running on CoLab')
+            # if 'google.colab' in str(get_ipython()):
+            #   print('Running on CoLab')
+            # else:
+            #   print('Not running on CoLab')
             raise
     else:
         default_locale = None
