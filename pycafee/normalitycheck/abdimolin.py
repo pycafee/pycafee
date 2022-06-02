@@ -267,14 +267,15 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         return result(critical, alfa)
 
     # with tet, tieh text, with database, with docstring
-    def draw_critical_values(self, ax=None, export=None, extension=None, file_name=None, dpi=None, decimal_separator=None, local=None):
+    def draw_critical_values(self, ax=None, export=None, extension=None, file_name=None, dpi=None, decimal_separator=None):
         """Draw a plot with the AbdiMolin  [1]_ *critical data*.
 
         Parameters
         ----------
         ax : ``None`` or ``matplotlib.axes.SubplotBase``
-            If ``ax`` is ``None``, a figure is created with a preset design. The other parameters can be used to export the graph.
-            If ``ax`` is a ``matplotlib.axes.SubplotBase``, the function returns a ``matplotlib.axes.SubplotBase`` with the AbdiMolin critical data. In this case, the other parameters do not affect the graph.
+
+            * If ``ax`` is ``None``, a figure is created with a preset design. The other parameters can be used to export the graph.
+            * If ``ax`` is a ``matplotlib.axes.SubplotBase``, the function returns a ``matplotlib.axes.SubplotBase`` with the AbdiMolin critical data. In this case, the other parameters do not affect the graph.
         export : ``bool``, optional
             Whether the graph should be exported (``True``) or not (``False``). The default value is ``None``, which implies ``False``.
         file_name : ``str``, optional
@@ -285,8 +286,6 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
             The figure pixel density. The default is ``None``, which results in a ``100 dpis`` picture. This parameter must be a number higher than zero.
         decimal_separator : ``str``, optional
             The decimal separator symbol used in the chart. It can be the dot (``None`` or ``'.'``) or the comma (``','``).
-        local : ``str``, optional
-            The alias for the desired locale. Only used if ``decimal_separator=','`` to set the matplolib's default locale. Its only function is to change the decimal separator symbol and should be changed only if the ``"pt_BR"`` option is not available.
 
 
         Returns
