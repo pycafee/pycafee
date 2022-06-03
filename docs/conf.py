@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
+    # 'sphinx_toolbox.shields',
     # 'sphinx.ext.doctest', # o problema é que ele quebra todo o output, e retorna muitos falsos erros
 ]
 

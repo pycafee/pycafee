@@ -1,5 +1,5 @@
 Welcome to PyCafee's documentation!
-=========================================
+===================================
 
 .. |cup_coffee| unicode:: U+2615
 
@@ -10,9 +10,16 @@ Welcome to PyCafee's documentation!
    This project is under active development.
 
 
+|
+
+**Latast version**: ``0.0.5``
+
+|
+
 .. toctree::
    :maxdepth: 1
 
+   source/instalation
    source/user_guide
    source/index
    source/examples/example

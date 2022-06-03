@@ -1,16 +1,8 @@
 Example Notebooks
 =================
 
+
 .. |cup_coffee| unicode:: U+2615
-
-.. admonition:: |cup_coffee|
-
-   Under construction.
-
-
-.. _KolmogorovSmirnov: https://colab.research.google.com/drive/1MtkriA01a_PINAwz4pA9fbh1QzeAfUC1?usp=sharing
-
-
 
 
 Normality Check
@@ -33,9 +25,26 @@ Individual Class
 * `KolmogorovSmirnov (pt-br) <https://colab.research.google.com/drive/1oW367co48SWPULpzo2w-5UNVJOazQWwe?usp=sharing>`_;
 * `Lilliefors (en) <https://colab.research.google.com/drive/18JZiXnYQVAoccEnoUrMTUSYnm69QfCou?usp=sharing>`_;
 * `Lilliefors (pt-br) <https://colab.research.google.com/drive/1y-Z938qtwbCJEGzsD9F1DHFlZVa4YOQO?usp=sharing>`_;
-* `ShapiroWilk (en) <https://colab.research.google.com/drive/1YzVtaw_LvbjF1PvfbhXZ89oepPWxpjE4?usp=sharing>`_;
-* `ShapiroWilk (pt-br) <https://colab.research.google.com/drive/1KUP0YuJLtoVekzB8HhtMzmAd2e3nJUsP?usp=sharing>`_;
+* `ShapiroWilk (en) <https://colab.research.google.com/drive/1YzVtaw_LvbjF1PvfbhXZ89oepPWxpjE4?usp=sharing>`_; |cup_coffee| :abbr:`.. (recommended)`
+* `ShapiroWilk (pt-br) <https://colab.research.google.com/drive/1KUP0YuJLtoVekzB8HhtMzmAd2e3nJUsP?usp=sharing>`_; |cup_coffee| :abbr:`.. (recomendado)`
 
 
 Plots
 ^^^^^
+
+* `DotPlot (en) <https://colab.research.google.com/drive/1UsgFMjrAtCGrM23DuwaTrKkFyp9VoLtB?usp=sharing>`_;
+* `DotPlot (pt-br) <https://colab.research.google.com/drive/1X-GOVrOwP5tN3-c9yyfmiin0K-BvcywB?usp=sharing>`_;
+
+* `DensityPlot (en) <https://colab.research.google.com/drive/1K5bbW4z9-iTPAIH3Ig5c57ob9ttS6eT6?usp=sharing>`_;
+* `DensityPlot (pt-br) <https://colab.research.google.com/drive/1OcJxLntaznPq08iEljCpzEkUDUxd41gu?usp=sharing>`_;
+
+
+
+
+Sample
+------
+
+One Sample
+^^^^^^^^^^
+
+* `compare_with_constant, (Dados Normais, teste bilateral, pt-br) <https://colab.research.google.com/drive/1A1HNux_7tLwrvrGVzluO_50y4R2HVsEi?usp=sharing>`_;
