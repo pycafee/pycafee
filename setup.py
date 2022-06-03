@@ -19,7 +19,8 @@ requirements = ["colorama>=0.4.4", "matplotlib>=3.2.2", "numpy>=1.21.6", "openpy
 ]
 
 setup(
-    name=__name__,
+    name=__name__.lower(),
+    python_requires='>3.8.10',
     version=__version__,
     author=__author__,
     author_email="andersonmdcanteli@gmail.com",
