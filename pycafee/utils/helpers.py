@@ -408,14 +408,18 @@ def _change_decimal_separator_x_axis(fig, axes, decimal_separator):
     """Esta função altera o separador de casa decimal através da mudança do seu label
     """
     if decimal_separator != ".":
-        new_x_ticks = []
+        new_x_ticks_labels = []
         fig.canvas.draw()
         for text in axes.get_xticklabels():
             result = _replace_last_occurrence(text.get_text(), '.', decimal_separator, 1)
-            new_x_ticks.append(result)
-        axes.set_xticklabels(new_x_ticks)
+            new_x_ticks_labels.append(result)
+        new_x_ticks = []
         for text in axes.get_xticklabels():
-            temp = text.get_text()
+            result = _replace_last_occurrence(text.get_text(), '.', decimal_separator, 1)
+            new_x_ticks.append(result)
+        axes.set_xticklabels(new_x_ticks_labels)
+        # for text in axes.get_xticklabels():
+        #     temp = text.get_text()
         return axes
     else:
         return axes
