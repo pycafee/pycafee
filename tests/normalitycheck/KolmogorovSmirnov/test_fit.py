@@ -35,9 +35,9 @@ class Test_fit(unittest.TestCase):
     def test_alfa_0_10(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, alfa=0.10)
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.368, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.10, "wrong alfa value")
         if "Data is Normal at a 90.0% of confidence level" in conclusao:
             result = True
@@ -49,9 +49,9 @@ class Test_fit(unittest.TestCase):
     def test_alfa_0_02(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, alfa=0.02, comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertIsNone(resultado[1], "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.02, "wrong alfa value")
         if "critical" in conclusao:
             result = False
@@ -63,9 +63,9 @@ class Test_fit(unittest.TestCase):
     def test_alfa_0_25(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, alfa=0.25, comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertIsNone(resultado[1], "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.25, "wrong alfa value")
         if "critical" in conclusao:
             result = False
@@ -203,9 +203,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x)
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.41, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Data is Normal" in conclusao:
             result = True
@@ -217,9 +217,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal_conclusion_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.410, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Data is Normal" in conclusao:
             result = True
@@ -231,9 +231,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal_details_full(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, details="full")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.410, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Since the critical value (0.41) >= statistic (0.154), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level." in conclusao:
             result = True
@@ -245,9 +245,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal_details_full_conclusion_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, details="full", comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.410, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Since p-value (0.97) >= alpha (0.05), we have NO evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level." in conclusao:
             result = True
@@ -259,9 +259,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal_details_binary_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, details="binary", comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644,msg= "wrong statistic value")
         self.assertEqual(resultado[1], 0.410, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
         self.assertEqual(conclusao, 0, msg="conclusion not 0 when binary and data not normal")
@@ -270,9 +270,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_normal_details_binary(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x, details="binary")
-        self.assertAlmostEqual(resultado[0], 0.15459867079959644, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.15459867079959644, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.410, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.9706128123504146, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.9706128123504146, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
         self.assertEqual(conclusao, 0, msg="conclusion not 0 when binary and data not normal")
@@ -281,9 +281,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal)
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Data is Not Normal at a 95.0% of confidence level." in conclusao:
             result = True
@@ -295,9 +295,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal_conclusion_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal, comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Data is Not Normal at a 95.0% of confidence level" in conclusao:
             result = True
@@ -309,9 +309,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal_details_full(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal, details="full")
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Since the critical value (0.349) < statistic (0.418), we HAVE evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level" in conclusao:
             result = True
@@ -323,9 +323,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal_details_full_conclusion_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal, details="full", comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         if "Since p-value (0.009) < alpha (0.05), we HAVE evidence to reject the hypothesis of data normality, according to the Kolmogorov Smirnov test at a 95.0% of confidence level" in conclusao:
             result = True
@@ -337,9 +337,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal_details_binary_p_value(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal, details="binary", comparison="p-value")
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
         self.assertEqual(conclusao, 1, msg="conclusion not 1 when binary and data not normal")
@@ -348,9 +348,9 @@ class Test_fit(unittest.TestCase):
     def test_pass_not_normal_details_binary(self):
         result = KolmogorovSmirnov()
         resultado, conclusao = result.fit(self.x_not_normal, details="binary")
-        self.assertAlmostEqual(resultado[0], 0.41883302450799276, "wrong statistic value")
+        self.assertAlmostEqual(resultado[0], 0.41883302450799276, msg="wrong statistic value")
         self.assertEqual(resultado[1], 0.349, "wrong tabulated value")
-        self.assertAlmostEqual(resultado[2], 0.009690080715050495, "wrong P-value value")
+        self.assertAlmostEqual(resultado[2], 0.009690080715050495, msg="wrong P-value value")
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         self.assertIsInstance(conclusao, int, msg='conclusao not int when binary')
         self.assertEqual(conclusao, 1, msg="conclusion not 1 when binary and data not normal")

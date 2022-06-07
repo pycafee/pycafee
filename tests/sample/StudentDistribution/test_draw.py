@@ -196,9 +196,18 @@ class Test_None_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -255,9 +264,18 @@ class Test_None_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -320,9 +338,19 @@ class Test_None_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_student'][1], 0.06379679895149033, msg="wrong teoretical value for t_student  returned")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
+
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1058,9 +1086,18 @@ class Test_ax_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1120,9 +1157,20 @@ class Test_ax_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
+
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1176,9 +1224,18 @@ class Test_ax_test_draw(unittest.TestCase):
             self.assertAlmostEqual(output['t_student'][1], 0.06379679895149033, msg="wrong teoretical value for t_student  returned")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $4", "Rejection region", "_collection2", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $4", "Rejection region", "_collection2", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1578,9 +1635,18 @@ class Test_None_test_draw_dataset2(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $1", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $1", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1637,9 +1703,18 @@ class Test_None_test_draw_dataset2(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $1", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $1", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -1702,9 +1777,18 @@ class Test_None_test_draw_dataset2(unittest.TestCase):
             self.assertAlmostEqual(output['t_student'][1], 0.06379679895149033, msg="wrong teoretical value for t_student  returned")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $1", "Rejection region", "_collection2", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $1", "Rejection region", "_collection2", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -3296,9 +3380,18 @@ class Test_None_test_draw_dataset3(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $-4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $-4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -3355,9 +3448,19 @@ class Test_None_test_draw_dataset3(unittest.TestCase):
             self.assertAlmostEqual(output['t_right'][0], -1*output['t_left'][0], msg="t value for t_right and t_left does not match")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $-4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $-4", "Rejection region", "_collection2", "_collection3", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
+
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")
@@ -3420,9 +3523,18 @@ class Test_None_test_draw_dataset3(unittest.TestCase):
             self.assertAlmostEqual(output['t_student'][1], 0.06379679895149033, msg="wrong teoretical value for t_student  returned")
 
             labels = axes.get_children()
-            expected = ["$t_{calc} = $-4", "Rejection region", "_collection2", "$gl=5$"]
-            for label, correct in zip(labels, expected):
-                self.assertEqual(label.get_label(), correct, msg="label does not match")
+            expected_list = ["$t_{calc} = $-4", "Rejection region", "_collection2", "$gl=5$"]
+            label_aux = []
+            for label in labels:
+                label_aux.append(label.get_label())
+
+            for expected in expected_list:
+                result = False
+                if expected not in expected_list:
+                    result = False
+                else:
+                    result = True
+                self.assertTrue(result, msg="label does not match")
 
             x_label = axes.get_xlabel()
             self.assertIsInstance(x_label, str, "xlabel not a string")

@@ -535,15 +535,15 @@ class Test_None_test_draw(unittest.TestCase):
             test = DotPlot()
             x, y, axes = test.draw(self.x, ax=None)
             ax_h, ax_w = axes.bbox.height, axes.bbox.width
-            self.assertEqual(ax_h, 142.11111111111111, "wrong defalt height")
-            self.assertEqual(ax_w, 359.19696969696975, "wrong defalt width")
+            self.assertAlmostEqual(ax_h, 142.11111111111111, msg="wrong defalt height")
+            self.assertAlmostEqual(ax_w, 359.19696969696975, msg="wrong defalt width")
             plt.close()
 
         with patch('matplotlib.pyplot.show') as p:
             test = DotPlot()
             x, y, axes = test.draw(self.x, ax=None, width=5, height=5)
             ax_h, ax_w = axes.bbox.height, axes.bbox.width
-            self.assertEqual(ax_h, 442.11111111111114, "wrong personalized height")
+            self.assertAlmostEqual(ax_h, 442.11111111111114, msg="wrong personalized height")
             self.assertEqual(ax_w, 470.0, "wrong personalized width")
             plt.close()
 
