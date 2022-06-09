@@ -4,6 +4,7 @@
 """
 
 # Function list:
+#     - _check_array_lower_size(array, value, param_name, language)
 #     - _check_data_in_range(value, param_name, min, max, language)
 #     - _check_is_bool(value, param_name, language)
 #     - _check_is_data_frame(df, param_name, language)

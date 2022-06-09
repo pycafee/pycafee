@@ -20,6 +20,7 @@ Numeric Metods
    KolmogorovSmirnov/index
    Lilliefors/index
    ShapiroWilk/index
+   Gaussian/index
 
 
 
