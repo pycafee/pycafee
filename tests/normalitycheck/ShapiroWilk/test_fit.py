@@ -55,7 +55,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -71,7 +71,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -87,7 +87,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -253,7 +253,7 @@ class Test_fit(unittest.TestCase):
         self.assertEqual(resultado[3], 0.05, "wrong alfa value")
         self.assertEqual(conclusao, "Since the critical value (0.829) < statistic (0.722), we HAVE evidence to reject the hypothesis of data normality, according to the Shapiro Wilk test at a 95.0% of confidence level.", msg='wrong conclusion')
 
-    
+
     def test_pass_not_normal_details_full_conclusion_p_value(self):
         result = ShapiroWilk()
         resultado, conclusao = result.fit(self.x_not_normal, details="full", comparison="p-value")

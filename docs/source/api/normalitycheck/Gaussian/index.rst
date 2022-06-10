@@ -7,6 +7,7 @@ Gaussian
    :maxdepth: 1
 
    kurtosis
+   skewness
 
 
 
