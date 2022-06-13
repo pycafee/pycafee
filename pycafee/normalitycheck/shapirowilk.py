@@ -203,7 +203,7 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
         ### quering ###
 
         fk_id_function = management._query_func_id("get_critical_value")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "get_critical_value")
 
         ### checking alpha value ###
         if alfa is None:
@@ -360,7 +360,7 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
         # local = self._get_default_local(local)
 
         fk_id_function = management._query_func_id("draw_critical_values")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "draw_critical_values")
 
 
         ### The values tabled in a dictionary ###
@@ -769,12 +769,12 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
         """
         if self.msg is None:
             fk_id_function = management._query_func_id("ShapiroWilk")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "ShapiroWilk")
             general._display_one_line_attention(messages[1][0][0])
         else:
             # quering
             fk_id_function = management._query_func_id("to_xlsx")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "to_xlsx")
 
             # batizando o nome do arquivo
             if file_name is None:
@@ -900,7 +900,7 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         if self.msg is None:
             fk_id_function = management._query_func_id("ShapiroWilk")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "ShapiroWilk")
             general._display_one_line_attention(messages[1][0][0])
 
         else:
@@ -948,12 +948,12 @@ class ShapiroWilk(AlphaManagement, NDigitsManagement, PlotsManagement):
     def __str__(self):
         if self.msg is None:
             fk_id_function = management._query_func_id("ShapiroWilk")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "ShapiroWilk")
             return messages[1][0][0]
         else:
             return self.msg
 
     def __repr__(self):
         fk_id_function = management._query_func_id("ShapiroWilk")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "ShapiroWilk")
         return messages[2][0][0]

@@ -1,5 +1,19 @@
 # Changelog
 
+
+## v0.0.7 (XX/XX/2022)
+
+
+### Release
+
+
+- Added documentation for the Dixon Module (13/06/2022)
+
+
+- Added documentation for the Gaussian Module
+
+
+
 ## v0.0.6 (06/06/2022)
 
 

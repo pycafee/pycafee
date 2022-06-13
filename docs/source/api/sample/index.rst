@@ -8,6 +8,7 @@ Sample
 
    Sample/index
    StudentDistribution/index
+   Dixon/index
 
 |
 |

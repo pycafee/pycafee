@@ -204,7 +204,7 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         """
         ### quering ###
         fk_id_function = management._query_func_id("get_critical_value")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "get_critical_value")
 
         am_table = AbdiMolin.ABDIMOLIN_TABLE
 
@@ -368,7 +368,7 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         # local = self._get_default_local(local)
 
         fk_id_function = management._query_func_id("draw_critical_values")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "draw_critical_values")
 
 
         ### The values tabled in a dictionary ###
@@ -717,12 +717,12 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
         """
         if self.msg is None:
             fk_id_function = management._query_func_id("AbdiMolin")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AbdiMolin")
             general._display_one_line_attention(messages[1][0][0])
         else:
             # quering
             fk_id_function = management._query_func_id("to_xlsx")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "to_xlsx")
 
             # batizando o nome do arquivo
             if file_name is None:
@@ -850,7 +850,7 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         if self.msg is None:
             fk_id_function = management._query_func_id("AbdiMolin")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AbdiMolin")
             general._display_one_line_attention(messages[1][0][0])
 
         else:
@@ -947,14 +947,14 @@ class AbdiMolin(AlphaManagement, NDigitsManagement, PlotsManagement):
     def __str__(self):
         if self.msg is None:
             fk_id_function = management._query_func_id("AbdiMolin")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AbdiMolin")
             return messages[1][0][0]
         else:
             return self.msg
 
     def __repr__(self):
         fk_id_function = management._query_func_id("AbdiMolin")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "AbdiMolin")
         return messages[2][0][0]
 
 

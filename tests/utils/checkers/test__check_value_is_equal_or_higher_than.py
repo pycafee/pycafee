@@ -11,7 +11,7 @@ Description:
 Command to run at the prompt:
     python -m unittest -v tests/utils/checkers/test__check_value_is_equal_or_higher_than.py
     or
-    python -m unittest -b tests/utils/helpers/test__check_value_is_equal_or_higher_than.py
+    python -m unittest -b tests/utils/checkers/test__check_value_is_equal_or_higher_than.py
 
 --------------------------------------------------------------------------------
 """

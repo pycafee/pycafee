@@ -1,0 +1,6 @@
+_r21
+====
+
+.. currentmodule:: pycafee.sample.dixon.Dixon
+
+.. autofunction:: pycafee.sample.dixon.Dixon._r21
