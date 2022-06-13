@@ -11,7 +11,9 @@
 
 - Added the Gaussian Module
 
+### Fix
 
+- Fixed the missing func_name for several functions where it was missing
 
 ## v0.0.6 (06/06/2022)
 
