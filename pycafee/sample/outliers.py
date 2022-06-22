@@ -316,17 +316,17 @@ class ModifiedZScore(LanguageManagement):
         Notes
         -----
 
-        The **ModifiedZScore test for outlier detection** compares a possible outlier with a pre estabelish critical value. The test statistic is calculated using the following equation:
+        The **ModifiedZScore test for outlier detection** compares a possible outlier with a pre establish critical value. The test statistic is calculated using the following equation:
 
         .. math::
 
                 M_i = \\frac{0.6745(|x_i-\\widetilde{x}|)}{MAD}
 
-        where :math:`x_i` is the possible outlier, :math:`\\widetilde{x}` is the sample median and :math:`MAD` is the median of the absolute deviations about the medianm which is obtained with the following equation
+        where :math:`x_i` is the possible outlier, :math:`\\widetilde{x}` is the sample median and :math:`MAD` is the median of the absolute deviations about the median which is obtained with the following equation
 
         .. math::
 
-                MAD =median_i\left\{|x_i-\widetilde{x}|\right\}
+                MAD = median_i\\left\\{|x_i-\\widetilde{x}|\\right\\}
 
         By default, the critical value is ``3.5`` [1]_. The conclusion of the test is based on the comparison between the ``critical`` value and the ``statistic`` of the test:
 
