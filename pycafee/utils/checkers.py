@@ -40,7 +40,6 @@ from pycafee.utils import  general
 ###########################################
 
 
-
 # with tests, with text, with database
 def _check_array_lower_size(array, value, param_name, language):
     """This function checks if a the size of a ndarray (``array``) is at least ``value``
@@ -144,6 +143,10 @@ def _check_data_in_range(value, param_name, lower, upper, language):
                                 )
             raise
     return True
+
+
+
+
 
 # with tests, with text, with database
 def _check_is_bool(value, param_name, language):
@@ -521,7 +524,7 @@ def _check_is_positive(value, param_name, language):
     """
     if value <= 0:
         ### quering ###
-        func_name = "_chek_is_positive"
+        func_name = "_check_is_positive"
         fk_id_function = management._query_func_id(func_name)
         messages = management._get_messages(fk_id_function, language, func_name)
         try:

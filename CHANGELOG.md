@@ -6,6 +6,9 @@
 
 ### Release
 
+
+- Added the ZScore Class (22/06/2022)
+- Added the outliers file (22/06/2022)
 - Added the Dixon Module (13/06/2022)
 
 

@@ -525,7 +525,7 @@ class Dixon(AlphaManagement, NDigitsManagement):
                 fk_id_function = management._query_func_id("normalitycheck_fit")
                 messages = management._get_messages(fk_id_function, self.language, "normalitycheck_fit")
                 try:
-                    error = messages[3][0][0]
+                    error = messages[1][0][0]
                     raise ValueError(error)
                 except ValueError:
                     general._display_one_line_attention(f"{messages[2][0][0]} '{details}'")
@@ -1164,6 +1164,8 @@ class Dixon(AlphaManagement, NDigitsManagement):
         return messages[12][0][0]
 
 
+
+
 # with tests, with text, with database (Dixon), with docstring
 def _check_dixon_division_by_zero(x_exp, position_1, position_2, language):
     """This function checks if two values are equal, which leads to a division by 0.
@@ -1188,7 +1190,7 @@ def _check_dixon_division_by_zero(x_exp, position_1, position_2, language):
     -----
     The parameter ``x_exp`` isn't checked if it is a ``numpy array``.
     The parameter ``position_1`` isn't checked if it is a ``int``.
-    The parameter ``position_1`` isn't checked if it is a ``int``.
+    The parameter ``position_2`` isn't checked if it is a ``int``.
     The parameter ``language`` isn't checked if it is a ``str``.
 
 
