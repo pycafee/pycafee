@@ -10,16 +10,16 @@ Description:
 
 --------------------------------------------------------------------------------
 Command to run at the prompt:
-    python -m unittest -v tests/sample/Dixon/test__check_dixon_division_by_zero.py
+    python -m unittest -v tests/sample/outliers/test__check_dixon_division_by_zero.py
     or
-    python -m unittest -b tests/sample/Dixon/test__check_dixon_division_by_zero.py
+    python -m unittest -b tests/sample/outliers/test__check_dixon_division_by_zero.py
 
 --------------------------------------------------------------------------------
 """
 
 import os
 import unittest
-from pycafee.sample.dixon import _check_dixon_division_by_zero
+from pycafee.sample.outliers import _check_dixon_division_by_zero
 import numpy as np
 os.system('cls')
 

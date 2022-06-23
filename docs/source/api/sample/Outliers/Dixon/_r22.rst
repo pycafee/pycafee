@@ -1,0 +1,6 @@
+_r22
+====
+
+.. currentmodule:: pycafee.sample.outliers.Dixon
+
+.. autofunction:: pycafee.sample.outliers.Dixon._r22

@@ -1,6 +1,0 @@
-_r10
-====
-
-.. currentmodule:: pycafee.sample.dixon.Dixon
-
-.. autofunction:: pycafee.sample.dixon.Dixon._r10

@@ -8,6 +8,7 @@ Outliers
 
    ZScore/index
    ModifiedZScore/index
+   Dixon/index
 
 |
 |

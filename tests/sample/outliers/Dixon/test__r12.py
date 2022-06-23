@@ -5,16 +5,16 @@
 
 --------------------------------------------------------------------------------
 Command to run at the prompt:
-    python -m unittest -v tests/sample/Dixon/test__r12.py
+    python -m unittest -v tests/sample/outliers/Dixon/test__r12.py
     or
-    python -m unittest -b tests/sample/Dixon/test__r12.py
+    python -m unittest -b tests/sample/outliers/Dixon/test__r12.py
 
 --------------------------------------------------------------------------------
 """
 
 import os
 import unittest
-from pycafee.sample.dixon import Dixon
+from pycafee.sample.outliers import Dixon
 import numpy as np
 os.system('cls')
 
