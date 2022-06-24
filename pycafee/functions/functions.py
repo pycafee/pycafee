@@ -12,9 +12,10 @@
 ###### Standard ######
 from collections import Counter
 from itertools import takewhile
+from collections import namedtuple
 
 ###### Third part ######
-
+import numpy as np
 
 
 ###### Home made ######
@@ -27,6 +28,153 @@ from pycafee.utils import general
 ###########################################
 ################ Functions ################
 ###########################################
+
+
+# with tests, with data, with text, with docstring
+def interquartile_range(x_exp, method=None, language=None):
+    """This function estimates the interquartile range of a data set
+
+    Parameters
+    ----------
+    x_exp : 1D :doc:`numpy array <numpy:reference/generated/numpy.array>`
+        Array with the sample data
+    method : ``str``, optional
+        The method used to estimate the quartiles.
+
+        * If ``method="tukey"`` (or ``None``), the method proposed by Tukey [1]_ is used
+
+    language : ``str``, optional
+        The language code. Default is ``None`` which results in ``en``.
+
+    Returns
+    -------
+    result : ``tuple`` with:
+        interquartile_range : ``float``
+            The interquartile range
+        q1 : ``float``
+            The first quartile, e.g., the median of the lower half
+        q3 : ``float``
+            The third quartile, e.g., the median of the upper half
+    x_low : 1D :doc:`numpy array <numpy:reference/generated/numpy.array>`
+        Array with the lower half data
+    x_upper : 1D :doc:`numpy array <numpy:reference/generated/numpy.array>`
+        Array with the upper half data
+
+
+    Notes
+    -----
+    Other methods will be added in the future or the function will be updated to ``np.quantile`` (requires newer numpy version).
+
+    The interquartile distance (:math:`IR`) is calculated using the following equation:
+
+    .. math::
+
+            IR = Q_3 - Q_1
+
+
+    References
+    ----------
+    .. [1] TUKEY, J. W. Exploring Data Analysis. 1. ed. Reading: Addison-Wesley Publish- ing Company. Inc., 1977.
+
+
+    Examples
+    --------
+
+    >>> from pycafee.functions.functions import interquartile_range
+    >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4])
+    >>> result, x_low, x_upper = interquartile_range(x)
+    >>> print(result)
+    InterquartileRangeResult(InterquartileRange=0.40000000000000036, FirstQuartil=4.6, ThirdQuartil=5.0)
+    >>> print(x_low)
+    [4.4 4.6 4.6 4.7 4.9]
+    >>> print(x_upper)
+    [4.9 5.  5.  5.1 5.4]
+
+
+
+
+    """
+
+    all_languages = management._get_all_available_languages()
+    current_default_language = management._get_current_default_language()
+    if language is None:
+        language = current_default_language
+    elif language in all_languages:
+        pass
+    else:
+        try:
+            raise ValueError("Error: language not valid")
+        except ValueError:
+            all_formated_languages = [f"  --->  {lang}" for lang in all_languages]
+            fk_id_function = management._query_func_id("LanguageManagment")
+
+            messages = management._get_messages(fk_id_function, current_default_language)
+            msg = [
+                f"{messages[2][0][0]} '{language}' {messages[2][2][0]}",
+                f"{messages[2][3][0]}:",
+                all_formated_languages
+            ]
+            msg = general._flatten_list_of_list_string(msg)
+            msg = list(msg)
+            general._display_n_line_attention(msg)
+            raise
+
+
+    # cheking if the input is a 1D numpy array
+    checkers._check_is_numpy_1_D(x_exp, "x_exp", language)
+    # ordenando os dados
+    x_exp = np.sort(x_exp, kind='quicksort')
+
+    # cheking the method
+    if method is None:
+        method = "tukey"
+    else:
+        checkers._check_is_str(method, "method", language)
+        if method not in ["tukey"]:
+            fk_id_function = management._query_func_id("generic")
+            messages = management._get_messages(fk_id_function, language, "generic")
+            try:
+                error = messages[3][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_one_line_attention(f"{messages[4][0][0]} 'method' {messages[4][2][0]}: 'tukey', {messages[4][4][0]} '{method}'.")
+                raise
+
+    # mediana
+    median = np.median(x_exp)
+
+    # sample size
+    n_rep = x_exp.size
+
+    # if method is Tukey
+    if method == "tukey":
+        half = int(n_rep/2) # get half size, round to lowest int
+        # if size is even
+        if n_rep % 2 == 0:
+            x_low = x_exp[:half] # get the lower dataset from 0 to half
+            x_upper = x_exp[half:] # get the upper dataset, from hatl to -1
+            q1 = np.median(x_low) # get the median from lower dataset
+            q3 = np.median(x_upper) # get the median from upper dataset
+        else: # if size is odd
+            x_low = x_exp[:half+1] # get the lower dataset from 0 to half + 1 (to include the median)
+            x_upper = x_exp[half:] # get the upper dataset, from hatl to -1
+            q1 = np.median(x_low) # get the median from lower dataset
+            q3 = np.median(x_upper) # get the median from upper dataset
+
+    # interquartile range
+    interquartile_range = q3 - q1
+    ### quering
+    fk_id_function = management._query_func_id("interquartile_range")
+    messages = management._get_messages(fk_id_function, language, "interquartile_range")
+    result = namedtuple(messages[1][0][0], (messages[1][1][0], messages[1][2][0], messages[1][3][0]))
+    return result(interquartile_range, q1, q3), x_low, x_upper
+
+
+
+
+
+
+
 
 
 
