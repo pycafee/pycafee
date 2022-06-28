@@ -16,6 +16,8 @@ from tabulate import tabulate
 import scipy.stats as stats
 
 ###### Home made ######
+from pycafee.functions.functions import interquartile_range
+
 from pycafee.utils import helpers
 from pycafee.utils import general
 from pycafee.utils import checkers
@@ -174,14 +176,25 @@ class ZScore(LanguageManagement):
             elif details == "binary":
                 details = "binary"
             else:
+
                 fk_id_function = management._query_func_id("generic")
                 messages = management._get_messages(fk_id_function, self.language, "generic")
                 try:
                     error = messages[3][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[4][0][0]} 'details' {messages[4][2][0]}: 'short' or 'binary', {messages[4][4][0]} '{details}'.")
+                    msg = [f"{messages[4][0][0]} 'details' {messages[4][2][0]}:"]
+                    values = ['short', 'binary']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{details}'")
+                    general._display_n_line_attention(msg)
                     raise
+
+
+
+
 
 
         ## Basic stats
@@ -407,8 +420,17 @@ class ModifiedZScore(LanguageManagement):
                     error = messages[3][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[4][0][0]} 'details' {messages[4][2][0]}: 'short' or 'binary', {messages[4][4][0]} '{details}'.")
+                    msg = [f"{messages[4][0][0]} 'details' {messages[4][2][0]}:"]
+                    values = ['short', 'binary']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{details}'")
+                    general._display_n_line_attention(msg)
                     raise
+
+
+
 
 
         ## Basic stats
@@ -494,7 +516,7 @@ class Tukey(LanguageManagement):
     def __init__(self, language=None, **kwargs):
         super().__init__(language=language, **kwargs)
         self.conclusion = None
-        self.statistic = None
+        self.interval = None
         self.critical = None
         self.x_exp = None
 
@@ -521,14 +543,18 @@ class Tukey(LanguageManagement):
             * If it is ``"min"``, the lowest value is checked if it is a possible outlier.
 
 
-        critical : ``int`` or ``float``, optional
-            The critical value of the test (default is ``3.5``).
+        critical : ``str``, ``int`` or ``float``, optional
+            The critical value of the test.
+
+            * If ``critical="extreme"``, the critical value is ``3.0`` (default);
+            * If ``critical="mild"``, the critical value is ``1.5``;
+            * If a number, it must higher than zero (``0``);
 
         Returns
         -------
         result : ``tuple`` with
-            statistic : ``float``
-                The test statistic.
+            interval : ``list`` of ``floats``
+                The range where the data are not considered to be outliers
             critical : ``float``
                 The critical value.
             outlier : ``float`` or ``int``
@@ -541,28 +567,31 @@ class Tukey(LanguageManagement):
         See Also
         --------
         pycafee.sample.outliers.ZScore.fit
+        pycafee.sample.outliers.ModifiedZScore.fit
         pycafee.sample.outliers.Dixon.fit
 
         Notes
         -----
 
-        The **ModifiedZScore test for outlier detection** compares a possible outlier with a pre establish critical value. The test statistic is calculated using the following equation:
+        The **Tukey test for outlier detection** checks if the possible outlier is within the interval adjacent to the data, e. g., the interval where the sample is not considered an outlier. The lower limit of this range is estimated through the following equation:
 
         .. math::
 
-                M_i = \\frac{0.6745(|x_i-\\widetilde{x}|)}{MAD}
+                lower = Q_1 - C \\times IR
 
-        where :math:`x_i` is the possible outlier, :math:`\\widetilde{x}` is the sample median and :math:`MAD` is the median of the absolute deviations about the median which is obtained with the following equation
+        where :math:`Q_1` is the first quartile, :math:`IR` is the interquartile range and :math:`C` is the decision criterion value. The upper limit of the decision range is estimaged through the following equation:
 
         .. math::
 
-                MAD = median_i\\left\\{|x_i-\\widetilde{x}|\\right\\}
+                upper = Q_3 + C \\times IR
 
-        By default, the critical value is ``3.5`` [1]_. The conclusion of the test is based on the comparison between the ``critical`` value and the ``statistic`` of the test:
+        where :math:`Q_3` is the third quartile. The interquartile range is estimated with :ref:`interquartile_range <interquartile_range>` function using ``method="tukey"``.
+
+        By default, the decision criterion value is ``3.0``, which implies checking for an extreme outlier. The conclusion of the test is done by checking if the ``outlier`` is within the range where the data are not considered as a outlier:
 
         .. code:: python
 
-           if critical <= statistic:
+           if lower <= outlier <= upper:
                Data does not have a outlier
            else:
                Data has a outlier
@@ -571,22 +600,41 @@ class Tukey(LanguageManagement):
 
         References
         ----------
-        .. [1] TUKEY, J. W. Exploring Data Analysis. 1. ed. Reading: Addison-Wesley Publish- ing Company. Inc., 1977.
+        .. [1] TUKEY, J. W. Exploring Data Analysis. 1. ed. Reading: Addison-Wesley Publishing Company. Inc., 1977.
 
 
 
         Examples
         --------
 
-        >>> from pycafee.sample.outliers import ModifiedZScore
+        **Looking for extreme outlier**
+
+
+        >>> from pycafee.sample.outliers import Tukey
         >>> import numpy as np
         >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
-        >>> test = ModifiedZScore()
+        >>> test = Tukey()
         >>> result, conclusion = test.fit(x)
         >>> print(result)
-        ModifiedZScoreResult(Statistic=1.6862500000000022, critical=3.5, outlier=5.4)
+        TukeyResult(Interval=[3.3999999999999986, 6.200000000000001], critical=3, Outlier=5.4)
         >>> print(conclusion)
         The dataset has no outliers
+
+
+        **Looking for mild outlier**
+
+
+        >>> from pycafee.sample.outliers import Tukey
+        >>> import numpy as np
+        >>> x = np.array([5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9])
+        >>> test = Tukey()
+        >>> result, conclusion = test.fit(x, critical="mild")
+        >>> print(result)
+        TukeyResult(Interval=[3.999999999999999, 5.6000000000000005], Critical=1.5, Outlier=5.4)
+        >>> print(conclusion)
+        The dataset has no outliers
+
+
 
         """
 
@@ -616,6 +664,27 @@ class Tukey(LanguageManagement):
         ### Cheking the critical parameter
         if critical is None:
             critical = 3
+        elif type(critical) == str:
+            checkers._check_is_str(critical, "critical", self.language)
+            if critical == "mild":
+                critical = 1.5
+            elif critical == "extreme":
+                critical = 3
+            else:
+                fk_id_function = management._query_func_id("generic")
+                messages = management._get_messages(fk_id_function, self.language, "generic")
+                try:
+                    error = messages[3][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    msg = [f"{messages[4][0][0]} 'critical' {messages[4][2][0]}:"]
+                    values = ['mild', 'extreme']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{critical}'")
+                    general._display_n_line_attention(msg)
+                    raise
         else:
             checkers._check_is_float_or_int(critical, "critical", self.language)
             checkers._check_is_positive(critical, "critical", self.language)
@@ -636,29 +705,39 @@ class Tukey(LanguageManagement):
                     error = messages[3][0][0]
                     raise ValueError(error)
                 except ValueError:
-                    general._display_one_line_attention(f"{messages[4][0][0]} 'details' {messages[4][2][0]}: 'short' or 'binary', {messages[4][4][0]} '{details}'.")
+                    msg = [f"{messages[4][0][0]} 'details' {messages[4][2][0]}:"]
+                    values = ['short', 'binary']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{details}'")
+                    general._display_n_line_attention(msg)
                     raise
+
 
 
         # ordenando os dados
         x_exp = np.sort(x_exp, kind='quicksort')
 
-        median = np.median(x_exp)
+        # obtendo a dstancia interquerlica
+        result, x_low, x_upper = interquartile_range(x_exp,method="tukey",language=self.language)
+        DI = result[0]
+        q1 = result[1]
+        q3 = result[2]
 
 
-        ## Z-score
+        ## interval
+        interval_lower = q1 - critical*DI
+        interval_upper = q3 + critical*DI
         if which == "min":
             outlier = np.min(x_exp)
         else:
             outlier = np.max(x_exp)
-        statistic =0.6745*np.abs(outlier - mediana)/mad_median
 
 
         aceita = 0
         rejeita = 1
-
-        # concluindo o teste
-        if statistic <= critical:
+        if interval_lower <= outlier <= interval_upper:
             if details == "short":
                 fk_id_function = management._query_func_id("outliers")
                 messages = management._get_messages(fk_id_function, self.language, "outliers")
@@ -678,16 +757,14 @@ class Tukey(LanguageManagement):
         fk_id_function = management._query_func_id("generic")
         messages = management._get_messages(fk_id_function, self.language, "generic")
         self.conclusion = conclusion
-        self.statistic = statistic
+        self.interval = [interval_lower, interval_upper]
         self.critical = critical
         self.x_exp = x_exp
         ### making the named tuple
-        name = "ModifiedZScore" + messages[1][0][0]
-        result = namedtuple(name, (messages[1][3][0], messages[1][1][0], "outlier"))
-        return result(statistic, critical, outlier), conclusion
 
-
-
+        name = "Tukey" + messages[1][0][0]
+        result = namedtuple(name, (messages[1][5][0], messages[1][1][0], messages[1][4][0]))
+        return result(self.interval, critical, outlier), conclusion
 
 
 
@@ -696,7 +773,7 @@ class Tukey(LanguageManagement):
         if self.conclusion is None:
             fk_id_function = management._query_func_id("generic")
             messages = management._get_messages(fk_id_function, self.language, "generic")
-            return f"{messages[2][0][0]} ModifiedZScore {messages[2][2][0]}"
+            return f"{messages[2][0][0]} Tukey {messages[2][2][0]}"
         else:
             return self.conclusion
 
@@ -704,7 +781,7 @@ class Tukey(LanguageManagement):
     def __repr__(self):
         fk_id_function = management._query_func_id("outliers")
         messages = management._get_messages(fk_id_function, self.language, "outliers")
-        return messages[5][0][0]
+        return messages[8][0][0]
 
 
 

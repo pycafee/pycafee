@@ -85,7 +85,7 @@ class Test_ModifiedZScore(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'details' parameter only accepts the following values: 'short' or 'binary', but we got 'full'."
+        expected = "'full'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True

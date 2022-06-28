@@ -1,5 +1,5 @@
-Boxplot
-=======
+Tukey
+=====
 
 |
 
@@ -7,6 +7,7 @@ Boxplot
    :maxdepth: 2
 
    fit
+   cite
 
 
 |

@@ -74,7 +74,7 @@ def interquartile_range(x_exp, method=None, language=None):
 
     References
     ----------
-    .. [1] TUKEY, J. W. Exploring Data Analysis. 1. ed. Reading: Addison-Wesley Publish- ing Company. Inc., 1977.
+    .. [1] TUKEY, J. W. Exploring Data Analysis. 1. ed. Reading: Addison-Wesley Publishing Company. Inc., 1977.
 
 
     Examples
@@ -137,8 +137,17 @@ def interquartile_range(x_exp, method=None, language=None):
                 error = messages[3][0][0]
                 raise ValueError(error)
             except ValueError:
-                general._display_one_line_attention(f"{messages[4][0][0]} 'method' {messages[4][2][0]}: 'tukey', {messages[4][4][0]} '{method}'.")
+                msg = [f"{messages[4][0][0]} 'method' {messages[4][2][0]}:"]
+                values = ['tukey']
+                for item in values:
+                    msg.append(f"   --->    '{item}'")
+                msg.append(f"{messages[4][4][0]}:")
+                msg.append(f"   --->    '{method}'")
+                general._display_n_line_attention(msg)
                 raise
+
+
+
 
     # mediana
     median = np.median(x_exp)

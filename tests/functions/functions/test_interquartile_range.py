@@ -50,7 +50,7 @@ class Test_Raises(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'method' parameter only accepts the following values: 'tukey', but we got 'ukey'."
+        expected = "'ukey'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -64,7 +64,7 @@ class Test_Raises(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "O parâmetro 'method' aceita apenas os seguintes valores: 'tukey', mas recebemos 'ukey'."
+        expected = "'ukey'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True

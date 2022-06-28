@@ -8,7 +8,7 @@ Outliers
 
    ZScore/index
    ModifiedZScore/index
-   Boxplot/index
+   Tukey/index
    Dixon/index
    Grubbs/index
 
