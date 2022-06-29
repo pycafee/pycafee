@@ -1,6 +1,6 @@
 fit
 ===
 
-.. currentmodule:: pycafee.sample.outliers.ZScore
+.. currentmodule:: pycafee.sample.outliers.Grubbs
 
-.. autofunction:: pycafee.sample.outliers.ZScore.fit
+.. autofunction:: pycafee.sample.outliers.Grubbs.fit

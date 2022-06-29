@@ -88,8 +88,11 @@ class ZScore(LanguageManagement):
 
         See Also
         --------
+        pycafee.sample.outliers.ZScore.fit
         pycafee.sample.outliers.ModifiedZScore.fit
+        pycafee.sample.outliers.Tukey.fit
         pycafee.sample.outliers.Dixon.fit
+        pycafee.sample.outliers.Grubbs.fit
 
 
         Notes
@@ -271,6 +274,7 @@ class ZScore(LanguageManagement):
         return messages[4][0][0]
 
 
+
 class ModifiedZScore(LanguageManagement):
     """This class instantiates an object to apply the modified Z test for detecting oultliers
 
@@ -325,7 +329,9 @@ class ModifiedZScore(LanguageManagement):
         See Also
         --------
         pycafee.sample.outliers.ZScore.fit
+        pycafee.sample.outliers.Tukey.fit
         pycafee.sample.outliers.Dixon.fit
+        pycafee.sample.outliers.Grubbs.fit
 
         Notes
         -----
@@ -569,6 +575,7 @@ class Tukey(LanguageManagement):
         pycafee.sample.outliers.ZScore.fit
         pycafee.sample.outliers.ModifiedZScore.fit
         pycafee.sample.outliers.Dixon.fit
+        pycafee.sample.outliers.Grubbs.fit
 
         Notes
         -----
@@ -785,11 +792,9 @@ class Tukey(LanguageManagement):
 
 
 
-
-
 class Dixon(AlphaManagement, NDigitsManagement):
-    """
-    O valor de nrep para 26 originalmente esta marcado como 29
+    """This class instantiates an object to apply the Dixon test for detecting oultliers
+
     """
 
     DIXON_TABLE_r10 = {
@@ -1106,7 +1111,8 @@ class Dixon(AlphaManagement, NDigitsManagement):
         which : ``str``, optional
             The value that should be evaluated as a possible outlier.
 
-            * If it is ``"max"`` (or ``None``), the highest value is checked if it is a possible outlier.
+            * If it is ``None`` (default), the outlier is automatically inferred as the farthest observation from the mean
+            * If it is ``"max"``, the highest value is checked if it is a possible outlier.
             * If it is ``"min"``, the lowest value is checked if it is a possible outlier.
 
         Returns
@@ -1128,6 +1134,8 @@ class Dixon(AlphaManagement, NDigitsManagement):
         get_critical_value
         pycafee.sample.outliers.ZScore.fit
         pycafee.sample.outliers.ModifiedZScore.fit
+        pycafee.sample.outliers.Tukey.fit
+        pycafee.sample.outliers.Grubbs.fit
 
 
         Notes
@@ -1300,7 +1308,7 @@ class Dixon(AlphaManagement, NDigitsManagement):
 
         ### checking the which ###
         if which is None:
-            which = "max"
+            which = _check_outermost_observation(x_exp)
         else:
             checkers._check_is_str(which, "which", language=self.language)
             if which not in ["min", "max"]:
@@ -1918,6 +1926,744 @@ class Dixon(AlphaManagement, NDigitsManagement):
         fk_id_function = management._query_func_id("Dixon")
         messages = management._get_messages(fk_id_function, self.language, "Dixon")
         return messages[12][0][0]
+
+
+
+class Grubbs(AlphaManagement, NDigitsManagement):
+    """This class instantiates an object to apply the Grubbs test for detecting oultliers
+
+    """
+
+    GRUBBS_ONE_TABLE = {
+        "n_rep" : [
+                    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+                    ],
+        0.10 : [
+                1.153, 1.463, 1.672, 1.822, 1.938, 2.032, 2.110, 2.176, 2.234, 2.285, 2.331, 2.371, 2.409, 2.443, 2.475, 2.504, 2.532, 2.557, 2.580, 2.603, 2.624, 2.644, 2.663, 2.681, 2.698, 2.714, 2.730, 2.745
+                ],
+        0.05 : [
+                1.155, 1.481, 1.715, 1.887, 2.020, 2.126, 2.215, 2.290, 2.355, 2.412, 2.462, 2.507, 2.549, 2.585, 2.620, 2.651, 2.681, 2.709, 2.733, 2.758, 2.781, 2.802, 2.822, 2.841, 2.859, 2.876, 2.893, 2.908
+                ],
+        0.01 : [
+                1.155, 1.496, 1.764, 1.973, 2.139, 2.274, 2.387, 2.482, 2.564, 2.636, 2.699, 2.755, 2.806, 2.852, 2.894, 2.932, 2.968, 3.001, 3.031, 3.060, 3.087, 3.112, 3.135, 3.157, 3.178, 3.199, 3.218, 3.236
+                ]
+        }
+
+
+    GRUBBS_TWO_TABLE = {
+        "n_rep" : [
+                    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+                    ],
+        0.10 : [
+                0.0008, 0.0183, 0.0564, 0.1020, 0.1478, 0.1909, 0.2305, 0.2667, 0.2996, 0.3295, 0.3568, 0.3818, 0.4048, 0.4259, 0.4455, 0.4636, 0.4804, 0.4961, 0.5107, 0.5244, 0.5373, 0.5495, 0.5609, 0.5717, 0.5819, 0.5916, 0.6008
+                ],
+        0.05 : [
+                0.0002, 0.0090, 0.0349, 0.0708, 0.1101, 0.1492, 0.1864, 0.2213, 0.2537, 0.2836, 0.3112, 0.3367, 0.3603, 0.3822, 0.4025, 0.4214, 0.4391, 0.4556, 0.4711, 0.4857, 0.4994, 0.5123, 0.5245, 0.5360, 0.5470, 0.5574, 0.5672
+                ],
+        0.01 : [
+                0.0000, 0.0018, 0.0116, 0.0308, 0.0563, 0.0851, 0.1150, 0.1448, 0.1738, 0.2016, 0.2280, 0.2530, 0.2767, 0.2990, 0.3200, 0.3398, 0.3585, 0.3761, 0.3927, 0.4085, 0.4234, 0.4376, 0.4510, 0.4638, 0.4759, 0.4875, 0.4985
+                ]
+        }
+
+
+
+
+    def __init__(self, name=None, alfa=None, language=None, n_digits=None, **kwargs):
+        super().__init__(alfa=alfa, language=language, n_digits=n_digits, **kwargs)
+        self.conclusion = None
+        self.statistic = None
+        self.critical = None
+        self.x_exp = None
+
+
+    # with tests, with text, without database, with docstring
+    def get_critical_value(self, n_rep, kind=None, alfa=None):
+        """This function returns the critical value for the Grubbs [1]_ test.
+
+        Parameters
+        ----------
+        n_rep : ``int``
+            The total number of observations (``3 <= n_rep <= 30``, vary).
+        kind : ``str``, optional
+            The type of the test. It can be ``"one"`` (or ``None``) or ``"two"``.
+        alfa : ``float``
+            The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
+
+        Returns
+        -------
+        result : ``tuple`` with:
+            critical : ``float``
+                The critical value.
+            alfa : ``float``
+                The corresponding significance level.
+
+        Notes
+        -----
+        Critical values are limited for sample sizes between ``3`` and ``30`` for ``kind="one"`` and between ``4`` and ``30`` for ``kind="two"``. For data with a higher number of repetitions, check GRUBBS & BECK (1972) [2]_.
+
+
+
+        References
+        ----------
+        .. [1] GRUBBS, F. E. Sample Criteria for Testing Outlying Observations. The Annals of Mathematical Statistics, v. 21, n. 1, p. 27–58, 1950.
+
+        .. [2] GRUBBS, F. E.; BECK, G. Extension of Sample Sizes and Percentage Points for Significance Tests of Outlying Observations. Technometrics, v. 14, n. 4, p. 847–854, 1972.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> test = Grubbs()
+        >>> result = test.get_critical_value(5)
+        >>> print(result)
+        GrubbsResult(Critical=1.715, alpha=0.05)
+
+
+        """
+
+        ### checking alpha value ###
+        if alfa is None:
+            alfa = self.alfa
+        else:
+            ## should be float ##
+            checkers._check_is_float(alfa, "alfa", self.language)
+            ## should be in the range (0,1) ##
+            checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+
+
+        ### checking the number of observations ###
+        checkers._check_is_integer(n_rep, "n_rep", self.language)
+
+        ### checking the ratio ###
+        if kind is None:
+            kind = "one"
+        else:
+            checkers._check_is_str(kind, "kind", language=self.language)
+
+
+        checkers._check_value_is_equal_or_lower_than(n_rep, "n_rep", 30, language=self.language)
+        if kind == "one":
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
+            table_data = Grubbs.GRUBBS_ONE_TABLE
+        elif kind == "two":
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 4, language=self.language)
+            table_data = Grubbs.GRUBBS_TWO_TABLE
+        else:
+            fk_id_function = management._query_func_id("Grubbs")
+            messages = management._get_messages(fk_id_function, self.language, "Grubbs")
+            try:
+                error = messages[1][0][0]
+                raise ValueError(error)
+            except ValueError:
+                allowed_ratios = ["one", "two"]
+                kinds = [f"    --->    '{allowed}'" for allowed in allowed_ratios]
+                msg = [
+                    f"{messages[2][0][0]} '{kind}'.",
+                    f"{messages[2][2][0]}:",
+                    kinds
+                    ]
+                flat_list = general._flatten_list_of_list_string(msg)
+                flat_list = list(flat_list)
+                general._display_n_line_attention(
+                    flat_list
+                )
+                raise
+
+        # Checking if the alfa value is valid #
+        if alfa not in table_data.keys():
+            fk_id_function = management._query_func_id("Grubbs")
+            messages = management._get_messages(fk_id_function, self.language, "Grubbs")
+            try:
+                error = messages[1][0][0]
+                raise ValueError(error)
+            except ValueError:
+                fk_id_function = management._query_func_id("generic")
+                messages = management._get_messages(fk_id_function, self.language, "generic")
+                msg = [f"{messages[4][0][0]} 'alfa' {messages[4][2][0]}:"]
+                values = ['0.01', '0.05']
+                for item in values:
+                    msg.append(f"   --->    {item}")
+                msg.append(f"{messages[4][4][0]}:")
+                msg.append(f"   --->    {alfa}")
+                general._display_n_line_attention(msg)
+                raise
+
+
+
+
+        ### getting the critical value ###
+        critical = table_data[alfa][n_rep-table_data['n_rep'][0]]
+
+        ### quering
+        fk_id_function = management._query_func_id("generic")
+        messages = management._get_messages(fk_id_function, self.language, "generic")
+
+        ### making the named tuple
+        name = "Grubbs" + messages[1][0][0]
+        result = namedtuple(name, (messages[1][1][0], messages[1][2][0]))
+        return result(critical, alfa)
+
+
+
+    # with tests, with text, without database, with docstring
+    def fit(self, x_exp, kind=None, which=None, alfa=None, details=None):
+        """This function applies the Grubbs test to identify outliers in Normal data with few samples [1]_.
+
+        Parameters
+        ----------
+        x_exp : ``numpy array``
+            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 3 sample data (vary).
+        kind : ``str``, optional
+            Whether to check for a single outlier (``"one"``, default) or to check for two outliers on the same side (``"two"``).
+        alfa : ``float``
+            The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
+        details : ``str``, optional
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
+
+        which : ``str``, optional
+            The value that should be evaluated as a possible outlier.
+
+            * If it is ``None`` (default), the outlier is automatically inferred as the farthest observation from the mean
+            * If it is ``"max"`` (or ``None``), the highest value is checked if it is a possible outlier.
+            * If it is ``"min"``, the lowest value is checked if it is a possible outlier.
+
+        Returns
+        -------
+        result : ``tuple`` with
+            statistic : ``float``
+                The test statistic.
+            critical : ``float``
+                The critical value.
+            alpha : ``float``
+                The significance level used.
+            kind : ``str``
+                The kind parameter used.
+            outlier : ``float`` or ``list`` of ``floats``
+                The outlier tested.
+
+                * If ``kind="one"``, a float is returned with the value tested;
+                * If ``kind="two"``, a list of two floats is returned with the two values tested;
+
+        conclusion : ``str``
+            The test conclusion (e.g, Possible outlier/ no outliers).
+
+
+        See Also
+        --------
+        get_critical_value
+        pycafee.sample.outliers.ZScore.fit
+        pycafee.sample.outliers.ModifiedZScore.fit
+        pycafee.sample.outliers.Tukey.fit
+        pycafee.sample.outliers.Dixon.fit
+
+
+        Notes
+        -----
+
+        The implementation of the **Grubbs test** is done in two different ways. The first checks whether the dataset has a single outlier (``kind="one"``), with the following hypotheses:
+
+        .. admonition:: \u2615
+
+           :math:`H_0:` data **does not have** a outlier.
+
+           :math:`H_1:` data **has** a outlier.
+
+        The conclusion of the test is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
+
+        .. code:: python
+
+           if critical <= statistic:
+               Data does not have a outlier
+           else:
+               Data has a outlier
+
+
+        For this case, when the possible outlier is the smallest observation in the data set (``which=="min"``), the test ``statistic`` is estimated through the following equation:
+
+        .. math::
+
+            G_1 = \\frac{\\overline{x}-x_1}{s}
+
+        and when the possible outlier is the highest observation in the data set (``which=="max"``), the test ``statistic`` is estimated through the following equation:
+
+        .. math::
+
+            G_1 = \\frac{x_n-\\overline{x}}{s}
+
+
+
+        The other implementation checks whether the dataset has a two outliers on the same side (``kind="two"``), with the following hypotheses:
+
+        .. admonition:: \u2615
+
+           :math:`H_0:` data **does not have** a outlier.
+
+           :math:`H_1:` data **has** two outliers.
+
+        The conclusion of the test is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
+
+        .. code:: python
+
+           if critical > statistic:
+               Data does not have a outlier
+           else:
+               Data has two outliers
+
+        Note that the comparison in this second case is done in reverse to what is usually done in hypothesis testing.
+
+
+        For this case, when the two possible outliers are the smallest observations in the data set (``which=="min"``), the test ``statistic`` is estimated through the following equation:
+
+
+        .. math::
+
+            G_2 = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
+
+
+
+        and when the two possible outliers are the highest observations in the data set (``which=="max"``), the test ``statistic`` is estimated through the following equation:
+
+        .. math::
+
+            G_2 = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
+
+
+
+        There are critical values for alpha equal to ``0.10``, ``0.05`` and ``0.01``. These values are for the **two-tailed Grubbs distribution** [2]_. For dataset with n higher than 30, check the [2]_.
+
+        The minimum number of samples needed to apply the test varies depending on the ``kind`` parameter, while the maximum number for all cases is 30.
+
+        * If ``kind="one"`` the minimum sample size is ``3``;
+        * If ``kind="two"`` the minimum sample size is ``4``;
+
+
+
+
+        References
+        ----------
+        .. [1] GRUBBS, F. E. Sample Criteria for Testing Outlying Observations. The Annals of Mathematical Statistics, v. 21, n. 1, p. 27–58, 1950.
+
+        .. [2] GRUBBS, F. E.; BECK, G. Extension of Sample Sizes and Percentage Points for Significance Tests of Outlying Observations. Technometrics, v. 14, n. 4, p. 847–854, 1972.
+
+        Examples
+        --------
+
+        **Checking if the largest observation is a possible outlier**
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x = np.array([159, 153, 184, 153, 156, 150, 147])
+        >>> testt = Grubbs()
+        >>> result, conclusion = test.fit(x)
+        >>> print(result)
+        GrubbsResult(Statistic=2.1532047136140045, Critical=2.02, alpha=0.05, kind='one', outlier=184)
+        >>> print(conclusion)
+        The sample 184 perhaps be an outlier (95.0% confidence level)
+
+
+        **Checking if the largest observation is a possible outlier at 99% of confidence level**
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x = np.array([159, 153, 184, 153, 156, 150, 147])
+        >>> test = Grubbs()
+        >>> result, conclusion = test.fit(x, alfa=0.01, details="full")
+        >>> print(result)
+        GrubbsResult(Statistic=2.1532047136140045, Critical=2.139, alpha=0.01, kind='one', outlier=184)
+        >>> print(conclusion)
+        Since the test statistic (2.153) is higher than the critical value (2.139), we have evidence to reject the null hypothesis, and perhaps sample 184 is an outlier (99.0% confidence level)
+
+
+        **Checking if the two largest observations are possible outliers**
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x = np.array([159, 153, 184, 153, 156, 150, 147, 186])
+        >>> test = Grubbs()
+        >>> result, conclusion = test.fit(x, kind="two", details="full")
+        >>> print(result)
+        GrubbsResult(Statistic=0.05528255528255528, Critical=0.1101, alpha=0.05, kind='two', outlier=[184, 186])
+        >>> print(conclusion)
+        Since the test statistic (0.055) is lower than the critical value (0.11), we have evidence to reject the null hypothesis, and perhaps sample 184 and 186 are outliers (95.0% confidence level)
+
+
+
+        """
+
+
+        ### getting the default alpha value ###
+        if alfa is None:
+            alfa = self.alfa
+        else:
+            checkers._check_is_float(alfa, "alfa", self.language)
+            checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+            self.alfa = alfa
+
+
+        ### checking input data ###
+        checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
+        self.x_exp = x_exp
+
+        ### checking the details parameter ###
+        if details == None:
+            details = "short"
+        else:
+            checkers._check_is_str(details, "details", self.language)
+            if details == "short":
+                details = "short"
+            elif details == "full":
+                details = "full"
+            elif details == "binary":
+                details = "binary"
+            else:
+                fk_id_function = management._query_func_id("normalitycheck_fit")
+                messages = management._get_messages(fk_id_function, self.language, "normalitycheck_fit")
+                try:
+                    error = messages[1][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    general._display_one_line_attention(f"{messages[2][0][0]} '{details}'")
+                    raise
+
+        # finding the n_rep
+        n_rep = x_exp.size
+        checkers._check_value_is_equal_or_lower_than(n_rep, "n_rep", 30, language=self.language)
+
+        ### checking the ratio and getting the critical value ###
+        if kind == None or kind == "one":
+            kind = "one"
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
+
+        elif kind == "two":
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 4, language=self.language)
+
+        else:
+            checkers._check_is_str(kind, "kind", language=self.language)
+            fk_id_function = management._query_func_id("Grubbs")
+            messages = management._get_messages(fk_id_function, self.language, "Grubbs")
+            try:
+                error = messages[1][0][0]
+                raise ValueError(error)
+            except ValueError:
+                allowed_ratios = ["one", "two"]
+                kinds = [f"    --->    '{allowed}'" for allowed in allowed_ratios]
+                msg = [
+                    f"{messages[2][0][0]} '{kind}'.",
+                    f"{messages[2][2][0]}:",
+                    kinds
+                    ]
+                flat_list = general._flatten_list_of_list_string(msg)
+                flat_list = list(flat_list)
+                general._display_n_line_attention(
+                    flat_list
+                )
+                raise
+
+        # ordenando os dados
+        x_exp = np.sort(x_exp, kind='quicksort')
+
+
+        ### checking the which ###
+        if which is None:
+            which = _check_outermost_observation(x_exp)
+        else:
+            checkers._check_is_str(which, "which", language=self.language)
+            if which not in ["min", "max"]:
+                fk_id_function = management._query_func_id("Dixon")
+                messages = management._get_messages(fk_id_function, self.language, "Dixon")
+                try:
+                    error = messages[9][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    general._display_one_line_attention(f"{messages[9][1][0]} '{which}'")
+                    raise
+
+        # quering
+        fk_id_function = management._query_func_id("Grubbs")
+        messages = management._get_messages(fk_id_function, self.language, "Grubbs")
+
+
+        aceita = 0
+        rejeita = 1
+
+
+        if kind == "one":
+            if which == "min":
+                outlier = x_exp[0]
+            else:
+                outlier = x_exp[-1]
+            # getting the statistic
+            statistic = self._one(x_exp, which)
+            critical = self.get_critical_value(n_rep=x_exp.size, kind=kind, alfa=alfa)[0]
+
+            if statistic <= critical:
+                if details == "short":
+                    conclusion = f"{messages[6][0][0]}{100*(1-alfa)}{messages[6][2][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[7][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[7][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[7][4][0]}{100*(1-alfa)}{messages[7][6][0]}"
+                else:
+                    conclusion = aceita
+            else:
+                if details == "short":
+                    conclusion = f"{messages[8][0][0]} {outlier} {messages[8][2][0]}{100*(1-alfa)}{messages[8][4][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[9][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[9][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[9][4][0]} {outlier} {messages[9][6][0]}{100*(1-alfa)}{messages[9][8][0]}"
+                else:
+                    conclusion = rejeita
+
+
+        else:
+            if which == "min":
+                outlier = [x_exp[0], x_exp[1]]
+            else:
+                outlier = [x_exp[-2], x_exp[-1]]
+            # getting the statistic
+            statistic = self._two(x_exp, which)
+            critical = self.get_critical_value(n_rep=x_exp.size, kind=kind, alfa=alfa)[0]
+
+            if statistic > critical:
+                if details == "short":
+                    conclusion = f"{messages[6][0][0]}{100*(1-alfa)}{messages[6][2][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[12][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[12][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[12][4][0]}{100*(1-alfa)}{messages[12][6][0]}"
+                else:
+                    conclusion = aceita
+            else:
+                if details == "short":
+                    conclusion = f"{messages[10][0][0]} {outlier[0]} {messages[10][2][0]} {outlier[1]} {messages[10][4][0]}{100*(1-alfa)}{messages[10][6][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[11][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[11][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[11][4][0]} {outlier[0]} {messages[11][6][0]} {outlier[1]} {messages[11][8][0]}{100*(1-alfa)}{messages[11][10][0]}"
+                else:
+                    conclusion = rejeita
+
+
+
+        ### quering
+        fk_id_function = management._query_func_id("generic")
+        messages = management._get_messages(fk_id_function, self.language, "generic")
+        self.conclusion = conclusion
+        self.statistic = statistic
+        self.critical = critical
+        self.x_exp = x_exp
+        ### making the named tuple
+        name = "Grubbs" + messages[1][0][0]
+        result = namedtuple(name, (messages[1][3][0], messages[1][1][0], messages[1][2][0], "kind", "outlier"))
+        return result(statistic, critical, alfa, kind, outlier), conclusion
+
+
+    # with tests, with text, without database, with docstring
+    def _one(self, x_exp, which):
+        """
+        This function calculates the statistic for the Grubbs test to check if the sample has **one** outlier as described by Grubbs [1]_
+
+        Parameters
+        ----------
+        x_exp : ``numpy array``
+            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with the data **ordered**.
+        which : ``str``
+            The value that should be evaluated.
+
+            * If it is ``"max"`` (or ``None``), the highest value is checked if it is a possible outlier.
+            * If it is ``"min"``, the lowest value is checked.
+
+        Returns
+        -------
+        statistic : ``float``
+            The test statistic
+
+
+        Notes
+        -----
+        If ``which=="min"``, the equation used is:
+
+        .. math::
+
+            G_1 = \\frac{\\overline{x}-x_1}{s}
+
+        If ``which=="max"``, the equation used is:
+
+        .. math::
+
+            G_1 = \\frac{x_n-\\overline{x}}{s}
+
+        References
+        ----------
+        .. [1] GRUBBS, F. E. Sample Criteria for Testing Outlying Observations. The Annals of Mathematical Statistics, v. 21, n. 1, p. 27–58, 1950.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([159, 153, 184, 153, 156, 150, 147])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._one(x_exp, which="max")
+        >>> print(result)
+        2.1532047136140045
+
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([15.42, 15.51, 15.52, 15.53, 15.68, 15.52, 15.56, 15.53, 15.54, 15.56])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._one(x_exp, which="min")
+        >>> print(result)
+        1.8344557993475004
+
+
+        """
+        _check_grubbs_division_by_zero(x_exp, self.language)
+        if which == "min":
+            statistic = (np.mean(x_exp) - x_exp[0])/np.std(x_exp, ddof=1)
+        else:
+            statistic = (x_exp[-1] - np.mean(x_exp))/np.std(x_exp, ddof=1)
+        return statistic
+
+
+    # with tests, with text, without database, with docstring
+    def _two(self, x_exp, which):
+        """
+        This function calculates the statistic for the Grubbs test to check if the sample has **two** outlier on the same side as described by Grubbs [1]_
+
+        Parameters
+        ----------
+        x_exp : ``numpy array``
+            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with the data **ordered**.
+        which : ``str``
+            The side that should be evaluated.
+
+            * If it is ``"max"`` (or ``None``), the two highest values are checked if they are possible outliers
+            * If it is ``"min"``, the two lowest values are checked if they are possible outliers
+
+        Returns
+        -------
+        statistic : ``float``
+            The test statistic
+
+        Notes
+        -----
+        If ``which=="min"``, the equation used is:
+
+        .. math::
+
+            G_2 = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
+
+        where :math:`s^2_{2 \\; lower}` is the sample variance disregarding the two samples suspected of being outliers (the two lowest values)
+
+
+        If ``which=="max"``, the equation used is:
+
+        .. math::
+
+            G_2 = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
+
+        where :math:`s^2_{2 \\; upper}` is the sample variance disregarding the two samples suspected of being outliers (the two highest values)
+
+        References
+        ----------
+        .. [1] GRUBBS, F. E. Sample Criteria for Testing Outlying Observations. The Annals of Mathematical Statistics, v. 21, n. 1, p. 27–58, 1950.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([159, 153, 184, 153, 156, 150, 147])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._two(x_exp, which="max")
+        >>> print(result)
+        0.05121951219512194
+
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([15.42, 15.51, 15.52, 15.53, 15.68, 15.52, 15.56, 15.53, 15.54, 15.56])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._two(x_exp, which="min")
+        >>> print(result)
+        0.5353728489483768
+
+
+        """
+        _check_grubbs_division_by_zero(x_exp, self.language)
+        if which == "min":
+            var = np.var(x_exp[2:], ddof=1)
+            statistic = (x_exp.size - 3)*var/((x_exp.size-1) * np.var(x_exp, ddof=1))
+        else:
+            var = np.var(x_exp[:-2], ddof=1)
+            statistic = (x_exp.size - 3)*var/((x_exp.size-1) * np.var(x_exp, ddof=1))
+        return statistic
+
+
+
+    # with tests, with text, with database (Dixon), with docstring
+    def __str__(self):
+        if self.conclusion is None:
+            fk_id_function = management._query_func_id("generic")
+            messages = management._get_messages(fk_id_function, self.language, "generic")
+            return f"{messages[2][0][0]} Grubbs {messages[2][2][0]}"
+        else:
+            return self.conclusion
+
+    # with tests, with text, with database, with docstring
+    def __repr__(self):
+        fk_id_function = management._query_func_id("Grubbs")
+        messages = management._get_messages(fk_id_function, self.language, "Grubbs")
+        return messages[4][0][0]
+
+
+
+
+# with tests, with text, with database (Dixon), with docstring
+def _check_grubbs_division_by_zero(x_exp, language):
+    """This function checks if the sample standart deviaation is zero
+
+    Parameters
+    ----------
+    x_exp : ``numpy array`` (1D)
+        One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>`
+    language : ``str``
+        The language code
+
+    Returns
+    -------
+    ``True`` if ``std!=0``
+    Raises ``ZeroDivisionError`` if ``std!==0``
+
+    Notes
+    -----
+    The parameter ``x_exp`` isn't checked if it is a ``numpy array``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+
+    """
+
+    if np.std(x_exp, ddof=1) < 10e-7:
+        fk_id_function = management._query_func_id("Dixon")
+        messages = management._get_messages(fk_id_function, language, "Dixon")
+        try:
+            error = messages[10][0][0]
+            raise ZeroDivisionError(error)
+        except ZeroDivisionError:
+            fk_id_function = management._query_func_id("Grubbs")
+            messages = management._get_messages(fk_id_function, language, "Grubbs")
+            general._display_one_line_attention(
+                messages[5][0][0]
+            )
+            raise
+    return True
+
 
 
 

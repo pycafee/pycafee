@@ -7,7 +7,7 @@ Tukey
    :maxdepth: 2
 
    fit
-   cite
+
 
 
 |
