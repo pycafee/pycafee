@@ -1950,7 +1950,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         }
 
 
-    GRUBBS_TWO_TABLE = {
+    GRUBBS_THREE_TABLE = {
         "n_rep" : [
                     4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
                     ],
@@ -1985,7 +1985,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         n_rep : ``int``
             The total number of observations (``3 <= n_rep <= 30``, vary).
         kind : ``str``, optional
-            The type of the test. It can be ``"one"`` (or ``None``) or ``"two"``.
+            The type of the test. It can be ``"one"`` (or ``None``) or ``"three"``.
         alfa : ``float``
             The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
 
@@ -2046,9 +2046,9 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         if kind == "one":
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
             table_data = Grubbs.GRUBBS_ONE_TABLE
-        elif kind == "two":
+        elif kind == "three":
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 4, language=self.language)
-            table_data = Grubbs.GRUBBS_TWO_TABLE
+            table_data = Grubbs.GRUBBS_THREE_TABLE
         else:
             fk_id_function = management._query_func_id("Grubbs")
             messages = management._get_messages(fk_id_function, self.language, "Grubbs")
@@ -2056,7 +2056,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                 error = messages[1][0][0]
                 raise ValueError(error)
             except ValueError:
-                allowed_ratios = ["one", "two"]
+                allowed_ratios = ["one", "two", "three"]
                 kinds = [f"    --->    '{allowed}'" for allowed in allowed_ratios]
                 msg = [
                     f"{messages[2][0][0]} '{kind}'.",
@@ -2115,7 +2115,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         x_exp : ``numpy array``
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 3 sample data (vary).
         kind : ``str``, optional
-            Whether to check for a single outlier (``"one"``, default) or to check for two outliers on the same side (``"two"``).
+            Whether to check for a single outlier (``"one"``, default) or to check for two outliers on the same side (``"three"``).
         alfa : ``float``
             The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
         details : ``str``, optional
@@ -2165,7 +2165,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         Notes
         -----
 
-        The implementation of the **Grubbs test** is done in two different ways. The first checks whether the dataset has a single outlier (``kind="one"``), with the following hypotheses:
+        The implementation of the **Grubbs test** is done in three different ways. The first checks whether the dataset has a single outlier (``kind="one"``), with the following hypotheses:
 
         .. admonition:: \u2615
 
@@ -2187,17 +2187,17 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_1 = \\frac{\\overline{x}-x_1}{s}
+            G_{'} = \\frac{\\overline{x}-x_1}{s}
 
         and when the possible outlier is the highest observation in the data set (``which=="max"``), the test ``statistic`` is estimated through the following equation:
 
         .. math::
 
-            G_1 = \\frac{x_n-\\overline{x}}{s}
+            G_{'} = \\frac{x_n-\\overline{x}}{s}
 
 
 
-        The other implementation checks whether the dataset has a two outliers on the same side (``kind="two"``), with the following hypotheses:
+        The third implementation checks whether the dataset has a two outliers on the same side (``kind="three"``), with the following hypotheses:
 
         .. admonition:: \u2615
 
@@ -2222,7 +2222,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_2 = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
+            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
 
 
 
@@ -2230,7 +2230,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_2 = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
+            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
 
 
 
@@ -2287,7 +2287,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         >>> test = Grubbs()
         >>> result, conclusion = test.fit(x, kind="two", details="full")
         >>> print(result)
-        GrubbsResult(Statistic=0.05528255528255528, Critical=0.1101, alpha=0.05, kind='two', outlier=[184, 186])
+        GrubbsResult(Statistic=0.05528255528255528, Critical=0.1101, alpha=0.05, kind='three', outlier=[184, 186])
         >>> print(conclusion)
         Since the test statistic (0.055) is lower than the critical value (0.11), we have evidence to reject the null hypothesis, and perhaps sample 184 and 186 are outliers (95.0% confidence level)
 
@@ -2340,6 +2340,9 @@ class Grubbs(AlphaManagement, NDigitsManagement):
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
 
         elif kind == "two":
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
+
+        elif kind == "three":
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 4, language=self.language)
 
         else:
@@ -2350,7 +2353,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                 error = messages[1][0][0]
                 raise ValueError(error)
             except ValueError:
-                allowed_ratios = ["one", "two"]
+                allowed_ratios = ["one", "two", "three"]
                 kinds = [f"    --->    '{allowed}'" for allowed in allowed_ratios]
                 msg = [
                     f"{messages[2][0][0]} '{kind}'.",
@@ -2416,6 +2419,8 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                 else:
                     conclusion = rejeita
 
+        elif kind == "two":
+            pass
 
         else:
             if which == "min":
@@ -2423,7 +2428,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
             else:
                 outlier = [x_exp[-2], x_exp[-1]]
             # getting the statistic
-            statistic = self._two(x_exp, which)
+            statistic = self._three(x_exp, which)
             critical = self.get_critical_value(n_rep=x_exp.size, kind=kind, alfa=alfa)[0]
 
             if statistic > critical:
@@ -2459,7 +2464,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
     # with tests, with text, without database, with docstring
     def _one(self, x_exp, which):
         """
-        This function calculates the statistic for the Grubbs test to check if the sample has **one** outlier as described by Grubbs [1]_
+        This function calculates the statistic for the Grubbs test to check if the sample has **one** outlier as described by Grubbs [1]_ (:math:`G_{'}`)
 
         Parameters
         ----------
@@ -2483,13 +2488,13 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_1 = \\frac{\\overline{x}-x_1}{s}
+            G_{'} = \\frac{\\overline{x}-x_1}{s}
 
         If ``which=="max"``, the equation used is:
 
         .. math::
 
-            G_1 = \\frac{x_n-\\overline{x}}{s}
+            G_{'} = \\frac{x_n-\\overline{x}}{s}
 
         References
         ----------
@@ -2529,9 +2534,9 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
 
     # with tests, with text, without database, with docstring
-    def _two(self, x_exp, which):
+    def _three(self, x_exp, which):
         """
-        This function calculates the statistic for the Grubbs test to check if the sample has **two** outlier on the same side as described by Grubbs [1]_
+        This function calculates the statistic for the Grubbs test to check if the sample has **two** outlier on the same side as described by Grubbs [1]_ (:math:`G_{'''}`)
 
         Parameters
         ----------
@@ -2554,7 +2559,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_2 = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
+            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
 
         where :math:`s^2_{2 \\; lower}` is the sample variance disregarding the two samples suspected of being outliers (the two lowest values)
 
@@ -2563,7 +2568,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_2 = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
+            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
 
         where :math:`s^2_{2 \\; upper}` is the sample variance disregarding the two samples suspected of being outliers (the two highest values)
 
@@ -2580,7 +2585,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         >>> x_exp = np.array([159, 153, 184, 153, 156, 150, 147])
         >>> x_exp.sort(kind='quicksort')
         >>> test = Grubbs()
-        >>> result = test._two(x_exp, which="max")
+        >>> result = test._three(x_exp, which="max")
         >>> print(result)
         0.05121951219512194
 
@@ -2590,7 +2595,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         >>> x_exp = np.array([15.42, 15.51, 15.52, 15.53, 15.68, 15.52, 15.56, 15.53, 15.54, 15.56])
         >>> x_exp.sort(kind='quicksort')
         >>> test = Grubbs()
-        >>> result = test._two(x_exp, which="min")
+        >>> result = test._three(x_exp, which="min")
         >>> print(result)
         0.5353728489483768
 

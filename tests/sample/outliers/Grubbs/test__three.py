@@ -1,13 +1,13 @@
-"""Tests if the test_test__one is working as expected
+"""Tests if the test__three is working as expected
 
 ---> Class Test__pass
 
 
 --------------------------------------------------------------------------------
 Command to run at the prompt:
-    python -m unittest -v tests/sample/outliers/Grubbs/test__two.py
+    python -m unittest -v tests/sample/outliers/Grubbs/test__three.py
     or
-    python -m unittest -b tests/sample/outliers/Grubbs/test__two.py
+    python -m unittest -b tests/sample/outliers/Grubbs/test__three.py
 
 --------------------------------------------------------------------------------
 """
@@ -31,24 +31,24 @@ class Test_pass(unittest.TestCase):
 
     def test_lower(self):
         teste = Grubbs()
-        result = teste._two(self.x, which="min")
+        result = teste._three(self.x, which="min")
         self.assertAlmostEqual(result, 0.751, places=3, msg="wrong lower value")
 
-        result = teste._two(self.y, which="min")
+        result = teste._three(self.y, which="min")
         self.assertAlmostEqual(result, 0.500819672, places=7, msg="wrong lower value")
 
-        result = teste._two(self.z, which="min")
+        result = teste._three(self.z, which="min")
         self.assertAlmostEqual(result, 0.535372849, places=7, msg="wrong lower value")
 
     def test_upper(self):
         teste = Grubbs()
-        result = teste._two(self.x, which="max")
+        result = teste._three(self.x, which="max")
         self.assertAlmostEqual(result, 0.051, places=3, msg="wrong upper value")
 
-        result = teste._two(self.y, which="max")
+        result = teste._three(self.y, which="max")
         self.assertAlmostEqual(result, 0.276697892, places=7, msg="wrong upper value")
 
-        result = teste._two(self.z, which="max")
+        result = teste._three(self.z, which="max")
         self.assertAlmostEqual(result, 0.3329008479, places=7, msg="wrong upper value")
 
 

@@ -31,7 +31,7 @@ class Test_Raises(unittest.TestCase):
 
         with self.assertRaises(ValueError, msg="Does not raised error when kind is wrong"):
             teste = Grubbs()
-            result = teste.get_critical_value(5, kind='three')
+            result = teste.get_critical_value(5, kind='threee')
 
         with self.assertRaises(ValueError, msg="Does not raised error when kind is wrong"):
             teste = Grubbs()
@@ -60,11 +60,11 @@ class Test_Raises(unittest.TestCase):
         sys.stdout = capturedOutput
         try:
             teste = Grubbs()
-            result = teste.get_critical_value(5, kind='three')
+            result = teste.get_critical_value(5, kind='threee')
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "three"
+        expected = "threee"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -101,7 +101,7 @@ class Test_Raises(unittest.TestCase):
 
         with self.assertRaises(ValueError, msg="Does not raised error when n_rep not allowed"):
             teste = Grubbs()
-            result = teste.get_critical_value(3, kind="two")
+            result = teste.get_critical_value(3, kind="three")
 
 
     def test_n_rep_raises_output(self):
@@ -189,7 +189,7 @@ class Test_get_critical_value(unittest.TestCase):
 
         result = teste.get_critical_value(29, alfa=0.1)
         self.assertEqual(result[0], 2.730, msg="wrong  critical value")
-        self.assertEqual(result[1], 0.1, msg="wrong alfa")        
+        self.assertEqual(result[1], 0.1, msg="wrong alfa")
 
 
 
