@@ -10,6 +10,7 @@ Grubbs
    get_critical_value
    _one
    _two
+   _three
 
 |
 |

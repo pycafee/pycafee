@@ -103,6 +103,10 @@ class Test_Raises(unittest.TestCase):
             teste = Grubbs()
             result = teste.get_critical_value(3, kind="three")
 
+        with self.assertRaises(ValueError, msg="Does not raised error when n_rep not allowed"):
+            teste = Grubbs()
+            result = teste.get_critical_value(21, kind="two")
+
 
     def test_n_rep_raises_output(self):
 
@@ -161,7 +165,7 @@ class Test_get_critical_value(unittest.TestCase):
         self.assertIsInstance(result[0], float, msg="critical not float")
         self.assertIsInstance(result[1], float, msg="alfa not float")
 
-    def test_result_values(self):
+    def test_result_values_one(self):
         teste = Grubbs()
         result = teste.get_critical_value(5)
         self.assertEqual(result[0], 1.715, msg="wrong  critical value")
@@ -189,6 +193,37 @@ class Test_get_critical_value(unittest.TestCase):
 
         result = teste.get_critical_value(29, alfa=0.1)
         self.assertEqual(result[0], 2.730, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.1, msg="wrong alfa")
+
+
+    def test_result_values_two(self):
+        teste = Grubbs()
+        result = teste.get_critical_value(5, kind="two")
+        self.assertEqual(result[0], 2.753, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.05, msg="wrong alfa")
+
+        result = teste.get_critical_value(13, kind="two")
+        self.assertEqual(result[0], 4.00, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.05, msg="wrong alfa")
+
+        result = teste.get_critical_value(15, kind="two")
+        self.assertEqual(result[0], 4.17, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.05, msg="wrong alfa")
+
+        result = teste.get_critical_value(10, alfa=0.01, kind="two")
+        self.assertEqual(result[0], 3.875, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.01, msg="wrong alfa")
+
+        result = teste.get_critical_value(14, alfa=0.01, kind="two")
+        self.assertEqual(result[0], 4.34, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.01, msg="wrong alfa")
+
+        result = teste.get_critical_value(4, alfa=0.1, kind="two")
+        self.assertEqual(result[0], 2.409, msg="wrong  critical value")
+        self.assertEqual(result[1], 0.1, msg="wrong alfa")
+
+        result = teste.get_critical_value(19, alfa=0.1, kind="two")
+        self.assertEqual(result[0], 4.27, msg="wrong  critical value")
         self.assertEqual(result[1], 0.1, msg="wrong alfa")
 
 

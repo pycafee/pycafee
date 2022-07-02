@@ -1950,6 +1950,22 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         }
 
 
+    GRUBBS_TWO_TABLE = {
+        "n_rep" : [
+                    3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+                    ],
+        0.10 : [
+                1.997, 2.409, 2.712, 2.949, 3.143, 3.308, 3.449, 3.57, 3.68, 3.78, 3.87, 3.95, 4.02, 4.09, 4.15, 4.21, 4.27, 4.32
+                ],
+        0.05 : [
+                1.999, 2.429, 2.753, 3.012, 3.222, 3.399, 3.552, 3.685, 3.80, 3.91, 4.00, 4.09, 4.17, 4.24, 4.31, 4.38, 4.43, 4.49,
+                ],
+        0.01 : [
+                2.000, 2.445, 2.803, 3.095, 3.338, 3.543, 3.720, 3.875, 4.012, 4.134, 4.244, 4.34, 4.43, 4.51, 4.59, 4.66, 4.73, 4.79
+                ]
+        }
+
+
     GRUBBS_THREE_TABLE = {
         "n_rep" : [
                     4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
@@ -1985,7 +2001,13 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         n_rep : ``int``
             The total number of observations (``3 <= n_rep <= 30``, vary).
         kind : ``str``, optional
-            The type of the test. It can be ``"one"`` (or ``None``) or ``"three"``.
+            The type of the test.
+
+            * If ``kind="one"`` (or ``None``), the function returns the critical value for :math:`G^{'}`
+            * If ``kind="two"``, the function returns the critical value for :math:`G^{''}`
+            * If ``kind="three"``, the function returns the critical value for :math:`G^{'''}`
+
+
         alfa : ``float``
             The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
 
@@ -1999,7 +2021,11 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         Notes
         -----
-        Critical values are limited for sample sizes between ``3`` and ``30`` for ``kind="one"`` and between ``4`` and ``30`` for ``kind="two"``. For data with a higher number of repetitions, check GRUBBS & BECK (1972) [2]_.
+        For :math:`G^{'}` (``kind="one"``) the critical values are limited for sample sizes between ``3`` and ``30``. For larger sample size, check [2]_
+
+        For :math:`G^{''}` (``kind="two"``) the critical values are limited for sample sizes between ``3`` and ``20``. For larger sample size, check [3]_.
+
+        For :math:`G^{'''}` (``kind="three"``) the critical values are limited for sample sizes between ``4`` and ``30``. For larger sample size, check [2]_.
 
 
 
@@ -2009,15 +2035,37 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. [2] GRUBBS, F. E.; BECK, G. Extension of Sample Sizes and Percentage Points for Significance Tests of Outlying Observations. Technometrics, v. 14, n. 4, p. 847–854, 1972.
 
+        .. [3] DAVID, H. A.; HARTLEY, H. O.; PEARSON, E. S. The Distribution of the Ratio, in a Single Normal Sample, of Range to Standard Deviation. Biometrika, v. 41, n. 3/4, p. 482–493, 1954.
 
         Examples
         --------
+
+        **Getting the critical value for 5 samples at 5% significance level for** :math:`G^{'}`
 
         >>> from pycafee.sample.outliers import Grubbs
         >>> test = Grubbs()
         >>> result = test.get_critical_value(5)
         >>> print(result)
         GrubbsResult(Critical=1.715, alpha=0.05)
+
+
+        **Getting the critical value for 5 samples at 5% significance level for** :math:`G^{''}`
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> test = Grubbs()
+        >>> result = test.get_critical_value(5, kind="two")
+        >>> print(result)
+        GrubbsResult(Critical=2.753, alpha=0.05)
+
+
+        **Getting the critical value for 5 samples at 5% significance level for** :math:`G^{'''}`
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> test = Grubbs()
+        >>> result = test.get_critical_value(5, kind="three")
+        >>> print(result)
+        GrubbsResult(Critical=0.009, alpha=0.05)
+
 
 
         """
@@ -2046,6 +2094,10 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         if kind == "one":
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
             table_data = Grubbs.GRUBBS_ONE_TABLE
+        elif kind == "two":
+            checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 3, language=self.language)
+            checkers._check_value_is_equal_or_lower_than(n_rep, "n_rep", 20, language=self.language)
+            table_data = Grubbs.GRUBBS_TWO_TABLE
         elif kind == "three":
             checkers._check_value_is_equal_or_higher_than(n_rep, "n_rep", 4, language=self.language)
             table_data = Grubbs.GRUBBS_THREE_TABLE
@@ -2081,7 +2133,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                 fk_id_function = management._query_func_id("generic")
                 messages = management._get_messages(fk_id_function, self.language, "generic")
                 msg = [f"{messages[4][0][0]} 'alfa' {messages[4][2][0]}:"]
-                values = ['0.01', '0.05']
+                values = ['0.01', '0.05', '0.10']
                 for item in values:
                     msg.append(f"   --->    {item}")
                 msg.append(f"{messages[4][4][0]}:")
@@ -2108,14 +2160,19 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
     # with tests, with text, without database, with docstring
     def fit(self, x_exp, kind=None, which=None, alfa=None, details=None):
-        """This function applies the Grubbs test to identify outliers in Normal data with few samples [1]_.
+        """This function applies the Grubbs test to identify outliers in Normal data with a few samples [1]_.
 
         Parameters
         ----------
         x_exp : ``numpy array``
-            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 3 sample data (vary).
+            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least ``3`` sample data (vary).
         kind : ``str``, optional
-            Whether to check for a single outlier (``"one"``, default) or to check for two outliers on the same side (``"three"``).
+            The type of the test.
+
+            * If ``kind="one"`` (or ``None``), the function returns the critical value for :math:`G^{'}`
+            * If ``kind="two"``, the function returns the critical value for :math:`G^{''}`
+            * If ``kind="three"``, the function returns the critical value for :math:`G^{'''}`
+
         alfa : ``float``
             The significance level (``0.10``, ``0.05`` (default) or ``0.01``)
         details : ``str``, optional
@@ -2128,9 +2185,11 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         which : ``str``, optional
             The value that should be evaluated as a possible outlier.
 
-            * If it is ``None`` (default), the outlier is automatically inferred as the farthest observation from the mean
-            * If it is ``"max"`` (or ``None``), the highest value is checked if it is a possible outlier.
-            * If it is ``"min"``, the lowest value is checked if it is a possible outlier.
+            * If ``which=None`` (default), the possible outlier is automatically inferred as the farthest observation from the mean.
+            * If ``which="max"``, the highest value is checked if it is a possible outlier.
+            * If ``which="min"``, the lowest value is checked if it is a possible outlier.
+
+            The ``which`` parameter has no effect when ``kind="two"``.
 
         Returns
         -------
@@ -2143,11 +2202,11 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                 The significance level used.
             kind : ``str``
                 The kind parameter used.
-            outlier : ``float`` or ``list`` of ``floats``
+            outlier : ``number`` or ``list`` of ``numbers``
                 The outlier tested.
 
-                * If ``kind="one"``, a float is returned with the value tested;
-                * If ``kind="two"``, a list of two floats is returned with the two values tested;
+                * If ``kind="one"``, a number is returned with the value tested;
+                * If ``kind="two"`` or ``kind="three"``, a list with two numbers is returned with the two values tested;
 
         conclusion : ``str``
             The test conclusion (e.g, Possible outlier/ no outliers).
@@ -2165,7 +2224,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         Notes
         -----
 
-        The implementation of the **Grubbs test** is done in three different ways. The first checks whether the dataset has a single outlier (``kind="one"``), with the following hypotheses:
+        The implementation of the **Grubbs test** is done in three different ways. The first implementation (:math:`G^{'}`), checks whether the dataset has a single outlier (``kind="one"``), with the following hypotheses:
 
         .. admonition:: \u2615
 
@@ -2180,30 +2239,55 @@ class Grubbs(AlphaManagement, NDigitsManagement):
            if critical <= statistic:
                Data does not have a outlier
            else:
-               Data has a outlier
+               Data has a possible outlier
 
 
         For this case, when the possible outlier is the smallest observation in the data set (``which=="min"``), the test ``statistic`` is estimated through the following equation:
 
         .. math::
 
-            G_{'} = \\frac{\\overline{x}-x_1}{s}
+            G^{'} = \\frac{\\overline{x}-x_1}{s}
 
         and when the possible outlier is the highest observation in the data set (``which=="max"``), the test ``statistic`` is estimated through the following equation:
 
         .. math::
 
-            G_{'} = \\frac{x_n-\\overline{x}}{s}
+            G^{'} = \\frac{x_n-\\overline{x}}{s}
 
 
-
-        The third implementation checks whether the dataset has a two outliers on the same side (``kind="three"``), with the following hypotheses:
+        The second implementation (:math:`G^{''}`) checks whether the dataset has two outliers (``kind="two"``) each on one side of the distribution (the smallest and largest value), with the following hypotheses:
 
         .. admonition:: \u2615
 
            :math:`H_0:` data **does not have** a outlier.
 
-           :math:`H_1:` data **has** two outliers.
+           :math:`H_1:` the minimum and the maximum values are possible outliers.
+
+        The conclusion of the test is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
+
+        .. code:: python
+
+           if critical <= statistic:
+               Data does not have a outlier
+           else:
+               Data has a outlier
+
+
+        For this case, the test ``statistic`` is estimated through the following equation:
+
+        .. math::
+
+            G^{''} = \\frac{x_n-x_1}{s}
+
+
+
+        The third implementation (:math:`G^{'''}`) checks whether the dataset has two outliers on the same side of the distribution (``kind="three"``), with the following hypotheses:
+
+        .. admonition:: \u2615
+
+           :math:`H_0:` data **does not have** a outlier.
+
+           :math:`H_1:` data **has** two possible outliers.
 
         The conclusion of the test is based on the comparison between the ``critical`` value (at ``ɑ`` significance level) and ``statistic`` of the test:
 
@@ -2234,13 +2318,13 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
 
 
-        There are critical values for alpha equal to ``0.10``, ``0.05`` and ``0.01``. These values are for the **two-tailed Grubbs distribution** [2]_. For dataset with n higher than 30, check the [2]_.
+        There are critical values for alpha equal to ``0.10``, ``0.05`` and ``0.01``. These values are for the **two-tailed Grubbs distribution** [2]_.
 
-        The minimum number of samples needed to apply the test varies depending on the ``kind`` parameter, while the maximum number for all cases is 30.
+        The minimum and maximum number of samples needed to apply the test varies depending on the ``kind`` parameter. The range for each option is as follows:
 
-        * If ``kind="one"`` the minimum sample size is ``3``;
-        * If ``kind="two"`` the minimum sample size is ``4``;
-
+        * If ``kind="one"``: ``3<=n<=30``;
+        * If ``kind="two"``: ``3<=n<=20``;
+        * If ``kind="three"``: ``4<=n<=30``;
 
 
 
@@ -2253,12 +2337,12 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         Examples
         --------
 
-        **Checking if the largest observation is a possible outlier**
+        **Checking if the highest observation is a possible outlier at a 95% of confidence level**
 
         >>> from pycafee.sample.outliers import Grubbs
         >>> import numpy as np
         >>> x = np.array([159, 153, 184, 153, 156, 150, 147])
-        >>> testt = Grubbs()
+        >>> test = Grubbs()
         >>> result, conclusion = test.fit(x)
         >>> print(result)
         GrubbsResult(Statistic=2.1532047136140045, Critical=2.02, alpha=0.05, kind='one', outlier=184)
@@ -2266,7 +2350,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         The sample 184 perhaps be an outlier (95.0% confidence level)
 
 
-        **Checking if the largest observation is a possible outlier at 99% of confidence level**
+        **Checking if the highest observation is a possible outlier at a 99% of confidence level**
 
         >>> from pycafee.sample.outliers import Grubbs
         >>> import numpy as np
@@ -2279,17 +2363,30 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         Since the test statistic (2.153) is higher than the critical value (2.139), we have evidence to reject the null hypothesis, and perhaps sample 184 is an outlier (99.0% confidence level)
 
 
-        **Checking if the two largest observations are possible outliers**
+        **Checking if the two highest observations are possible outliers at a 95% of confidence level**
 
         >>> from pycafee.sample.outliers import Grubbs
         >>> import numpy as np
         >>> x = np.array([159, 153, 184, 153, 156, 150, 147, 186])
         >>> test = Grubbs()
-        >>> result, conclusion = test.fit(x, kind="two", details="full")
+        >>> result, conclusion = test.fit(x, kind="three", details="full")
         >>> print(result)
         GrubbsResult(Statistic=0.05528255528255528, Critical=0.1101, alpha=0.05, kind='three', outlier=[184, 186])
         >>> print(conclusion)
         Since the test statistic (0.055) is lower than the critical value (0.11), we have evidence to reject the null hypothesis, and perhaps sample 184 and 186 are outliers (95.0% confidence level)
+
+
+        **Checking if the highest and the lowest observations are possible outliers at a 95% of confidence level**
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x = np.array([159, 153, 184, 153, 156, 150, 147, 140])
+        >>> test = Grubbs()
+        >>> result, conclusion = test.fit(x, kind="two", details="full")
+        >>> print(result)
+        GrubbsResult(Statistic=3.3896333493939195, Critical=3.399, alpha=0.05, kind='two', outlier=[140, 184])
+        >>> print(conclusion)
+        As the test statistic (3.389) is lower than the critical value (3.399), we have no evidence to reject the null hypothesis that the sample does not contain outliers (95.0% confidence level)
 
 
 
@@ -2420,7 +2517,26 @@ class Grubbs(AlphaManagement, NDigitsManagement):
                     conclusion = rejeita
 
         elif kind == "two":
-            pass
+            outlier = [x_exp[0], x_exp[-1]]
+            # getting the statistic
+            statistic = self._two(x_exp)
+            critical = self.get_critical_value(n_rep=x_exp.size, kind=kind, alfa=alfa)[0]
+
+            if statistic <= critical:
+                if details == "short":
+                    conclusion = f"{messages[6][0][0]}{100*(1-alfa)}{messages[6][2][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[7][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[7][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[7][4][0]}{100*(1-alfa)}{messages[7][6][0]}"
+                else:
+                    conclusion = aceita
+            else:
+                if details == "short":
+                    conclusion = f"{messages[10][0][0]} {outlier[0]} {messages[10][2][0]} {outlier[1]} {messages[10][4][0]}{100*(1-alfa)}{messages[10][6][0]}"
+                elif details == "full":
+                    conclusion = f"{messages[13][0][0]}{helpers._truncate(statistic, language=self.language, decs=self.n_digits)}{messages[13][2][0]}{helpers._truncate(critical, language=self.language, decs=self.n_digits)}{messages[13][4][0]} {outlier[0]} {messages[13][6][0]} {outlier[1]} {messages[13][8][0]}{100*(1-alfa)}{messages[13][10][0]}"
+                else:
+                    conclusion = rejeita
+
 
         else:
             if which == "min":
@@ -2464,7 +2580,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
     # with tests, with text, without database, with docstring
     def _one(self, x_exp, which):
         """
-        This function calculates the statistic for the Grubbs test to check if the sample has **one** outlier as described by Grubbs [1]_ (:math:`G_{'}`)
+        This function calculates the statistic for the Grubbs test to check if the sample has **one** outlier as described by Grubbs [1]_ (:math:`G^{'}`)
 
         Parameters
         ----------
@@ -2473,8 +2589,8 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         which : ``str``
             The value that should be evaluated.
 
-            * If it is ``"max"`` (or ``None``), the highest value is checked if it is a possible outlier.
-            * If it is ``"min"``, the lowest value is checked.
+            * If ``which="max"`` (or ``None``), the highest value is checked if it is a possible outlier.
+            * If ``which="min"``, the lowest value is checked if it is a possible outlier.
 
         Returns
         -------
@@ -2488,13 +2604,15 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_{'} = \\frac{\\overline{x}-x_1}{s}
+            G^{'} = \\frac{\\overline{x}-x_1}{s}
 
         If ``which=="max"``, the equation used is:
 
         .. math::
 
-            G_{'} = \\frac{x_n-\\overline{x}}{s}
+            G^{'} = \\frac{x_n-\\overline{x}}{s}
+
+        **The data must be ordered.**
 
         References
         ----------
@@ -2534,9 +2652,70 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
 
     # with tests, with text, without database, with docstring
+    def _two(self, x_exp):
+        """
+        This function calculates the statistic for the Grubbs test to check if the sample has **two** outliers, in each at one end of the distribution (the lowest and highest value at the same time), as described by Grubbs [1]_ (:math:`G^{''}`)
+
+        Parameters
+        ----------
+        x_exp : ``numpy array``
+            One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with the data **ordered**.
+
+        Returns
+        -------
+        statistic : ``float``
+            The test statistic
+
+
+        Notes
+        -----
+        The equation used to estimate the Grubbs statistic for this case is the following:
+
+        .. math::
+
+            G^{''} = \\frac{x_n-x_1}{s}
+
+        **The data must be ordered.**
+
+        References
+        ----------
+        .. [1] GRUBBS, F. E. Sample Criteria for Testing Outlying Observations. The Annals of Mathematical Statistics, v. 21, n. 1, p. 27–58, 1950.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([159, 153, 184, 153, 156, 150, 147])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._two(x_exp)
+        >>> print(result)
+        2.99827968186036
+
+
+        >>> from pycafee.sample.outliers import Grubbs
+        >>> import numpy as np
+        >>> x_exp = np.array([15.42, 15.51, 15.52, 15.53, 15.68, 15.52, 15.56, 15.53, 15.54, 15.56])
+        >>> x_exp.sort(kind='quicksort')
+        >>> test = Grubbs()
+        >>> result = test._two(x_exp)
+        >>> print(result)
+        4.076568442994411
+
+
+        """
+        _check_grubbs_division_by_zero(x_exp, self.language)
+        statistic = (x_exp[-1] - x_exp[0])/np.std(x_exp, ddof=1)
+        return statistic
+
+
+
+    # with tests, with text, without database, with docstring
     def _three(self, x_exp, which):
         """
-        This function calculates the statistic for the Grubbs test to check if the sample has **two** outlier on the same side as described by Grubbs [1]_ (:math:`G_{'''}`)
+        This function calculates the statistic for the Grubbs test to check if the sample has **two** outlier on the same side (the two highest or the two lowest observations) as described by Grubbs [1]_ (:math:`G^{'''}`).
 
         Parameters
         ----------
@@ -2545,8 +2724,8 @@ class Grubbs(AlphaManagement, NDigitsManagement):
         which : ``str``
             The side that should be evaluated.
 
-            * If it is ``"max"`` (or ``None``), the two highest values are checked if they are possible outliers
-            * If it is ``"min"``, the two lowest values are checked if they are possible outliers
+            * If ``which"max"`` (or ``None``), the two highest values are checked if they are possible outliers
+            * If ``which"min"``, the two lowest values are checked if they are possible outliers
 
         Returns
         -------
@@ -2559,7 +2738,7 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
+            G^{'''} = \\frac{(n-3)\\times s^2_{2 \\; lower}}{(n-1)\\times s^2}
 
         where :math:`s^2_{2 \\; lower}` is the sample variance disregarding the two samples suspected of being outliers (the two lowest values)
 
@@ -2568,9 +2747,11 @@ class Grubbs(AlphaManagement, NDigitsManagement):
 
         .. math::
 
-            G_{'''} = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
+            G^{'''} = \\frac{(n-3)\\times s^2_{2 \\; upper}}{(n-1)\\times s^2}
 
         where :math:`s^2_{2 \\; upper}` is the sample variance disregarding the two samples suspected of being outliers (the two highest values)
+
+        **The data must be ordered.**
 
         References
         ----------

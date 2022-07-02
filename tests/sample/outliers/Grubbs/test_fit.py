@@ -6,6 +6,8 @@
 
 ---> Class Test_three: This checks the results for cases where kind equals to three
 
+---> Class Test_two: This checks the results for cases where kind equals to two
+
 ---> Class Test_one: This checks the results for cases where kind equals to one
 
 --------------------------------------------------------------------------------
@@ -35,7 +37,7 @@ class Test_details(unittest.TestCase):
         cls.x = np.array([15.52, 15.53, 15.53, 15.54, 15.56, 15.56]) # sem outliers
         cls.y = np.array([15.52, 15.53, 15.53, 15.54, 15.56, 15.56, 16]) # outlier superior
         cls.z = np.array([15, 15.52, 15.53, 15.53, 15.54, 15.56, 15.56]) # outlier inferior
-
+        cls.w = np.array([14, 15.52, 15.53, 15.53, 15.54, 15.56, 15.56, 17]) # outliers nos dois lados
 
     def test_details_short(self):
         teste = Grubbs()
@@ -58,6 +60,22 @@ class Test_details(unittest.TestCase):
         if "does not have outliers" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
+
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.x, kind="two", details="short")
+        result = False
+        if "does not have outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+        teste = Grubbs(language="pt-br")
+        result, conclusion = teste.fit(self.x, kind="two", details="short")
+        result = False
+        if "não contém outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
 
         teste = Grubbs()
         result, conclusion = teste.fit(self.x, kind="three", details="short")
@@ -169,6 +187,23 @@ class Test_details(unittest.TestCase):
         self.assertTrue(result, msg="wrong conclusion")
 
 
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.w, kind="two", details="short")
+        result = False
+        if "14.0 and 17.0 may be outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+        teste = Grubbs(language='pt-br')
+        result, conclusion = teste.fit(self.w, kind="two", details="short")
+        result = False
+        if "14.0 e 17.0 talvez sejam outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+
     def test_details_full(self):
         teste = Grubbs()
         result, conclusion = teste.fit(self.x, kind="one", details="full")
@@ -190,6 +225,24 @@ class Test_details(unittest.TestCase):
         if "we have no evidence to reject the null hypothesis" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
+
+
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.x, kind="two", details="full")
+        result = False
+        if "we have no evidence to reject the null hypothesis" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+        teste = Grubbs(language='pt-br')
+        result, conclusion = teste.fit(self.x, kind="two", details="full")
+        result = False
+        if "não temos evidências para rejeitar a hipótese nula" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
 
         teste = Grubbs()
         result, conclusion = teste.fit(self.x, kind="three", details="full")
@@ -303,6 +356,21 @@ class Test_details(unittest.TestCase):
         self.assertTrue(result, msg="wrong conclusion")
 
 
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.w, kind="two", details="full")
+        result = False
+        if "statistic (3.74) is higher than the critical value (3.399), we have evidence to reject the null hypothesis, and perhaps samples 14.0 and 17.0 " in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+        teste = Grubbs(language='pt-br')
+        result, conclusion = teste.fit(self.w, kind="two", details="full")
+        result = False
+        if "teste (3.74) é maior do que o valor crítico (3.399), temos evidências para rejeitar a hipótese nula, e talvez as amostras 14.0 e 17.0 " in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
 
     def test_details_binary(self):
         teste = Grubbs()
@@ -315,6 +383,10 @@ class Test_details(unittest.TestCase):
 
         teste = Grubbs()
         result, conclusion = teste.fit(self.x, kind="one", details="binary", which="min")
+        self.assertEqual(conclusion, 0, msg="wrong conclusion")
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.x, kind="two", details="binary")
         self.assertEqual(conclusion, 0, msg="wrong conclusion")
 
         teste = Grubbs()
@@ -377,6 +449,15 @@ class Test_details(unittest.TestCase):
 
         teste = Grubbs()
         result, conclusion = teste.fit(self.z, kind="three", details="binary", which="min")
+        self.assertEqual(conclusion, 1, msg="wrong conclusion")
+
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.w, kind="two", details="binary")
+        self.assertEqual(conclusion, 1, msg="wrong conclusion")
+
+        teste = Grubbs(language='pt-br')
+        result, conclusion = teste.fit(self.w, kind="two", details="binary")
         self.assertEqual(conclusion, 1, msg="wrong conclusion")
 
 
@@ -506,8 +587,6 @@ class Test_raises(unittest.TestCase):
         if expected in capturedOutput.getvalue():
             result = True
         self.assertTrue(result, msg="wrong output when Raising Error")
-
-
 
 
 class Test_three(unittest.TestCase):
@@ -693,7 +772,6 @@ class Test_three(unittest.TestCase):
         self.assertIsInstance(conclusion, str, msg="conclusion not a str")
 
 
-
 class Test_one(unittest.TestCase):
 
 
@@ -861,6 +939,121 @@ class Test_one(unittest.TestCase):
         self.assertIsInstance(result[4], float, msg="kind not a float")
         self.assertIsInstance(conclusion, str, msg="conclusion not a str")
 
+
+class Test_two(unittest.TestCase):
+
+
+    @classmethod
+    def setUpClass(cls):
+        cls.x = np.array([15.52, 15.53, 15.53, 15.54, 15.56, 15.56]) # sem outliers
+        cls.y = np.array([159, 153, 184, 153, 156, 150, 147]) # book
+        cls.z = np.array([9, 16, 23, 41, 44, 46, 80])
+        cls.w = np.array([15.42, 15.51, 15.52, 15.52, 15.53, 15.53, 15.54, 15.56, 15.56, 15.68])
+
+
+
+    def test_data2(self):
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.w, kind="two")
+        self.assertAlmostEqual(result[0], 4.076568443, places=7, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.685, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.05, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 15.42, msg="wrong outlier")
+        self.assertEqual(result[4][1], 15.68, msg="wrong outlier")
+        result = False
+        if "15.42 and 15.68 may be outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.w, kind="two", alfa=0.01)
+        self.assertAlmostEqual(result[0], 4.076568443, places=7, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.875, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.01, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 15.42, msg="wrong outlier")
+        self.assertEqual(result[4][1], 15.68, msg="wrong outlier")
+        result = False
+        if "15.42 and 15.68 may be outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+
+
+
+    def test_data1(self):
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.z, kind="two")
+        self.assertAlmostEqual(result[0], 2.975603377, places=7, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.222, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.05, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 9, msg="wrong outlier")
+        self.assertEqual(result[4][1], 80, msg="wrong outlier")
+        result = False
+        if "data does not have outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.z, kind="two", alfa=0.01)
+        self.assertAlmostEqual(result[0], 2.975603377, places=7, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.338, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.01, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 9, msg="wrong outlier")
+        self.assertEqual(result[4][1], 80, msg="wrong outlier")
+        result = False
+        if "data does not have outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+    def test_book(self):
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.y, kind="two")
+        self.assertAlmostEqual(result[0], 2.998279682, places=3, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.222, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.05, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 147, msg="wrong outlier")
+        self.assertEqual(result[4][1], 184, msg="wrong outlier")
+        result = False
+        if "data does not have outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+        teste = Grubbs(language="pt-br")
+        result, conclusion = teste.fit(self.y, kind="two", alfa=0.01)
+        self.assertAlmostEqual(result[0], 2.998279682, places=3, msg="wrong statistic")
+        self.assertAlmostEqual(result[1], 3.338, places=3, msg="wrong critical")
+        self.assertEqual(result[2], 0.01, msg="wrong alpha")
+        self.assertEqual(result[3], "two", msg="wrong kind")
+        self.assertEqual(result[4][0], 147, msg="wrong outlier")
+        self.assertEqual(result[4][1], 184, msg="wrong outlier")
+        result = False
+        if " dados não contém outliers" in conclusion:
+            result = True
+        self.assertTrue(result, msg="wrong conclusion")
+
+
+
+    def test_output_type(self):
+        teste = Grubbs()
+        result, conclusion = teste.fit(self.x, kind="two")
+        self.assertIsInstance(result, tuple, msg="result not a tuple")
+        self.assertIsInstance(result[0], float, msg="statistic not a tuple")
+        self.assertIsInstance(result[1], float, msg="critical not a tuple")
+        self.assertIsInstance(result[2], float, msg="alfa not a tuple")
+        self.assertIsInstance(result[3], str, msg="kind not a str")
+        self.assertIsInstance(result[4], list, msg="output not a list")
+        self.assertIsInstance(result[4][0], float, msg="output not a float")
+        self.assertIsInstance(result[4][1], float, msg="output not a float")
+        self.assertIsInstance(conclusion, str, msg="conclusion not a str")
 
 
 
