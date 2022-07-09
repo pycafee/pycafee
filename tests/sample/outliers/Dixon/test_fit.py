@@ -44,7 +44,7 @@ class Test_ratio_22(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r22", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -119,7 +119,7 @@ class Test_ratio_22(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r22", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -194,7 +194,7 @@ class Test_ratio_22(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r22", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -280,7 +280,7 @@ class Test_ratio_21(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r21", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -355,7 +355,7 @@ class Test_ratio_21(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r21", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -430,7 +430,7 @@ class Test_ratio_21(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r21", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -516,7 +516,7 @@ class Test_ratio_20(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r20", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -667,7 +667,7 @@ class Test_ratio_20(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r20", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -753,7 +753,7 @@ class Test_ratio_12(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r12", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -903,7 +903,7 @@ class Test_ratio_12(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r12", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -989,7 +989,7 @@ class Test_ratio_11(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r11", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1139,7 +1139,7 @@ class Test_ratio_11(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r11", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1225,7 +1225,7 @@ class Test_ratio_10(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r10", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1375,7 +1375,7 @@ class Test_ratio_10(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r10", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1669,7 +1669,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r10", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1704,7 +1704,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r11", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1739,7 +1739,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r21", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1773,7 +1773,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r22", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1875,7 +1875,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r10", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1910,7 +1910,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r11", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1945,7 +1945,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r21", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
@@ -1979,7 +1979,7 @@ class Test_ratio_None(unittest.TestCase):
         self.assertEqual(result[2], 0.05, msg="wrong statistic value")
         self.assertEqual(result[3], "r22", msg="wrong ratio")
         result = False
-        if "Data do not have outliers (with 95.0% confidence)" in conclusion:
+        if "The data does not have outliers (with 95.0% confidence)" in conclusion:
             result = True
         self.assertTrue(result, msg="wrong conclusion")
 
