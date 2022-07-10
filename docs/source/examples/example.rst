@@ -48,3 +48,12 @@ One Sample
 ^^^^^^^^^^
 
 * `compare_with_constant, (Dados Normais, teste bilateral, pt-br) <https://colab.research.google.com/drive/1A1HNux_7tLwrvrGVzluO_50y4R2HVsEi?usp=sharing>`_;
+
+
+Outlier detection (univariate)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* `Grubbs (en) <https://colab.research.google.com/drive/1a9uPP5v_R20Qw-M3kwh67U2ljqInSA_D?usp=sharing>`_; |cup_coffee| :abbr:`.. (recommended)`
+* `Grubbs (pt-br) <https://colab.research.google.com/drive/12LDCcQlVETyxJboLf_kK7ziRBkwc2zok?usp=sharing>`_; |cup_coffee| :abbr:`.. (recomendado)`
+* `Dixon (en) <https://colab.research.google.com/drive/10rhLdZtZ7XuiS2vxYmPtXapryikZ-NDC?usp=sharing>`_;
+* `Dixon (pt-br) <https://colab.research.google.com/drive/12zX-nRaQaH_uWWqLCTPEyTqRFvRTe2sI?usp=sharing>`_;

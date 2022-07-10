@@ -12,7 +12,7 @@ Welcome to PyCafee's documentation!
 
 |
 
-**Latast version**: ``0.0.6``
+**Latast version**: ``0.0.7``
 
 |
 

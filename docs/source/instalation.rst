@@ -15,10 +15,12 @@ Install PyCafee with:
 See more details on `PyPI <https://pypi.org/project/pycafee/>`_
 
 
-Used packages and prerequisites
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The required libraries and their prerequisites are as follows:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-PyCafee requires Python ``3.8.10`` and the following packages:
+PyCafee requires the Python version to be between ``3.7`` and ``3.8.13``.
+
+The dependencies are:
 
 * ``colorama>=0.4.4``
 * ``matplotlib>=3.2.2``
