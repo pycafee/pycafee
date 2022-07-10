@@ -707,7 +707,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
             t_student = [stats.t.ppf(alfa, gl), stats.t.ppf(1 - alfa, gl)]
 
         fk_id_function = management._query_func_id("StudentDistribution")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "StudentDistribution")
 
         result = namedtuple(messages[13][0][0], (messages[13][1][0], messages[13][2][0], messages[13][3][0], messages[13][4][0]))
 
@@ -926,7 +926,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         """
         fk_id_function = management._query_func_id("StudentDistribution")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "StudentDistribution")
 
         ### Checking the input parameters ###
 
@@ -1131,6 +1131,12 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         # print(critical)
         return result(statistic, [critical[0], critical[1]], p_value, which, alfa), conclusion
 
+
+
+
+    def compare_pairs(self, x_exp_1, x_exp_2, alfa=None, which=None, comparison=None, details=None):
+
+        pass
 
 
 

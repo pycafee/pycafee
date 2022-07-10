@@ -1,0 +1,6 @@
+_r12
+====
+
+.. currentmodule:: pycafee.sample.outliers.Dixon
+
+.. autofunction:: pycafee.sample.outliers.Dixon._r12

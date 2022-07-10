@@ -462,12 +462,12 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
         """
         if self.msg is None:
             fk_id_function = management._query_func_id("AndersonDarling")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AndersonDarling")
             general._display_one_line_attention(messages[1][0][0])
         else:
             # quering
             fk_id_function = management._query_func_id("to_xlsx")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "to_xlsx")
 
             # batizando o nome do arquivo
             if file_name is None:
@@ -592,7 +592,7 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
 
         if self.msg is None:
             fk_id_function = management._query_func_id("AndersonDarling")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AndersonDarling")
             general._display_one_line_attention(messages[1][0][0])
 
         else:
@@ -640,14 +640,14 @@ class AndersonDarling(AlphaManagement, NDigitsManagement, PlotsManagement):
     def __str__(self):
         if self.msg is None:
             fk_id_function = management._query_func_id("AndersonDarling")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "AndersonDarling")
             return messages[1][0][0]
         else:
             return self.msg
 
     def __repr__(self):
         fk_id_function = management._query_func_id("AndersonDarling")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "AndersonDarling")
         return messages[2][0][0]
 
 

@@ -211,7 +211,7 @@ def _get_current_default_language():
 
 # with A test (OK)
 # maybe, add a detault text just for testing on the database
-def _get_messages(fk_id_function, language, func_name=None):
+def _get_messages(fk_id_function, language, func_name):
     """
     Function to get the messages for each function on the database
     """

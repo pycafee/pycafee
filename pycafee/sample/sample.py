@@ -43,7 +43,7 @@ class Sample(AlphaManagement, NDigitsManagement):
         super().__init__(alfa=alfa, language=language, n_digits=n_digits, **kwargs)
         if name is None:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             self.name = messages[4][0][0]
         else:
             checkers._check_is_str(name, "name", self.language)
@@ -112,7 +112,7 @@ class Sample(AlphaManagement, NDigitsManagement):
             helpers._raises_when_fit_was_not_applied("Sample", self.language, self.name)
         else:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             colalign = []
             ic = f"{messages[9][0][0]} ({100*(1-self.alfa)}%)"
             data = {
@@ -150,7 +150,7 @@ class Sample(AlphaManagement, NDigitsManagement):
             helpers._raises_when_fit_was_not_applied("Sample", self.language, self.name)
         else:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             colalign = []
             data = {
                 f"{messages[6][0][0]} - s": [self.mean - self.std],
@@ -185,7 +185,7 @@ class Sample(AlphaManagement, NDigitsManagement):
             helpers._raises_when_fit_was_not_applied("Sample", self.language, self.name)
         else:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             colalign = []
             data = {
                 f"{messages[6][0][0]} - IC": [self.mean - self.t_interval],
@@ -220,7 +220,7 @@ class Sample(AlphaManagement, NDigitsManagement):
             helpers._raises_when_fit_was_not_applied("Sample", self.language, self.name)
         else:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             colalign = []
             data = {
                 messages[12][0][0]: [self.min],
@@ -344,17 +344,17 @@ class Sample(AlphaManagement, NDigitsManagement):
     def __str__(self):
         if self.mean is None:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
             return f"{messages[2][0][0]} {self.name}"
         else:
             fk_id_function = management._query_func_id("Sample")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "Sample")
 
             return f"{self.name} {messages[5][0][0]} = {helpers._truncate(self.mean, self.language, decs=self.n_digits)} +/- {helpers._truncate(self.std, self.language, decs=self.n_digits)}"
 
     def __repr__(self):
         fk_id_function = management._query_func_id("Sample")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "Sample")
         return messages[3][0][0]
 
 

@@ -213,7 +213,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
         >>> print(result)
         AbdiMolinResult(Statistic=0.15459867079959644, Critical=0.2616, p_value=None, Alpha=0.05)
         >>> print(conclusion)
-        Data is Normal at a 95.0% of confidence level.        
+        Data is Normal at a 95.0% of confidence level.
 
 
 
@@ -226,7 +226,7 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
                 "sw", "shapiro-wilk"
                 ]
         fk_id_function = management._query_func_id("NormalityCheck")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "NormalityCheck")
         if test is not None:
             checkers._check_is_str(test, "test", self.language)
             if test not in normality_tests:
@@ -303,14 +303,14 @@ class NormalityCheck(AlphaManagement, NDigitsManagement):
     def __str__(self):
         if self.msg is None:
             fk_id_function = management._query_func_id("NormalityCheck")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "NormalityCheck")
             return messages[1][0][0]
         else:
             return self.msg
 
     def __repr__(self):
         fk_id_function = management._query_func_id("NormalityCheck")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "NormalityCheck")
         return messages[2][0][0]
 
 

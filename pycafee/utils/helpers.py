@@ -451,7 +451,7 @@ def _change_locale(language, decimal_separator=".", local="pt_BR"):
         The decimal separator symbol. It can be the dot (default '.') or the comma (',').
     local : string (default "pt_BR")
         The alias for the desired locale. Only used if decimal_separator is a comma, setting matplolib's default value. Its only function is to change the decimal separator symbol and should be changed only if the "pt_BR" option is not available.
-    language : string
+    language : ``str``
         The language code
 
     Notes
@@ -1400,7 +1400,7 @@ def _raises_when_fit_was_not_applied(func_name, language, name):
 
     """
     fk_id_function = management._query_func_id(func_name)
-    messages = management._get_messages(fk_id_function, language)
+    messages = management._get_messages(fk_id_function, language, func_name)
     try:
         error = messages[1][0][0]
         raise ValueError(error)

@@ -186,7 +186,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         ### quering ###
 
         fk_id_function = management._query_func_id("get_critical_value")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "get_critical_value")
 
         ### checking alpha value ###
         if alfa is None:
@@ -380,7 +380,7 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         # local = self._get_default_local(local)
 
         fk_id_function = management._query_func_id("draw_critical_values")
-        messages = management._get_messages(fk_id_function, self.language)
+        messages = management._get_messages(fk_id_function, self.language, "draw_critical_values")
 
 
         ### The values tabled in a dictionary ###
@@ -789,12 +789,12 @@ class KolmogorovSmirnov(AlphaManagement, NDigitsManagement, PlotsManagement):
         """
         if self.msg is None:
             fk_id_function = management._query_func_id("KolmogorovSmirnov")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "KolmogorovSmirnov")
             general._display_one_line_attention(messages[1][0][0])
         else:
             # quering
             fk_id_function = management._query_func_id("to_xlsx")
-            messages = management._get_messages(fk_id_function, self.language)
+            messages = management._get_messages(fk_id_function, self.language, "to_xlsx")
 
             # batizando o nome do arquivo
             if file_name is None:

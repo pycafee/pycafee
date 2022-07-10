@@ -4,6 +4,7 @@
 """
 
 # Function list:
+#     - _check_array_lower_size(array, value, param_name, language)
 #     - _check_data_in_range(value, param_name, min, max, language)
 #     - _check_is_bool(value, param_name, language)
 #     - _check_is_data_frame(df, param_name, language)
@@ -18,7 +19,7 @@
 #     - _check_is_subplots(value, param_name, language)
 #     - _check_list_length(value, n, param_name, language)
 #     - _check_value_is_equal_or_higher_than(value, param_name, minimum, language)
-
+#     - _check_value_is_equal_or_lower_than(value, param_name, maximum, language)
 #########################################
 ################ Imports ################
 #########################################
@@ -37,6 +38,55 @@ from pycafee.utils import  general
 ###########################################
 ################ Functions ################
 ###########################################
+
+
+# with tests, with text, with database
+def _check_array_lower_size(array, value, param_name, language):
+    """This function checks if a the size of a ndarray (``array``) is at least ``value``
+
+    Parameters
+    ----------
+    array : ``ndarray`` (1D)
+        The array to be to checked if it has at least ``value`` size.
+    value : ``int``
+        The minimum size that the array must have
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``array``.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``array`` isn't checked if it is a ``ndarray``.
+    The parameter ``value`` isn't checked if it is a ``int``.
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+    ``True`` if the size of the ``array`` is at least ``value``;
+    Raises ``ValueError`` if the size of the ``array`` is lower than ``value``;
+
+    """
+    ### quering ###
+    func_name = "_check_array_lower_size"
+    fk_id_function = management._query_func_id(func_name)
+    messages = management._get_messages(fk_id_function, language, func_name)
+
+    if array.size < value :
+        try:
+            error = messages[1][0][0]
+            raise ValueError(error)
+        except ValueError:
+            general._display_one_line_attention(
+                                f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{value}', {messages[2][4][0]} '{array.size}'",
+                                )
+            raise
+    else:
+        return True
+
+
+
 
 
 # with tests, with text, with database
@@ -93,6 +143,10 @@ def _check_data_in_range(value, param_name, lower, upper, language):
                                 )
             raise
     return True
+
+
+
+
 
 # with tests, with text, with database
 def _check_is_bool(value, param_name, language):
@@ -470,7 +524,7 @@ def _check_is_positive(value, param_name, language):
     """
     if value <= 0:
         ### quering ###
-        func_name = "_chek_is_positive"
+        func_name = "_check_is_positive"
         fk_id_function = management._query_func_id(func_name)
         messages = management._get_messages(fk_id_function, language, func_name)
         try:
@@ -665,54 +719,52 @@ def _check_value_is_equal_or_higher_than(value, param_name, minimum, language):
     return True
 
 
-
-
-
 # with tests, with text, with database
-def _check_array_lower_size(array, value, param_name, language):
-    """This function checks if a the size of a ndarray (``array``) is at least ``value``
+def _check_value_is_equal_or_lower_than(value, param_name, maximum, language):
+    """This function checks if a ``value`` is equal or higher than ``minimum``.
 
     Parameters
     ----------
-    array : ``ndarray`` (1D)
-        The array to be to checked if it has at least ``value`` size.
-    value : ``int``
-        The minimum size that the array must have
+    value : ``int`` or ``float``
+        The value to be evaluated
     param_name : ``str``
-        The original name of the parameter passed through the parameter ``array``.
+        The original name of the parameter passed through the parameter ``value``.
+    maximum : ``int`` or ``float``
+        The upper bound (closed)
     language : ``str``
         The language code
 
     Notes
     -----
-    The parameter ``array`` isn't checked if it is a ``ndarray``.
-    The parameter ``value`` isn't checked if it is a ``int``.
     The parameter ``param_name`` isn't checked if it is a ``str``.
+
     The parameter ``language`` isn't checked if it is a ``str``.
 
     Returns
     -------
-    ``True`` if the size of the ``array`` is at least ``value``;
-    Raises ``ValueError`` if the size of the ``array`` is lower than ``value``;
+    ``True`` if ``value`` is equal or higher than ``minimum``.
+    ``ValueError`` if ``value`` is lower than ``minimum``.
 
     """
-    ### quering ###
-    func_name = "_check_array_lower_size"
-    fk_id_function = management._query_func_id(func_name)
-    messages = management._get_messages(fk_id_function, language, func_name)
+    _check_is_float_or_int(value, "value", language)
+    _check_is_float_or_int(maximum, "maximum", language)
 
-    if array.size < value :
+    if value <= maximum:
+        pass
+    else:
+        ### quering ###
+        func_name = "_check_value_is_equal_or_lower_than"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, language, func_name)
         try:
             error = messages[1][0][0]
             raise ValueError(error)
         except ValueError:
             general._display_one_line_attention(
-                                f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{value}', {messages[2][4][0]} '{array.size}'",
+                f"{messages[2][0][0]} '{param_name}' {messages[2][2][0]} '{maximum}' {messages[2][4][0]}, '{value}'",
                                 )
             raise
-    else:
-        return True
-
+    return True
 
 
 

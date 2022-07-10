@@ -140,7 +140,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -156,7 +156,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -172,7 +172,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -385,7 +385,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'any'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -401,7 +401,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'tabulated'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
@@ -417,7 +417,7 @@ class Test_fit(unittest.TestCase):
         except ValueError:
             pass
         sys.stdout = sys.__stdout__
-        expected = "The 'conclusion' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
+        expected = "The 'comparison' parameter only accepts 'critical' or 'p-value' as values, but we got 'p_value'"
         result = False
         if expected in capturedOutput.getvalue():
             result = True
