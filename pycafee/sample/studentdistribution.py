@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 from scipy.stats import ttest_1samp as one_sample_comparison
+from scipy.stats import t as t_student
 
 ###### Home made ######
 from pycafee.database_management import management
@@ -581,12 +582,114 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         return axes, output
 
+    # with tests, with databse (but at StudentDistribution), with docstring
+    def _get_p_value(self, t_calc, gl, which=None):
+        """
+        Returns the p-value of Student's t-distribution based on test statistic, degree of freedom, and type of distribution. This function is a wrapper around the `scipy.stats.t.cdf()` function [1]_, which returns the probability of the t distribution.
 
-    def get_p_value(self):
+
+
+        Parameters
+        ----------
+        tcalc : ``float`` or ``int``
+            The t statistic
+        gl : ``int``, higher than ``1``
+            The degree of freedom of the sample
+        which : ``str``, optional
+            The type of the distribution.
+
+            * If ``which = "two-side"`` (or ``None``, e.g, the default), the p-value is calculated with the two-sided Student's distribution.
+            * If ``which = "one-side"``, the p-value is calculated with the one-sided Student's distribution.
+
+        Returns
+        -------
+        result : ``tuple``, with
+
+            p_value : ``float``
+                The estimated probability for the test statistic
+            which : ``str``
+                The type of distribution that was used to obtain the ``p_value``
+
+        See Also
+        --------
+        get_critical_value
+
+
+        Notes
+        -----
+        If ``which = "one-side"``, the ``p_value`` is estimated using the ``scipy.stats.t.cdf()`` function as follows:
+
+        .. code:: python
+
+           p_value = (1 - scipy.stats.t.cdf(np.abs(t_calc), gl))
+
+
+        If ``which = "two-side"``, the ``p_value`` is estimated using the ``scipy.stats.t.cdf()`` function as follows:
+
+        .. code:: python
+
+           p_value = 2*(1 - scipy.stats.t.cdf(np.abs(t_calc), gl))
+
+
+
+        References
+        ----------
+        .. [1] SCIPY. scipy.stats.t. Available at: `www.scipy.org <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.t.html>`_. Access on: 10 May. 2022.
+
+
+        Examples
+        --------
+
+        **Getting p-value for two side distribution**
+
+        >>> from pycafee.sample import StudentDistribution
+        >>> teste = StudentDistribution()
+        >>> result = teste._get_p_value(1.19, 5)
+        >>> print(result)
+        Student(p_value=0.2874641347924176, which='two-side')
+
+
+        **Getting p-value for one side distribution**
+
+        >>> from pycafee.sample import StudentDistribution
+        >>> teste = StudentDistribution()
+        >>> result = teste._get_p_value(1.19, 5, which="one-side")
+        >>> print(result)
+        Student(p_value=0.1437320673962088, which='one-side')
+        
+
         """
-        Esta função retorna o p-valor
-        """
-        pass
+
+        ## tcalc ##
+        checkers._check_is_float_or_int(t_calc, "t_calc", self.language)
+
+        ## gl ##
+        checkers._check_is_integer(gl, param_name="gl", language=self.language)
+        checkers._check_value_is_equal_or_higher_than(gl, 'gl', 1, self.language)
+
+        ## which ##
+        if which is None:
+            which = "two-side"
+        else:
+            checkers._check_is_str(which, "which", self.language)
+            which_keys = ["two-side", "one-side"]
+            which = _check_which_param(which, self.language)
+
+
+        # ------ getting from scipy ------ #
+        if which == "two-side":
+            p_value = 2*(1 - t_student.cdf(np.abs(t_calc), gl))
+        else:
+            p_value = (1 - t_student.cdf(np.abs(t_calc), gl))
+
+        fk_id_function = management._query_func_id("StudentDistribution")
+        messages = management._get_messages(fk_id_function, self.language, "StudentDistribution")
+
+        result = namedtuple(messages[13][0][0], (messages[21][3][0], "which"))
+
+        return result(p_value, which)
+
+
 
     # with tests, with databse (but at StudentDistribution), with docstring
     def get_critical_value(self, gl, alfa=None, which=None):
