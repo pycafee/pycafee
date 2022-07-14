@@ -1,7 +1,20 @@
 # Changelog
 
 
-## v0.0.7 (XX/XX/2022)
+
+
+## v0.0.8 (XX/07/2022)
+
+
+### Release
+
+- Updated documentation for compare_with_constant (14/07/2022)
+- Added documentation for _get_p_value (StudentDistribution) (13/07/2022)
+
+
+
+
+## v0.0.7 (09/07/2022)
 
 
 ### Release

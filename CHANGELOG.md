@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.0.8 (//2022)
+
+
+### Release
+
+- Updated compare_with_constant for StudentDistribution to allow sample parameters (14/07/2022)
+- Added _get_p_value for StudentDistribution (13/07/2022)
+
+
+### Fix
+
+-
+
+
+
+
 ## v0.0.7 (09/07/2022)
 
 

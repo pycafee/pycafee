@@ -587,8 +587,6 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         """
         Returns the p-value of Student's t-distribution based on test statistic, degree of freedom, and type of distribution. This function is a wrapper around the `scipy.stats.t.cdf()` function [1]_, which returns the probability of the t distribution.
 
-
-
         Parameters
         ----------
         tcalc : ``float`` or ``int``
@@ -656,7 +654,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> result = teste._get_p_value(1.19, 5, which="one-side")
         >>> print(result)
         Student(p_value=0.1437320673962088, which='one-side')
-        
+
 
         """
 
@@ -817,19 +815,22 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         return result(t_student[1], t_student[0], alfa, which)
 
     # with tests, with databse (but at StudentDistribution), with docstring
-    def compare_with_constant(self, x_exp, value, alfa=None, which=None, comparison=None, details=None):
-        """This function is a wraper around ``scipy.stats.ttest_1samp`` [1]_ to compare the mean of a sample with a constant using the Student's t-test (one-sided or two-sided).
-
-        The test is performed using:
-
-        >>> scipy.stats.ttest_1samp(x_exp, value, axis=None)
+    def compare_with_constant(self, x_exp=None, params=None, value=None, alfa=None, which=None, comparison=None, details=None):
+        """This function checks if a sample is equal to a constant through Student's t test.
 
         Parameters
         ----------
-        x_exp : ``numpy array``
+        x_exp : ``numpy array``, optional
             One dimension :doc:`numpy array <numpy:reference/generated/numpy.array>` with at least 2 sample data.
-        value : ``int`` or ``float``
-            The value that will be used as a reference. This value is treated as a constant.
+        value : ``int`` or ``float``, optional
+            The value that will be used as a reference. This value is treated as a constant. Default is ``0``.
+        params : ``list``, optional
+            A ``list`` with three elements, where each one represents a parameter of the sample
+
+             * First element corresponds to the sample mean;
+             * Second element corresponds to the standard deviation of the sample;
+             * Third element corresponds to the sample size;
+
         alfa : ``float``, optional
             The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
         which : ``str``, optional
@@ -881,6 +882,21 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
         Notes
         -----
+
+        * Parameters ``x_exp`` and ``param`` can not be ``None`` at the same time;
+        * If ``x_exp!=None``, the parameter ``params`` has no influence on the test. In this case, the test statistic is estimated using ``scipy.stats.ttest_1samp`` [1]_:
+
+        .. code:: python
+
+                statistic, p_value = scipy.stats.ttest_1samp(x_exp, value, axis=None)
+
+        * If ``param!=None``, the parameter ``x_exp`` has no influence on the test. In this case, the test statistic is estimated through the following relation:
+
+        .. math::
+
+                t_{calc}=\\frac{\\overline{x}-\\mu}{s_x/ \\sqrt{n}}
+
+
         The parameter ``comparison`` uses the hypothesis test to compare the means as follows:
 
         .. admonition:: \u2615
@@ -979,7 +995,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> x = np.array([3.335, 3.328, 3.288, 3.198, 3.254])
         >>> constant = 3.2
         >>> comparison_test = StudentDistribution()
-        >>> result, conclusion = comparison_test.compare_with_constant(x, constant)
+        >>> result, conclusion = comparison_test.compare_with_constant(x_exp=x, value=constant)
         >>> print(result)
         OneSampleStudentComparison(statistic=3.187090493341284, critical=[2.7764451051977987, -2.7764451051977996], p_value=0.03330866140058606, which='two-side', alpha=0.05)
         >>> print(conclusion)
@@ -992,11 +1008,27 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> x = np.array([3.335, 3.328, 3.288, 3.198, 3.254])
         >>> constant = 3.2
         >>> comparison_test = StudentDistribution()
-        >>> result, conclusion = comparison_test.compare_with_constant(x, constant, comparison='p-value', details='full')
+        >>> result, conclusion = comparison_test.compare_with_constant(x_exp=x, value=constant, comparison='p-value', details='full')
         >>> print(result)
         OneSampleStudentComparison(statistic=3.187090493341284, critical=[2.7764451051977987, -2.7764451051977996], p_value=0.03330866140058606, which='two-side', alpha=0.05)
         >>> print(conclusion)
         Since the p-value (0.033) is lower than the adopted significance level (0.05), we have evidence to reject the null hypothesis of equality of means, and we can say that the mean (3.28) is different from the constant (3.2) (with 95.0% confidence).
+
+
+        ** Two side t test using sample parameters**
+
+        >>> from pycafee.sample import StudentDistribution
+        >>> mean = 3.4
+        >>> std = 0.35
+        >>> n = 6
+        >>> constant = 3.2
+        >>> comparison_test = StudentDistribution()
+        >>> result, conclusion = comparison_test.compare_with_constant(params=[mean, std, n], value=constant, comparison='p-value', details='full')
+        >>> print(result)
+        OneSampleStudentComparison(statistic=1.3997084244475284, critical=[2.5705818366147395, -2.57058183661474], p_value=0.22048596679416987, which='two-side', alpha=0.05)
+        >>> print(conclusion)
+        Since the p-value (0.22) is higher than the adopted significance level (0.05), we do not have evidence to reject the hypothesis of equality between the means, and we can say that the mean (3.4) is equal to the constant (3.2) (with 95.0% confidence).
+
 
 
 
@@ -1007,7 +1039,7 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> x = np.array([3380, 3500, 3600, 3450, 3490, 3390])
         >>> constant = 3450
         >>> comparison_test = StudentDistribution()
-        >>> result, conclusion = comparison_test.compare_with_constant(x, constant, which="one-side")
+        >>> result, conclusion = comparison_test.compare_with_constant(x_exp=x, value=constant, which="one-side")
         >>> print(result)
         OneSampleStudentComparison(statistic=0.5520741745513498, critical=[2.015048372669157, -2.0150483726691575], p_value=0.3023326513892771, which='one-side', alpha=0.05)
         >>> print(conclusion)
@@ -1020,11 +1052,28 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         >>> x = np.array([3380, 3500, 3600, 3450, 3490, 3390])
         >>> constant = 3450
         >>> comparison_test = StudentDistribution()
-        >>> result, conclusion = comparison_test.compare_with_constant(x, constant, which="one-side", alfa=0.01, details='full')
+        >>> result, conclusion = comparison_test.compare_with_constant(x_exp=x, value=constant, which="one-side", alfa=0.01, details='full')
         >>> print(result)
         OneSampleStudentComparison(statistic=0.5520741745513498, critical=[3.3649299989072743, -3.3649299989072756], p_value=0.3023326513892771, which='one-side', alpha=0.01)
         >>> print(conclusion)
         Since the test statistic (0.552) is lower than the upper critical value (3.364), we have no evidence to reject the null hypothesis of equality between the means, and we can say that the mean (3468.333) is equal to the constant (3450) (with 99.0% confidence)
+
+
+        ** One side t test using sample parameters**
+
+
+        >>> from pycafee.sample import StudentDistribution
+        >>> import numpy as np
+        >>> mean = 3440
+        >>> std = 100
+        >>> n = 10
+        >>> constant = 3450
+        >>> comparison_test = StudentDistribution()
+        >>> result, conclusion = comparison_test.compare_with_constant(params=[mean, std, n], value=constant, which="one-side", alfa=0.01, details='full')
+        >>> print(result)
+        OneSampleStudentComparison(statistic=-0.31622776601683794, critical=[2.8214379233005493, -2.8214379233005498], p_value=0.37952032723207196, which='one-side', alpha=0.01)
+        >>> print(conclusion)
+        Since the test statistic (-0.316) is higher than the lower critical value (-2.821), we have no evidence to reject the null hypothesis of equality between the means, and we can say that the mean (3440) is equal to the constant (3450) (with 99.0% confidence)
 
 
         """
@@ -1034,11 +1083,33 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         ### Checking the input parameters ###
 
         ## x_exp ##
-        checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
-        checkers._check_array_lower_size(x_exp, 2, "x_exp", self.language)
+        if x_exp is not None:
+            checkers._check_is_numpy_1_D(x_exp, "x_exp", self.language)
+            checkers._check_array_lower_size(x_exp, 2, "x_exp", self.language)
+
+        ## param
+        if params is not None:
+            checkers._check_is_list(params, "params", self.language)
+            checkers._check_is_float_or_int(params[0], "params[0]", self.language)
+            checkers._check_is_float_or_int(params[1], "params[1]", self.language)
+            checkers._check_is_integer(params[2], "params[2]", self.language)
+            checkers._check_value_is_equal_or_higher_than(params[2], 'params[2]', 2, self.language)
+
+        ## conflicting x_exp and param
+        if x_exp is None and params is None:
+            try:
+                error = messages[33][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_one_line_attention(messages[34][0][0])
+                raise
+
 
         ## value ##
-        checkers._check_is_float_or_int(value, param_name="value", language=self.language)
+        if value is None:
+            value = 0
+        else:
+            checkers._check_is_float_or_int(value, param_name="value", language=self.language)
 
         ## alfa ##
         if alfa is None:
@@ -1098,97 +1169,127 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
         rejeita = 1
 
         if which == "two-side":
-            statistic, p_value = one_sample_comparison(x_exp, value, axis=None)
-            critical = self.get_critical_value(gl=x_exp.size-1, alfa=alfa)
+            if x_exp is not None:
+                statistic, p_value = one_sample_comparison(x_exp, value, axis=None)
+                media = x_exp.mean()
+                gl = x_exp.size - 1
+            else:
+                media = params[0]
+                gl = params[2]-1
+                statistic = _compare_with_constant_func(
+                                value=value,
+                                mean=media,
+                                std=params[1],
+                                n=params[2])
+                p_value = self._get_p_value(
+                                t_calc=statistic,
+                                gl=gl,
+                                which=which)[0]
+            critical = self.get_critical_value(gl=gl, alfa=alfa)
             if comparison == 'critical':
                 if critical[1] <= statistic <= critical[0]:
                     if details == 'short':
-                        conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                     elif details == "full":
-                        conclusion = f"{messages[15][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[15][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}, {helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[15][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[15][6][0]}{value}{messages[15][8][0]} {100*(1-alfa)}{messages[15][10][0]}"
+                        conclusion = f"{messages[15][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[15][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}, {helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[15][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[15][6][0]}{value}{messages[15][8][0]} {100*(1-alfa)}{messages[15][10][0]}"
                     else:
                         # aceita
                         conclusion = aceita
                 else:
                     if details == 'short':
-                        conclusion = f"{messages[16][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[16][2][0]}{value}{messages[16][4][0]} {100*(1-alfa)}{messages[16][6][0]}."
+                        conclusion = f"{messages[16][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[16][2][0]}{value}{messages[16][4][0]} {100*(1-alfa)}{messages[16][6][0]}."
                     elif details == "full":
                         if statistic > 0:
-                            conclusion = f"{messages[17][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[17][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[17][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[17][6][0]}{value}{messages[17][8][0]} {100*(1-alfa)}{messages[17][10][0]}."
+                            conclusion = f"{messages[17][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[17][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[17][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[17][6][0]}{value}{messages[17][8][0]} {100*(1-alfa)}{messages[17][10][0]}."
                         else:
-                            conclusion = f"{messages[18][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[18][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[18][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[18][6][0]}{value}{messages[18][8][0]} {100*(1-alfa)}{messages[18][10][0]}."
+                            conclusion = f"{messages[18][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[18][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[18][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[18][6][0]}{value}{messages[18][8][0]} {100*(1-alfa)}{messages[18][10][0]}."
                     else:
                         # rejeita
                         conclusion = rejeita
             else:
                 if p_value < alfa:
                     if details == 'short':
-                        conclusion = f"{messages[16][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[16][2][0]}{value}{messages[16][4][0]} {100*(1-alfa)}{messages[16][6][0]}."
+                        conclusion = f"{messages[16][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[16][2][0]}{value}{messages[16][4][0]} {100*(1-alfa)}{messages[16][6][0]}."
                     elif details == "full":
-                        conclusion = f"{messages[19][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[19][2][0]}{alfa}{messages[19][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[19][6][0]}{value}{messages[19][8][0]} {100*(1-alfa)}{messages[19][10][0]}."
+                        conclusion = f"{messages[19][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[19][2][0]}{alfa}{messages[19][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[19][6][0]}{value}{messages[19][8][0]} {100*(1-alfa)}{messages[19][10][0]}."
                     else:
                         # rejeita
                         conclusion = rejeita
                 else:
                     if details == "short":
-                        conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                     elif details == "full":
-                        conclusion = f"{messages[20][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[20][2][0]}{alfa}{messages[20][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[20][6][0]}{value}{messages[20][8][0]} {100*(1-alfa)}{messages[20][10][0]}."
+                        conclusion = f"{messages[20][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[20][2][0]}{alfa}{messages[20][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[20][6][0]}{value}{messages[20][8][0]} {100*(1-alfa)}{messages[20][10][0]}."
                     else:
                         # aceita
                         conclusion = aceita
 
 
         else:
-            critical = self.get_critical_value(gl=x_exp.size-1, alfa=alfa, which=which)
-            statistic, p_value = one_sample_comparison(x_exp, value, axis=None)
-            p_value = p_value/2 # corrigindo o valor de p
+            if x_exp is not None:
+                statistic, p_value = one_sample_comparison(x_exp, value, axis=None)
+                p_value = p_value/2 # corrigindo o valor de p
+                media = x_exp.mean()
+                gl = x_exp.size - 1
+            else:
+                media = params[0]
+                gl = params[2]-1
+                statistic = _compare_with_constant_func(
+                                value=value,
+                                mean=media,
+                                std=params[1],
+                                n=params[2])
+                p_value = self._get_p_value(
+                                t_calc=statistic,
+                                gl=gl,
+                                which=which)[0]
+            critical = self.get_critical_value(gl=gl, alfa=alfa, which=which)
             # Teste Unilateral a ESQUERDA #
-            if value < x_exp.mean():
+            if value < media:
                 # a constante é menor do que a média, a estatistica é positiva
                 if comparison == "critical":
                     if statistic > critical[0]:
                         if details == "short":
-                            conclusion = f"{messages[22][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
+                            conclusion = f"{messages[22][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[32][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[32][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[32][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[32][6][0]}{value}{messages[32][8][0]} {100*(1-alfa)}{messages[32][10][0]}"
+                            conclusion = f"{messages[32][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[32][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[32][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[32][6][0]}{value}{messages[32][8][0]} {100*(1-alfa)}{messages[32][10][0]}"
                         else:
                             # rejeita
                             conclusion = rejeita
                     else:
                         if details == "short":
-                            conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[24][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[24][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[24][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[24][6][0]}{value}{messages[24][8][0]} {100*(1-alfa)}{messages[24][10][0]}"
+                            conclusion = f"{messages[24][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[24][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[24][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[24][6][0]}{value}{messages[24][8][0]} {100*(1-alfa)}{messages[24][10][0]}"
                         else:
                             # aceita
                             conclusion = aceita
                 else:
                     if p_value < alfa:
                         if details == "short":
-                            conclusion = f"{messages[22][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
+                            conclusion = f"{messages[22][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[25][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[25][2][0]}{alfa}{messages[25][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[25][6][0]}{value}{messages[25][8][0]} {100*(1-alfa)}{messages[25][10][0]}"
+                            conclusion = f"{messages[25][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[25][2][0]}{alfa}{messages[25][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[25][6][0]}{value}{messages[25][8][0]} {100*(1-alfa)}{messages[25][10][0]}"
                         else:
                             # rejeita
                             conclusion = rejeita
                     else:
 
                         if details == "short":
-                            conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
+                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
                         else:
                             # aceita
                             conclusion = aceita
 
 
-            elif value == x_exp.mean():
+            elif value == media:
                 if details == "binary":
                     # aceita
                     conclusion = aceita
                 else:
-                    conclusion = f"{messages[27][0][0]}{value}{messages[27][2][0]}{x_exp.mean()}{messages[27][4][0]}"
+                    conclusion = f"{messages[27][0][0]}{value}{messages[27][2][0]}{media}{messages[27][4][0]}"
 
             else:
 
@@ -1197,34 +1298,34 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
                 if comparison == "critical":
                     if statistic < critical[1]:
                         if details == "short":
-                            conclusion = f"{messages[28][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
+                            conclusion = f"{messages[28][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[29][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[29][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[29][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[29][6][0]}{value}{messages[29][8][0]} {100*(1-alfa)}{messages[29][10][0]}"
+                            conclusion = f"{messages[29][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[29][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[29][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[29][6][0]}{value}{messages[29][8][0]} {100*(1-alfa)}{messages[29][10][0]}"
                         else:
                             # rejeita
                             conclusion = rejeita
                     else:
                         if details == "short":
-                            conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[23][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[23][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[23][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[23][6][0]}{value}{messages[23][8][0]} {100*(1-alfa)}{messages[23][10][0]}"
+                            conclusion = f"{messages[23][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[23][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[23][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[23][6][0]}{value}{messages[23][8][0]} {100*(1-alfa)}{messages[23][10][0]}"
                         else:
                             # aceita
                             conclusion = aceita
                 else:
                     if p_value < alfa:
                         if details == "short":
-                            conclusion = f"{messages[28][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
+                            conclusion = f"{messages[28][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[30][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[30][2][0]}{alfa}{messages[30][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[30][6][0]}{value}{messages[30][8][0]} {100*(1-alfa)}{messages[30][10][0]}"
+                            conclusion = f"{messages[30][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[30][2][0]}{alfa}{messages[30][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[30][6][0]}{value}{messages[30][8][0]} {100*(1-alfa)}{messages[30][10][0]}"
                         else:
                             # rejeita
                             conclusion = rejeita
                     else:
                         if details == "short":
-                            conclusion = f"{messages[14][0][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
                         elif details == "full":
-                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(x_exp.mean(), self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
+                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
                         else:
                             # aceita
                             conclusion = aceita
@@ -1303,6 +1404,40 @@ def _check_which_param(which, language):
                 raise
     return which
 
+
+
+def _compare_with_constant_func(value, mean, std, n):
+    """This function calculates the value of the Student's t test statistic that compares a sample with a constant, using the sample parameters.
+
+    Parameters
+    ----------
+    value : ``int`` or ``float``
+        The value that will be used as a reference. This value is treated as a constant.
+    mean : ``int`` or ``float``
+        The sample mean
+    std : ``int`` or ``float``
+        The sample standard deviation
+    n : ``int``
+         The sample size (higher than 1);
+
+
+    Returns
+    -------
+    tcalc : ``float``
+        The test statistic
+
+    Notes
+    -----
+
+    The statistic is estimated through the following relation:
+
+    .. math::
+
+            t_{calc}=\\frac{\\overline{x}-\\mu}{s_x/ \\sqrt{n}}
+
+    """
+    t_calc = (mean - value)/(std/np.sqrt(n))
+    return t_calc
 
 
 
