@@ -9,28 +9,27 @@ Description:
 
 --------------------------------------------------------------------------------
 Command to run at the prompt:
-    python -m unittest -v tests/discriminative_tests/discriminative_tests/TriangleTest/test_get_number_assessors.py
+    python -m unittest -v tests/sensoryanalysis/discriminative_tests/TriangleTest/test_get_number_assessors.py
     or
-    python -m unittest -b tests/discriminative_tests/discriminative_tests/TriangleTest/test_get_number_assessors.py
+    python -m unittest -b tests/sensoryanalysis/discriminative_tests/TriangleTest/test_get_number_assessors.py
 
 --------------------------------------------------------------------------------
 """
 
 import os
 import unittest
-from pycafee.sensoryanalysis.d import get_number_assessors
-import numpy as np
+from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+
 os.system('cls')
 
 class Test_get_number_assessors(unittest.TestCase):
 
     def test_output(self):
-        x = np.array([1, 1, 2, 3, 4, 5])
-        result = multimode(x)
-        data = list(result.items())
-        self.assertIsInstance(result, dict, "the output is not a dict")
-        self.assertIsInstance(data[0][0], (int, np.uint, np.integer), "the key is not an int")
-        self.assertIsInstance(data[0][1], (int, np.uint, np.integer), "the value is not an int")
+        test = TriangleTest()
+        result, input = test.get_number_assessors(pd=None, beta=None, alfa=None)
+        self.assertIsInstance(result, (int, np.uint, np.integer), "the number of assessors is not an int")
+        self.assertIsInstance(input, dict, "the input is not a dict")
+
 
 
 

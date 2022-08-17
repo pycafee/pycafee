@@ -1549,9 +1549,48 @@ def _truncate(value, language, decs=None):
         return np.trunc(value*10**decs)/(10**decs)
 
 
+# with tests, without database, with docstring
+def _raises_wrong_param(param_name, alloweds, param_value, language):
+    """This function checks if the parameter passed is contained in a list of options, using a generic form.
+
+    Parameters
+    ----------
+    param_name: ``str``
+        The parameter name
+    alloweds: ``list``
+        A list containing all accepted keys for the parameter
+    param_value: any
+        The value of the parameter passed by the user
+    language: ``str``
+        The language code
+
+    Notes
+    -----
+    The parameters aren't checked if they have correct type
+
+    Returns
+    -------
+    ``True`` if ``value_value`` is in ``alloweds``
+    Raises ``ValueError`` if ``value_value`` is NOT in ``alloweds``
 
 
-
+    """
+    if param_value not in alloweds:
+        fk_id_function = management._query_func_id("generic")
+        messages = management._get_messages(fk_id_function, language, "generic")
+        try:
+            error = messages[3][0][0]
+            raise ValueError(error)
+        except ValueError:
+            msg = [f"{messages[4][0][0]} '{param_name}' {messages[4][2][0]}:"]
+            for item in alloweds:
+                msg.append(f"   --->    {item}")
+            msg.append(f"{messages[4][4][0]}:")
+            msg.append(f"   --->    {param_value}")
+            general._display_n_line_attention(msg)
+            raise
+    else:
+        return True
 
 
 
