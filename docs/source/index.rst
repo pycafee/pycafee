@@ -10,8 +10,10 @@ Documentation
    api/functions/index
    api/normalitycheck/index
    api/sample/index
+   api/sensoryanalysis/index
    api/database_management/index
    api/helpers/index
+
 
 
 |

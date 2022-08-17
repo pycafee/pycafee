@@ -66,13 +66,13 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
 
-
+    # with tests, with text, with database, with docstring
     def get_number_assessors(self, pd=None, beta=None, alfa=None):
-        """This function returns the minimum number of assessors to perform the triangular test.
+        """This function returns the minimum number of assessors to perform the triangular test [1]_.
 
         Parameters
         ----------
-        pd : ``str``
+        pd : ``str``, optional
             The proportion of the population represented by the assessors that can distinguish between the two products. It can be:
 
             * ``50%``;
@@ -81,7 +81,8 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             * ``20%``;
             * ``10%``;
 
-        alfa: ``float``
+
+        alfa : ``float``, optional
             The probability of concluding that a perceptible difference exists when, in reality, one does not (Type I Error). It can be:
 
             * ``0.20``;
@@ -90,7 +91,8 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             * ``0.01``;
             * ``0.001``;
 
-        beta: ``float``
+
+        beta : ``float``, optional
             The probability of concluding that no perceptible difference exists when, in reality, one does (Type II Error). It can be:
 
             * ``0.20``;
@@ -99,10 +101,14 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             * ``0.01``;
             * ``0.001``;
 
+
         Returns
         -------
-        n_assessors: ``int``
+        n_assessors : ``int``
             The minimum number of assessors to perform the triangular test
+        inputs : ``dict``
+            A dictionary with the parameters used to obtain the minimum value of assessors
+
 
         References
         ----------
@@ -111,6 +117,32 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
         Examples
         --------
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, input = tringular.get_number_assessors()
+        >>> print(result)
+        TriangleTest(minimum_number_of_assessors=66)
+        >>> print(input)
+        {'pd': '30%', 'alfa': 0.05, 'beta': 0.05}
+
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, input = tringular.get_number_assessor(pd="10%", alfa=0.01)
+        >>> print(result)
+        TriangleTest(minimum_number_of_assessors=824)
+        >>> print(input)
+        {'pd': '10%', 'alfa': 0.01, 'beta': 0.05}
+
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest(language="pt-br")
+        >>> result, input = tringular.get_number_assessors(pd="20%", alfa=0.05, beta=0.10)
+        >>> print(result)
+        TesteTriangular(numero_minimo_de_avaliadores=117)
+        >>> print(input)
+        {'pd': '20%', 'alfa': 0.05, 'beta': 0.1}
 
 
         """
@@ -123,44 +155,43 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             checkers._check_is_float(alfa, "alfa", self.language)
             # --- should be in the range (0,1) --- #
             checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+            # --- must be in --- #
+            alloweds = [0.20, 0.10, 0.05, 0.01, 0.001]
+            helpers._raises_wrong_param("alfa", alloweds, alfa, self.language)
 
-        ### checking the pd ###
+        # ----- checking beta value ----- #
+        if beta is None:
+            beta = 0.05
+        else:
+            # --- should be float --- #
+            checkers._check_is_float(beta, "beta", self.language)
+            # --- should be in the range (0,1) --- #
+            checkers._check_data_in_range(beta, "beta", 0.0, 1.0, self.language)
+            # --- must be in --- #
+            alloweds = [0.20, 0.10, 0.05, 0.01, 0.001]
+            helpers._raises_wrong_param("beta", alloweds, beta, self.language)
+
+
+        # ----- checking the pd value ----- #
         if pd is None:
             pd = "30%"
         else:
+            # --- should be str --- #
             checkers._check_is_str(pd, "pd", language=self.language)
-
+            # --- must be in --- #
             alloweds = ["10%", "20%", "30%", "40%", "50%"]
+            helpers._raises_wrong_param("pd", alloweds, pd, self.language)
 
-            if pd not in alloweds:
-                fk_id_function = management._query_func_id("generic")
-                messages = management._get_messages(fk_id_function, self.language, "generic")
-                try:
-                    error = messages[3][0][0]
-                    raise ValueError(error)
-                except ValueError:
-                    msg = [f"{messages[4][0][0]} 'pd' {messages[4][2][0]}:"]
-                    for item in alloweds:
-                        msg.append(f"   --->    {item}")
-                    msg.append(f"{messages[4][4][0]}:")
-                    msg.append(f"   --->    {pd}")
-                    general._display_n_line_attention(msg)
-                    raise
-
-
-
-
-
-
-
-
-
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+        # ----- grouping entries into a dictionary ----- #
         inputs = {
             "pd": pd,
-            "alfa": alfa,
-            "beta": beta
+            messages[1][2][0]: alfa,
+            messages[1][3][0]: beta
             }
 
+        # ----- getting the position for each beta value ----- #
         if beta == 0.20:
             position = 0
         elif beta == 0.10:
@@ -169,13 +200,11 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             position = 2
         elif beta == 0.01:
             position = 3
-        elif beta == 0.001:
-            position = 4
         else:
             position = 4
 
-
-        minimum_number_of_assessors = {
+        # ----- dictionary with the data ----- #
+        n_assessors = {
             "50%": {
                 0.20: [7, 12, 16, 25, 36],
                 0.10: [12, 15, 20, 30, 43],
@@ -213,9 +242,11 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             }
         }
 
-        output = minimum_number_of_assessors[pd][alfa][position]
+        # ----- getting the results ----- #
+        minimum_number_of_assessors = n_assessors[pd][alfa][position]
 
-        return output, inputs
+        result = namedtuple(messages[1][0][0], (messages[1][1][0],))
+        return result(minimum_number_of_assessors), inputs
 
 
 
