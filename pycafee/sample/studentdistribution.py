@@ -1338,9 +1338,432 @@ class StudentDistribution(PlotsManagement, AlphaManagement, NDigitsManagement):
 
 
 
-    def compare_pairs(self, x_exp_1, x_exp_2, alfa=None, which=None, comparison=None, details=None):
+    def compare_paired(self, x_exp_1, x_exp_2, names=None, value=None, alfa=None, which=None, comparison=None, details=None):
+        """
+        Esfa função aplica o teste t de Student para amostras pareadas
+        """
 
-        pass
+        fk_id_function = management._query_func_id("StudentDistribution")
+        messages = management._get_messages(fk_id_function, self.language, "StudentDistribution")
+
+
+        ### ----- Checking the input parameters ----- ###
+
+        ## ----- x_exp_1 ----- ##
+        checkers._check_is_numpy_1_D(x_exp_1, "x_exp_1", self.language)
+        checkers._check_array_lower_size(x_exp_1, 2, "x_exp_1", self.language)
+
+        # ----- measures ----- #
+        mean_1 = x_exp_1.mean()
+        std_1 = x_exp_1.std(ddof=1)
+        n_1 = x_exp_1.size
+
+        ## ----- x_exp_2 ----- ##
+        checkers._check_is_numpy_1_D(x_exp_2, "x_exp_2", self.language)
+        checkers._check_array_lower_size(x_exp_2, 2, "x_exp_2", self.language)
+
+        # ----- measures ----- #
+        mean_2 = x_exp_2.mean()
+        std_2 = x_exp_2.std(ddof=1)
+        n_2 = x_exp_2.size
+
+
+        ## ----- names ----- ##
+        if names is None:
+            name_1 = "x_exp_1"
+            name_2 = "x_exp_2"
+        else:
+            checkers._check_list_length(names, 2, "names", self.language)
+            checkers._check_is_str(names[0], "names[0]", self.language)
+            checkers._check_is_str(names[1], "names[1]", self.language)
+            name_1 = names[0]
+            name_2 = names[1]
+
+
+        ## ----- x_exp_1 and x_exp_2 must be the same size ----- ##
+        if n_1 != n_2:
+            try:
+                error = messages[35][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_one_line_attention(f"{messages[36][0][0]} {name_1} {messages[36][2][0]} {name_2} {messages[36][4][0]} {name_1} {messages[36][6][0]} {n_1} {messages[36][8][0]} {name_2} {messages[36][10][0]} {n_2}.")
+                raise
+
+        ## value ##
+        if value is None:
+            value = 0
+        else:
+            checkers._check_is_float_or_int(value, param_name="value", language=self.language)
+
+
+        ## ----- alfa ----- ##
+        if alfa is None:
+            alfa = self.alfa
+        else:
+            checkers._check_is_float(alfa, "alfa", self.language)
+            checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+
+
+        ## ----- comparison ----- ##
+        comparison = _check_comparison_param(comparison, self.language)
+
+        ## ----- details ----- ##
+        details = _check_details_param(details, self.language)
+
+        ## ----- which ----- ##
+        which = _check_which_param(which, self.language)
+
+        ## ----- binary ----- ##
+        aceita = 0
+        rejeita = 1
+
+
+        ### ----- estimating diff ----- ###
+        diff = x_exp_1 - x_exp_2
+
+        ## ----- measures ----- ##
+        diff_mean = diff.mean()
+        diff_std = diff.std(ddof=1)
+        diff_n = diff.size
+        diff_gl = diff_n - 1
+
+
+        ### ----- estimating statistic ----- ###
+        statistic = _paired_with_constant_func(
+                    value=value,
+                    mean=diff_mean,
+                    std=diff_std,
+                    n=diff_n
+                    )
+
+        ### ----- p_value ----- ###
+        p_value = self._get_p_value(
+                        t_calc=statistic,
+                        gl=diff_gl,
+                        which=which
+                        )[0]
+
+        ### ----- critical ----- ###
+        critical = self.get_critical_value(
+                            gl=diff_gl,
+                            alfa=alfa,
+                            which=which
+                            )
+
+
+        ### ----- concluding ----- ###
+        if which == "two-side":
+
+            if comparison == 'critical':
+                if critical[1] <= statistic <= critical[0]:
+                    if details == 'short':
+                        conclusion = f"{messages[37][0][0]} {100*(1-alfa)}{messages[37][2][0]}"
+                    elif details == "full":
+                        if value == 0:
+                            conclusion = f"{messages[38][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[38][2][0]}{helpers._truncate(critical[1], self.language, self.n_digits)}, {helpers._truncate(critical[0], self.language, self.n_digits)}{messages[38][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[38][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[38][10][0]} {100*(1-alfa)}{messages[38][12][0]}."
+                        else:
+                            conclusion = f"{messages[38][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[38][2][0]}{helpers._truncate(critical[1], self.language, self.n_digits)}, {helpers._truncate(critical[0], self.language, self.n_digits)}{messages[38][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[38][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[38][10][0]} {100*(1-alfa)}{messages[38][12][0]}, {messages[38][13][0]} {value}."
+                    else:
+                        # aceita
+                        conclusion = aceita
+                else:
+                    if details == 'short':
+                        conclusion = f"{messages[39][0][0]} {100*(1-alfa)}{messages[39][2][0]}"
+                    elif details == "full":
+                        if statistic > 0:
+                            if value == 0:
+                                conclusion = f"{messages[40][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[40][2][0]}{helpers._truncate(critical[0], self.language, self.n_digits)}{messages[40][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[40][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[40][10][0]} {100*(1-alfa)}{messages[40][12][0]}."
+                            else:
+                                conclusion = f"{messages[40][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[40][2][0]}{helpers._truncate(critical[0], self.language, self.n_digits)}{messages[40][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[40][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[40][10][0]} {100*(1-alfa)}{messages[40][12][0]} {messages[40][13][0]} {value}."
+                        else:
+                            if value == 0:
+                                conclusion = f"{messages[41][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[41][2][0]}{helpers._truncate(critical[1], self.language, self.n_digits)}{messages[41][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[41][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[41][10][0]} {100*(1-alfa)}{messages[41][12][0]}."
+                            else:
+                                conclusion = f"{messages[41][0][0]}{helpers._truncate(statistic, self.language, self.n_digits)}{messages[41][2][0]}{helpers._truncate(critical[1], self.language, self.n_digits)}{messages[41][4][0]} {name_1} ({helpers._truncate(mean_1, self.language, self.n_digits)}) {messages[41][7][0]} {name_2} ({helpers._truncate(mean_2, self.language, self.n_digits)}) {messages[41][10][0]} {100*(1-alfa)}{messages[41][12][0]} {messages[41][13][0]} {value}."
+                    else:
+                        # rejeita
+                        conclusion = rejeita
+            else:
+                if p_value < alfa:
+                    if details == 'short':
+                        conclusion = f"{messages[16][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[16][2][0]}{value}{messages[16][4][0]} {100*(1-alfa)}{messages[16][6][0]}."
+                    elif details == "full":
+                        conclusion = f"{messages[19][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[19][2][0]}{alfa}{messages[19][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[19][6][0]}{value}{messages[19][8][0]} {100*(1-alfa)}{messages[19][10][0]}."
+                    else:
+                        # rejeita
+                        conclusion = rejeita
+                else:
+                    if details == "short":
+                        conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                    elif details == "full":
+                        conclusion = f"{messages[20][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[20][2][0]}{alfa}{messages[20][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[20][6][0]}{value}{messages[20][8][0]} {100*(1-alfa)}{messages[20][10][0]}."
+                    else:
+                        # aceita
+                        conclusion = aceita
+
+
+        else: # if which == "one-side"
+
+            # Teste Unilateral a ESQUERDA #
+            if value < media:
+                # a constante é menor do que a média, a estatistica é positiva
+                if comparison == "critical":
+                    if statistic > critical[0]:
+                        if details == "short":
+                            conclusion = f"{messages[22][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[32][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[32][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[32][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[32][6][0]}{value}{messages[32][8][0]} {100*(1-alfa)}{messages[32][10][0]}"
+                        else:
+                            # rejeita
+                            conclusion = rejeita
+                    else:
+                        if details == "short":
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[24][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[24][2][0]}{helpers._truncate(critical[0], self.language, decs=self.n_digits)}{messages[24][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[24][6][0]}{value}{messages[24][8][0]} {100*(1-alfa)}{messages[24][10][0]}"
+                        else:
+                            # aceita
+                            conclusion = aceita
+                else:
+                    if p_value < alfa:
+                        if details == "short":
+                            conclusion = f"{messages[22][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[22][2][0]}{value}{messages[22][4][0]} {100*(1-alfa)}{messages[22][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[25][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[25][2][0]}{alfa}{messages[25][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[25][6][0]}{value}{messages[25][8][0]} {100*(1-alfa)}{messages[25][10][0]}"
+                        else:
+                            # rejeita
+                            conclusion = rejeita
+                    else:
+
+                        if details == "short":
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
+                        else:
+                            # aceita
+                            conclusion = aceita
+
+
+            elif value == media:
+                if details == "binary":
+                    # aceita
+                    conclusion = aceita
+                else:
+                    conclusion = f"{messages[27][0][0]}{value}{messages[27][2][0]}{media}{messages[27][4][0]}"
+
+            else:
+
+                # Teste Unilateral a DIREITA #
+                # Se a constante é maior do que a média, a estatistica é negativa
+                if comparison == "critical":
+                    if statistic < critical[1]:
+                        if details == "short":
+                            conclusion = f"{messages[28][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[29][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[29][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[29][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[29][6][0]}{value}{messages[29][8][0]} {100*(1-alfa)}{messages[29][10][0]}"
+                        else:
+                            # rejeita
+                            conclusion = rejeita
+                    else:
+                        if details == "short":
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[23][0][0]}{helpers._truncate(statistic, self.language, decs=self.n_digits)}{messages[23][2][0]}{helpers._truncate(critical[1], self.language, decs=self.n_digits)}{messages[23][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[23][6][0]}{value}{messages[23][8][0]} {100*(1-alfa)}{messages[23][10][0]}"
+                        else:
+                            # aceita
+                            conclusion = aceita
+                else:
+                    if p_value < alfa:
+                        if details == "short":
+                            conclusion = f"{messages[28][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[28][2][0]}{value}{messages[28][4][0]} {100*(1-alfa)}{messages[28][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[30][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[30][2][0]}{alfa}{messages[30][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[30][6][0]}{value}{messages[30][8][0]} {100*(1-alfa)}{messages[30][10][0]}"
+                        else:
+                            # rejeita
+                            conclusion = rejeita
+                    else:
+                        if details == "short":
+                            conclusion = f"{messages[14][0][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[14][2][0]}{value}{messages[14][4][0]} {100*(1-alfa)}{messages[14][6][0]}."
+                        elif details == "full":
+                            conclusion = f"{messages[26][0][0]}{helpers._truncate(p_value, self.language, decs=self.n_digits)}{messages[26][2][0]}{alfa}{messages[26][4][0]}{helpers._truncate(media, self.language, decs=self.n_digits)}{messages[26][6][0]}{value}{messages[26][8][0]} {100*(1-alfa)}{messages[26][10][0]}."
+                        else:
+                            # aceita
+                            conclusion = aceita
+
+
+        result = namedtuple(messages[21][0][0], (messages[21][1][0], messages[21][2][0], messages[21][3][0], "which", messages[21][4][0]))
+        # print(critical)
+        return result(statistic, [critical[0], critical[1]], p_value, which, alfa), conclusion
+
+
+
+    #
+    # def compare_two_means_independet(self, x_exp_1, x_exp_2, names=None, value=None, alfa=None, which=None, comparison=None, details=None, kind=None):
+    #     """
+    #     Esfa função aplica o teste t de Student para amostras pareadas
+    #     """
+    #
+    #     fk_id_function = management._query_func_id("StudentDistribution")
+    #     messages = management._get_messages(fk_id_function, self.language, "StudentDistribution")
+    #
+    #
+    #     ### ----- Checking the input parameters ----- ###
+    #
+    #
+    #     ## ----- kind ----- ##
+    #     if kind is None or kind == "data":
+    #         kind = "data"
+    #
+    #         ## ----- x_exp_1 ----- ##
+    #         checkers._check_is_numpy_1_D(x_exp_1, "x_exp_1", self.language)
+    #         checkers._check_array_lower_size(x_exp_1, 2, "x_exp_1", self.language)
+    #
+    #         # ----- measures ----- #
+    #         mean_1 = x_exp_1.mean()
+    #         std_1 = x_exp_1.std(ddof=1)
+    #         n_1 = x_exp_1.size
+    #
+    #         ## ----- x_exp_2 ----- ##
+    #         checkers._check_is_numpy_1_D(x_exp_2, "x_exp_2", self.language)
+    #         checkers._check_array_lower_size(x_exp_2, 2, "x_exp_2", self.language)
+    #
+    #         # ----- measures ----- #
+    #         mean_2 = x_exp_2.mean()
+    #         std_2 = x_exp_2.std(ddof=1)
+    #         n_2 = x_exp_2.size
+    #
+    #     elif kind == "params":
+    #
+    #         ## ----- x_exp_1 ----- ##
+    #         checkers._check_is_numpy_1_D(x_exp_1, "x_exp_1", self.language)
+    #         checkers._check_list_length(x_exp_1, 3, "x_exp_1", self.language)
+    #
+    #         # ----- measures ----- #
+    #         mean_1 = x_exp_1[0]
+    #         std_1 = x_exp_1[1]
+    #         n_1 = x_exp_1[2]
+    #
+    #         ## ----- x_exp_2 ----- ##
+    #         checkers._check_is_numpy_1_D(x_exp_2, "x_exp_2", self.language)
+    #         checkers._check_list_length(x_exp_2, 3, "x_exp_2", self.language)
+    #
+    #         # ----- measures ----- #
+    #         mean_2 = x_exp_2[0]
+    #         std_2 = x_exp_2[1]
+    #         n_2 = x_exp_2[2]
+    #
+    #     else:
+    #         try:
+    #             error = messages[1][0][0]
+    #             raise ValueError(error)
+    #         except ValueError:
+    #             general._display_one_line_attention(f"{messages[31][0][0]} 'kind' {messages[31][2][0]} 'data' {messages[31][4][0]} 'params', {messages[31][6][0]}: '{comparison}'")
+    #             raise
+    #
+    #     ## ----- names ----- ##
+    #     if names is None:
+    #         name_1 = "x_exp_1"
+    #         name_2 = "x_exp_2"
+    #     else:
+    #         checkers._check_list_length(names, 2, "names", self.language)
+    #         checkers._check_is_str(names[0], "names[0]", self.language)
+    #         checkers._check_is_str(names[1], "names[1]", self.language)
+    #         name_1 = names[0]
+    #         name_2 = names[1]
+    #
+    #
+    #     ## ----- x_exp_1 and x_exp_2 must be the same size ----- ##
+    #     if n_1 != n_2:
+    #         try:
+    #             error = messages[35][0][0]
+    #             raise ValueError(error)
+    #         except ValueError:
+    #             general._display_one_line_attention(f"{messages[36][0][0]} {name_1} {messages[36][2][0]} {name_2} {messages[36][4][0]} {name_1} {messages[36][6][0]} {n_1} {messages[36][8][0]} {name_2} {messages[36][10][0]} {n_2}.")
+    #             raise
+    #
+    #     ## value ##
+    #     if value is None:
+    #         value = 0
+    #     else:
+    #         checkers._check_is_float_or_int(value, param_name="value", language=self.language)
+    #
+    #
+    #     ## ----- alfa ----- ##
+    #     if alfa is None:
+    #         alfa = self.alfa
+    #     else:
+    #         checkers._check_is_float(alfa, "alfa", self.language)
+    #         checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+    #
+    #
+    #     ## ----- conclusion ----- ##
+    #     if comparison is None:
+    #         comparison = "critical"
+    #     else:
+    #         checkers._check_is_str(comparison, "comparison", self.language)
+    #         if comparison == "critical":
+    #             comparison = "critical"
+    #         elif comparison == "p-value":
+    #             comparison = "p-value"
+    #         else:
+    #             try:
+    #                 error = messages[1][0][0]
+    #                 raise ValueError(error)
+    #             except ValueError:
+    #                 general._display_one_line_attention(f"{messages[31][0][0]} 'comparison' {messages[31][2][0]} 'critical' {messages[31][4][0]} 'p-value', {messages[31][6][0]}: '{comparison}'")
+    #                 raise
+    #
+    #     ## ----- details ----- ##
+    #     if details == None:
+    #         details = "short"
+    #     else:
+    #         checkers._check_is_str(details, "details", self.language)
+    #         if details == "short":
+    #             details = "short"
+    #         elif details == "full":
+    #             details = "full"
+    #         elif details == "binary":
+    #             details = "binary"
+    #         else:
+    #             try:
+    #                 error = messages[1][0][0]
+    #                 raise ValueError(error)
+    #             except ValueError:
+    #                 general._display_one_line_attention(f"{messages[31][0][0]} 'details' {messages[31][2][0]} 'short', 'full' {messages[31][4][0]} 'binary', {messages[31][6][0]}: '{details}'")
+    #                 raise
+    #
+    #
+    #     ## ----- which ----- ##
+    #     if which is None:
+    #         which = "two-side"
+    #     else:
+    #         checkers._check_is_str(which, "which", self.language)
+    #         which_keys = ["two-side", "one-side"]
+    #         which = _check_which_param(which, self.language)
+    #
+    #
+    #     aceita = 0
+    #     rejeita = 1
+    #
+    #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1393,8 +1816,7 @@ def _check_which_param(which, language):
         which = "two-side"
     else:
         checkers._check_is_str(which, "which", language)
-        which_keys = ["two-side", "one-side"]
-        if which not in which_keys:
+        if which not in ["two-side", "one-side"]:
             try:
                 error = messages[1][0][0]
                 raise ValueError(error)
@@ -1404,6 +1826,94 @@ def _check_which_param(which, language):
                 raise
     return which
 
+
+# with tests, with docstring, with database but at StudentDistribution
+def _check_details_param(details, language):
+    """This function checks whether the parameter ``details`` is ``"short"``, ``"full"`` or ``"binary"``
+
+    Parameters
+    ----------
+
+    comparison : ``str``
+        The ``details`` parameter for Student's t distribution
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+
+        * If ``details`` is ``"short"``, ``"full"`` or ``"binary"``, the function returns ``"short"``, ``"full"`` or ``"binary"``
+        * Else, the function raises ``ValueError``.
+
+
+    """
+    ### ----- quering ----- ###
+    fk_id_function = management._query_func_id("StudentDistribution")
+    messages = management._get_messages(fk_id_function, language, "StudentDistribution")
+
+    ### ----- details ----- ###
+    if details == None:
+        details = "short"
+    else:
+        checkers._check_is_str(details, "details", language)
+        if details not in ["short", "full", "binary"]:
+            try:
+                error = messages[1][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_one_line_attention(f"{messages[31][0][0]} 'details' {messages[31][2][0]} 'short', 'full' {messages[31][4][0]} 'binary', {messages[31][6][0]}: '{details}'")
+                raise
+
+    return details
+
+
+
+# with tests, with docstring, with database but at StudentDistribution
+def _check_comparison_param(comparison, language):
+    """This function checks whether the parameter comparison is ``"critical"`` or ``"p-value"``
+
+    Parameters
+    ----------
+
+    comparison : ``str``
+        The ``comparison`` parameter for Student's t distribution
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+
+        * If ``comparison`` is ``"critical"`` or ``"p-value"``, the function returns ``"critical"`` or ``"p-value"``
+        * Else, the function raises ``ValueError``.
+
+
+    """
+    ### ----- quering ----- ###
+    fk_id_function = management._query_func_id("StudentDistribution")
+    messages = management._get_messages(fk_id_function, language, "StudentDistribution")
+
+    ### ----- comparison ----- ###
+    if comparison is None:
+        comparison = "critical"
+    else:
+        checkers._check_is_str(comparison, "comparison", language)
+        if comparison not in ["critical", "p-value"]:
+            try:
+                error = messages[1][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_one_line_attention(f"{messages[31][0][0]} 'comparison' {messages[31][2][0]} 'critical' {messages[31][4][0]} 'p-value', {messages[31][6][0]}: '{comparison}'")
+                raise
+
+    return comparison
 
 
 def _compare_with_constant_func(value, mean, std, n):
@@ -1440,7 +1950,11 @@ def _compare_with_constant_func(value, mean, std, n):
     return t_calc
 
 
+def _paired_with_constant_func(value, mean, std, n):
+    """Esta função calcula a estatística do teste t de Student para dados pareados"""
 
+    tcalc = (mean-value)/(std/np.sqrt(n))
+    return tcalc
 
 
 
