@@ -249,117 +249,223 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         return result(minimum_number_of_assessors), inputs
 
 
+    # with tests, with text, with database, with docstring
+    def minimum_of_correct_responses(self, n_of_assessors, alfa=None, which=None):
+        """This functions returns the minimum number of correct responses required for significance at the stated α level for the corresponding number of assessors.
+
+        Parameters
+        ----------
+        n_of_assessors : ``int``
+            The number of assessors (greater than 6)
+
+        alfa : ``float``, optional
+            The significance level. It can be:
+
+            * ``0.20``;
+            * ``0.10``;
+            * ``0.05`` (default);
+            * ``0.01``;
+            * ``0.001``;
+
+
+        which : ``str``, optional
+            A forma de obter o resultado.
+
+            * If ``"function"`` (default), the equation given in [1]_ is used;
+            * If ``"original"``, the tabulated values provided by [1]_ are used;
+
+
+        Returns
+        -------
+        min_responses : ``int``
+            The minimum number of correct responses required for significance at the stated α level
+        inputs : ``dict``
+            A dictionary with the parameters used to obtain the result
+
+
+        Notes
+        -----
+        In cases where the original values are not available, the value is returned using ``which="function"`` instead of ``which="original"``.
+
+        In a small number of combinations between the level of significance and the number of assessors, there are discrepancies between the original results and the respective calculated values. In all cases the difference is one less right answer, that is, the original values are more conservative than the values obtained with the equation.
+
+
+        The minimum number of correct answers is estimated using the following relationship:
+
+        .. math::
+                min = \\frac{n_{assessors + t_{\\infty} \\sqrt{2n_{assessors}}}}{3}
+
+        where :math:`t_{\\infty}` is the value of the one-sided student t distribution for infinite degrees of freedom (1000000) rounded to 2 decimal places. The value of t is obtained using ``stats.t.ppf(1-alfa, 1000000)``
+
+
+        References
+        ----------
+        .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result = tringular.minimum_of_correct_responses(10)
+        >>> print(result)
+        TriangleTest(minimum_of_correct_responses=7)
+        >>> print(inputs)
+        {'alpha': 0.05, 'which': 'original'}
+
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest(language="pt-br")
+        >>> result, inputs = tringular.minimum_of_correct_responses(36)
+        >>> print(result)
+        TesteTriangular(minimo_de_respostas_corretas=18)
+        >>> print(inputs)
+        {'alfa': 0.05, 'which': 'original'}
+
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inputs = tringular.minimum_of_correct_responses(36, alfa = 0.01)
+        >>> print(result)
+        TriangleTest(minimum_of_correct_responses=20)
+        >>> print(inputs)
+        {'alpha': 0.01, 'which': 'original'}
+
+
+        """
+        # ----- checking n_of_assessors value ----- #
+        checkers._check_is_integer(n_of_assessors, "n_of_assessors", self.language)
+        checkers._check_value_is_equal_or_higher_than(n_of_assessors, "n_of_assessors", 6, language=self.language)
+
+        # ----- checking alpha value ----- #
+        if alfa is None:
+            alfa = self.alfa
+        else:
+            # --- should be float --- #
+            checkers._check_is_float(alfa, "alfa", self.language)
+            # --- should be in the range (0,1) --- #
+            checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+            # --- must be in --- #
+            alloweds = [0.20, 0.10, 0.05, 0.01, 0.001]
+            helpers._raises_wrong_param("alfa", alloweds, alfa, self.language)
+
+
+
+        # ----- checking which value ----- #
+        if which is None:
+            which = "original"
+        else:
+            # --- should be str --- #
+            checkers._check_is_str(which, "which", self.language)
+            # --- must be in --- #
+            alloweds = ["function", "original"]
+            helpers._raises_wrong_param("which", alloweds, which, self.language)
+
+
+        # ----- getting the position for each alfa value ----- #
+        if alfa == 0.20:
+            position = 0
+        elif alfa == 0.10:
+            position = 1
+        elif alfa == 0.05:
+            position = 2
+        elif alfa == 0.01:
+            position = 3
+        else:
+            position = 4
+
+        # critical values
+        critical = {
+            6: [4, 5, 5, 6],
+            7: [4, 5, 5, 6, 7],
+            8: [5, 5, 6, 7, 8],
+            9: [5, 6, 6, 7, 8],
+            10: [6, 6, 7, 8, 9],
+            11: [6, 7, 7, 8, 10],
+            12: [6, 7, 8, 9, 10],
+            13: [7, 8, 8, 9, 11],
+            15: [8, 8, 9, 10, 12],
+            14: [7, 8, 9, 10, 11],
+            16: [8, 9, 9, 11, 12],
+            17: [8, 9, 10, 11, 13],
+            18: [9, 10, 10, 12, 13],
+            19: [9, 10, 11, 12, 14],
+            20: [9, 10, 11, 13, 14],
+            21: [10, 11, 12, 13, 15],
+            22: [10, 11, 12, 14, 15],
+            23: [11, 12, 12, 14, 16],
+            24: [11, 12, 13, 15, 16],
+            25: [11, 12, 13, 15, 17],
+            26: [12, 13, 14, 15, 17],
+            27: [12, 13, 14, 16, 18],
+            28: [12, 14, 15, 16, 18],
+            29: [13, 14, 15, 17, 19],
+            30: [13, 14, 15, 17, 19],
+            31: [14, 15, 16, 18, 20],
+            32: [14, 15, 16, 18, 20],
+            33: [14, 15, 17, 18, 21],
+            34: [15, 16, 17, 19, 21],
+            35: [15, 16, 17, 19, 22],
+            36: [15, 17, 18, 20, 22],
+            37: [16, 17, 18, 20, 22],
+            38: [16, 17, 19, 21, 23],
+            39: [16, 18, 19, 21, 23],
+            40: [17, 18, 19, 21, 24],
+            41: [17, 19, 20, 22, 24],
+            42: [18, 19, 20, 22, 25],
+            43: [18, 19, 20, 23, 25],
+            44: [18, 20, 21, 23, 26],
+            45: [19, 20, 21, 24, 26],
+            46: [19, 20, 22, 24, 27],
+            47: [19, 21, 22, 24, 27],
+            48: [20, 21, 22, 25, 27],
+            54: [22, 23, 25, 27, 30],
+            60: [24, 26, 27, 30, 33],
+            66: [26, 28, 29, 32, 35],
+            72: [28, 30, 32, 34, 38],
+            78: [30, 32, 34, 37, 40],
+            84: [33, 35, 36, 39, 43],
+            90: [35, 37, 38, 42, 45],
+            96: [37, 39, 41, 44, 48],
+            102: [39, 41, 43, 46, 50]
+        }
+
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+
+        # ----- grouping entries into a dictionary ----- #
+        inputs = {
+            messages[1][2][0]: alfa,
+            "which": which
+        }
+
+        if which == "function":
+            min_responses = _min_responses(n_of_assessors, alfa)
+        else:
+            if n_of_assessors in critical.keys():
+                try:
+                    min_responses = critical[n_of_assessors][position]
+
+                except IndexError: # requeried due to n_of_assessors = 6 and alfa = 0.001 is missing
+                    min_responses = _min_responses(n_of_assessors, alfa)
+                    general._display_warn(messages[2][0][0], messages[2][1][0])
+                    inputs["which"] = "function"
+            else: # for missing n_of_assessors values
+                min_responses = _min_responses(n_of_assessors, alfa)
+                aviso = f"{messages[2][2][0]} {n_of_assessors}{messages[2][4][0]}"
+                general._display_warn(messages[2][0][0], aviso)
+                inputs["which"] = "function"
+
+        result = namedtuple(messages[1][0][0], (messages[1][4][0],))
+        return result(min_responses), inputs
 
 
 
 
-# print(get_number_assessors(pd="10%", alfa=0.05, beta=0.05))
 
-# def minimum_of_correct_responses(n, alfa, which=None):
-#
-#
-#     if n == 6 and alfa == 0.001:
-#         raise ValueError
-#
-#
-#
-#
-#     def _min_responses(n, alfa):
-#         # t values
-#         z = round(stats.t.ppf(1-alfa, 1000000),2)
-#         # calculating the minimum
-#         min = (n/3) + z*np.sqrt(2*n)/3
-#         # rounding to nearest whole number greater than min
-#         min_correct = int(min + 0.5) + 1
-#         return min_correct
-#
-#
-#     # getting the critical value position based on significance level
-#     if alfa == 0.20:
-#         position = 0
-#     elif alfa == 0.10:
-#         position = 1
-#     elif alfa == 0.05:
-#         position = 1
-#     elif alfa == 0.01:
-#         position = 3
-#     elif alfa == 0.001:
-#         position = 4
-#     else:
-#         raise ValueError
-#
-#
-#
-#     # critical values
-#     critical = {
-#         6: [4, 5, 5, 6, "X"],
-#         7: [4, 5, 5, 6, 7],
-#         8: [5, 5, 6, 7, 8],
-#         9: [5, 6, 6, 7, 8],
-#         10: [6, 6, 7, 8, 9],
-#         11: [6, 7, 7, 8, 10],
-#         12: [6, 7, 8, 9, 10],
-#         13: [7, 8, 8, 9, 11],
-#         15: [8, 8, 9, 10, 12],
-#         14: [7, 8, 9, 10, 11],
-#         16: [8, 9, 9, 11, 12],
-#         17: [8, 9, 10, 11, 13],
-#         18: [9, 10, 10, 12, 13],
-#         19: [9, 10, 11, 12, 14],
-#         20: [9, 10, 11, 13, 14],
-#         21: [10, 11, 12, 13, 15],
-#         22: [10, 11, 12, 14, 15],
-#         23: [11, 12, 12, 14, 16],
-#         24: [11, 12, 13, 15, 16],
-#         25: [11, 12, 13, 15, 17],
-#         26: [12, 13, 14, 15, 17],
-#         27: [12, 13, 14, 16, 18],
-#         28: [12, 14, 15, 16, 18],
-#         29: [13, 14, 15, 17, 19],
-#         30: [13, 14, 15, 17, 19],
-#         31: [14, 15, 16, 18, 20],
-#         32: [14, 15, 16, 18, 20],
-#         33: [14, 15, 17, 18, 21],
-#         34: [15, 16, 17, 19, 21],
-#         35: [15, 16, 17, 19, 22],
-#         36: [15, 17, 18, 20, 22],
-#         37: [16, 17, 18, 20, 22],
-#         38: [16, 17, 19, 21, 23],
-#         39: [16, 18, 19, 21, 23],
-#         40: [17, 18, 19, 21, 24],
-#         41: [17, 19, 20, 22, 24],
-#         42: [18, 19, 20, 22, 25],
-#         43: [18, 19, 20, 23, 25],
-#         44: [18, 20, 21, 23, 26],
-#         45: [19, 20, 21, 24, 26],
-#         46: [19, 20, 22, 24, 27],
-#         47: [19, 21, 22, 24, 27],
-#         48: [20, 21, 22, 25, 27],
-#         54: [22, 23, 25, 27, 30],
-#         60: [24, 26, 27, 30, 33],
-#         66: [26, 28, 29, 32, 35],
-#         72: [28, 30, 32, 34, 38],
-#         78: [30, 32, 34, 37, 40],
-#         84: [33, 35, 36, 39, 43],
-#         90: [35, 37, 38, 42, 45],
-#         96: [37, 39, 41, 44, 48],
-#         102: [39, 41, 43, 46, 50]
-#     }
-#
-#
-#     if which == "original":
-#         if n not in critical.keys():
-#             min_responses = _min_responses(n, alfa)
-#         else:
-#             min_responses = critical[n][position]
-#     else:
-#         min_responses = _min_responses(n, alfa)
-#
-#
-#
-#     return min_responses
-#
-#
+
+
 #
 #
 # enes = [7, 8, 9, 10, 11, 12, 13, 15, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
@@ -448,7 +554,55 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
 
+# with tests, with docstring
+def _min_responses(n_assessors, alfa):
+    """This functions calculates the minimum number of correct responses based on the number of assessors and alfa value [1]_.
 
+    Parameters
+    ----------
+    n_assessors : ``int``
+        The number of assessors.
+    alfa : ``float``
+        The significance level.
+
+
+    Returns
+    -------
+    min_correct: ``int``
+        The minimum number of correct answers
+
+
+    Notes
+    -----
+    The minimum number of correct answers is estimated using the following relationship:
+
+    .. math::
+            min = \\frac{n_{assessors + t_{\\infty} \\sqrt{2n_{assessors}}}}{3}
+
+    where :math:`t_{\\infty}` is the value of the one-sided student t distribution for infinite degrees of freedom (1000000) rounded to 2 decimal places. The value of t is obtained using ``stats.t.ppf(1-alfa, 1000000)``
+
+
+    References
+    ----------
+    .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
+
+
+    Examples
+    --------
+
+    >>> from pycafee.sensoryanalysis.discriminative_tests import _min_responses
+    >>> result = _min_responses(48, 0.05)
+    >>> print(result)
+    22
+
+    """
+    # t values
+    t = round(stats.t.ppf(1-alfa, 1000000),2)
+    # calculating the minimum
+    min = (n_assessors/3) + t*np.sqrt(2*n_assessors)/3
+    # rounding to nearest whole number greater than min
+    min_correct = int(min + 0.5) + 1
+    return min_correct
 
 
 

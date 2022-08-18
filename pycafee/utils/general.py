@@ -134,12 +134,12 @@ def _display_warn(aviso, texto):
     """
     init()
     size = max(len(aviso), len(texto))
-    print("\n")
+    # print("\n")
     print(Fore.RED, "-"*size)
     print(Fore.RED, aviso)
     print(Fore.WHITE, texto)
     print(Fore.RED, "-"*size)
-    print("\n")
+    # print("\n")
     print(Style.RESET_ALL)
 
 def _flatten_list_of_list_string(list_of_lists):

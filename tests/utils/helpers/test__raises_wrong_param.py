@@ -22,7 +22,7 @@ import os
 import unittest
 from pycafee.utils.helpers import _raises_wrong_param
 import io
-import  sys
+import sys
 os.system('cls')
 
 class Test__raises_wrong_param(unittest.TestCase):
