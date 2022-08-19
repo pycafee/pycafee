@@ -59,10 +59,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
     def __init__(self, name=None, alfa=None, language=None, n_digits=None, **kwargs):
         super().__init__(alfa=alfa, language=language, n_digits=n_digits, **kwargs)
-        self.conclusion = None
-        self.statistic = None
-        self.critical = None
-        self.x_exp = None
+        self.df_table = None
 
 
 
@@ -461,68 +458,188 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         return result(min_responses), inputs
 
 
+    # with tests, with text, with database, with docstring
+    def make_combinations(self, n_of_assessors, seed=None, shuffle=None, reorder=None):
+        """This function creates a dataframe with all the combinations to apply the triangle test.
+
+
+        Parameters
+        ----------
+        n_of_assessors : ``int``
+            The number of assessors (greater than 6)
+        seed : ``int`` (positive), optional
+            The seed that controls the randomness of the output.
+
+            * If ``None`` (default), three-digit numbers are randomly generated without a specific seed;
+            * If a number, three-digit numbers are generated using randomness specified by the seed (which can be used to replicate the random results).
+
+
+        shuffle : ``bool``, optional
+            Whether permutations between ``"A"`` and ``"B"`` should be randomized or not.
+
+            * If ``True`` (default), the six possible combinations will be randomized. The ``seed`` parameter controls the randomness of this parameter;
+            * If ``False``, the combinations follow the following pattern: ``"AAB", "ABA", "ABB", "BBA", "BAB", "BAA"``.
+
+        reorder : ``bool``, optional
+            Whether the table should should be randomized or not.
+
+            * If ``True``, the table will be randomized. The ``seed`` parameter controls the randomness of this parameter;
+            * If ``False`` (default), the table will keep the original pattern.
+
+
+        Returns
+        -------
+        min_responses : ``pd.DataFrame``
+            The dataframe with all the combinations required to prepare the Triangle Test
+        inputs : ``dict``
+            A dictionary with the parameters used to obtain the table
 
 
 
+        References
+        ----------
+        .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
 
 
-#
-#
-# enes = [7, 8, 9, 10, 11, 12, 13, 15, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-#         29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 54,
-#         60, 66, 72, 78, 84, 90, 96, 102]
-#
-# for ene in enes:
-#     print(minimum_of_correct_responses(n=ene, alfa=0.05))
+        Examples
+        --------
 
-# n_panelists = 500
-#
-#
-# data = np.arange(100, 1000)
-# while len(data) < n_panelists*3:
-#     data = np.repeat(data, 2)
-#
-# print(len(data))
-#
-#
-# # print(data)
-# np.random.seed(42)
-# ale = np.random.choice(data, n_panelists*3, replace=False)
-#
-# ale = np.array_split(ale, 3)
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inputs = tringular.make_combinations(42, seed=42, shuffle=True, reorder=False)
+        >>> print(result.head(6))
+           Panelist Sample 1 Sample 2 Sample 3
+        0         1    B-516    B-523    A-666
+        1         2    A-903    B-866    B-759
+        2         3    A-953    B-390    A-944
+        3         4    B-698    A-380    A-762
+        4         5    A-895    A-682    B-819
+        5         6    B-791    A-719    B-796
+        >>> print(inputs)
+        {'n_of_assessors': 42, 'seed': 42, 'shuffle': True, 'reorder': False}
 
 
-# combinations = ["ABB", "AAB", "ABA", "BAA", "BBA", "BAB"]
-#
-# def repeat_items(l, c):
-#     return l * (c // len(l)) + l[:(c % len(l))]
-#
-# all_combinations = repeat_items(combinations, n_panelists)
-#
-# df = pd.DataFrame(columns=["Panelist", "Sample 1", "Sample 2", "Sample 3"])
-# df["Panelist"] = range(1, n_panelists+1)
-# first = []
-# second = []
-# third = []
-#
-# for i in range(n_panelists):
-#     first.append(f"{all_combinations[i][0]} - {ale[0][i]}")
-#     second.append(f"{all_combinations[i][1]} - {ale[1][i]}")
-#     third.append(f"{all_combinations[i][2]} - {ale[2][i]}")
-#
-#
-#
-# df["Sample 1"] = first
-# df["Sample 2"] = second
-# df["Sample 3"] = third
-#
-#
-#
-#
-#
-#
-# # df["First"] =
-# print(df)
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inputs = tringular.make_combinations(42, seed=42, shuffle=False, reorder=False)
+        >>> print(result.head(6))
+           Panelist Sample 1 Sample 2 Sample 3
+        0         1    A-516    A-523    B-666
+        1         2    A-903    B-866    A-759
+        2         3    A-953    B-390    B-944
+        3         4    B-698    B-380    A-762
+        4         5    B-895    A-682    B-819
+        5         6    B-791    A-719    A-796
+        >>> print(inputs)
+        {'n_of_assessors': 42, 'seed': 42, 'shuffle': False, 'reorder': False}
+
+
+        >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inputs = tringular.make_combinations(42, seed=42, shuffle=False, reorder=True)
+        >>> print(result.head(6))
+           Panelist Sample 1 Sample 2 Sample 3
+        0         1    A-174    B-548    A-462
+        1         2    A-245    B-457    A-672
+        2         3    A-772    B-465    B-492
+        3         4    A-474    B-657    B-839
+        4         5    B-895    A-682    B-819
+        5         6    B-283    B-257    A-945
+        >>> print(inputs)
+        {'n_of_assessors': 42, 'seed': 42, 'shuffle': False, 'reorder': True}
+
+
+        """
+
+        # ----- checking n_of_assessors value ----- #
+        checkers._check_is_integer(n_of_assessors, "n_of_assessors", self.language)
+        checkers._check_value_is_equal_or_higher_than(n_of_assessors, "n_of_assessors", 6, language=self.language)
+
+        # ----- checking seed value ----- #
+        if seed is None:
+            seed = np.random.randint(1,100)
+        else:
+            checkers._check_is_integer(seed, "seed", self.language)
+            checkers._check_value_is_equal_or_higher_than(seed, "seed", 0, language=self.language)
+
+        # ----- checking shuffle value ----- #
+        if shuffle is None:
+            shuffle = True
+        else:
+            checkers._check_is_bool(shuffle, "shuffle", self.language)
+
+        # ----- checking reorder value ----- #
+        if reorder is None:
+            reorder = False
+        else:
+            checkers._check_is_bool(reorder, "reorder", self.language)
+
+
+        # ----- creating the three digit random numbers ----- #
+        data = np.arange(100, 1000)
+
+        # --- Checking if the amount of unique numbers is less than the amount that will be used --- #
+        # --- If not, we will replicate all 900 numbers until the correct amount is reached --- #
+        while len(data) < n_of_assessors*3:
+            data = np.repeat(data, 2)
+
+        # ----- getting random sequence ----- #
+        rng = np.random.default_rng(seed)
+        random_sequence = rng.choice(data, n_of_assessors*3, replace=False)
+
+        # ----- splitting the random numbers into 3 columns ----- #
+        random_sequence = np.array_split(random_sequence, 3)
+
+        # ----- all permutations ----- #
+        combinations = ["AAB", "ABA", "ABB", "BBA", "BAB", "BAA"]
+
+
+        # ----- if shuffle is True, we need to shuffle the list ----- #
+        if shuffle:
+            combinations = list(rng.choice(combinations, len(combinations), replace=False))
+
+        # ------ Now we need to repeat the combinations to get one combination to each panelist ----- #
+        all_combinations = _repeat_items(combinations, n_of_assessors)
+
+        # ----- quering ----- #
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+        panelist = messages[3][0][0]
+        sample = messages[3][1][0]
+
+        # ----- making the DataFrame ----- #
+        df = pd.DataFrame(columns=[panelist, f"{sample} 1", f"{sample} 2", f"{sample} 3"])
+        df[panelist] = range(1, n_of_assessors+1)
+        first = []
+        second = []
+        third = []
+
+        for i in range(n_of_assessors):
+            first.append(f"{all_combinations[i][0]}-{random_sequence[0][i]}")
+            second.append(f"{all_combinations[i][1]}-{random_sequence[1][i]}")
+            third.append(f"{all_combinations[i][2]}-{random_sequence[2][i]}")
+
+        df[f"{sample} 1"] = first
+        df[f"{sample} 2"] = second
+        df[f"{sample} 3"] = third
+
+        # reording the df
+        if reorder:
+            df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
+            df[panelist] = range(1, n_of_assessors+1)
+
+        inputs = {
+            "n_of_assessors": n_of_assessors,
+            "seed": seed,
+            "shuffle": shuffle,
+            "reorder": reorder,
+        }
+
+        self.df_table = df
+
+        return df, inputs
+
+
 
 
 
@@ -606,8 +723,40 @@ def _min_responses(n_assessors, alfa):
 
 
 
+# with some tests
+def _repeat_items(lista, elemts):
+    """This function returns a repetition of ``elemts`` elements of a list ``list``.
+
+    Parameters
+    ----------
+    lista: ``list``
+        The list that will be repeated
+    elemts: ``int``
+        The number of list elements with repeated items
+
+    Returns
+    -------
+    lista: ``list``
+        A list of repeated elements
 
 
+    Examples
+    --------
+
+    >>> repeat_items([1,2], 3)
+    [1, 2, 1]
+
+    >>> repeat_items([1,2], 6)
+    [1, 2, 1, 2, 1, 2]
+
+    >>> repeat_items(["A", "B", "C", "D"], 12)
+    ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D']
+
+    >>> repeat_items(["A", "B", "C", "D"], 2)
+    ['A', 'B']
+
+    """
+    return lista * (elemts // len(lista)) + lista[:(elemts % len(lista))]
 
 
 
