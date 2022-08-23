@@ -18,6 +18,7 @@
 #     - _check_is_str(value, param_name, language)
 #     - _check_is_subplots(value, param_name, language)
 #     - _check_list_length(value, n, param_name, language)
+#     - _check_list_length_equal_or_higher_than(value, n, param_name, language)
 #     - _check_value_is_equal_or_higher_than(value, param_name, minimum, language)
 #     - _check_value_is_equal_or_lower_than(value, param_name, maximum, language)
 #########################################
@@ -669,6 +670,53 @@ def _check_list_length(value, n, param_name, language):
                                 )
             raise
     return True
+
+
+
+# with tests, with text, with database, with docstring
+def _check_list_length_equal_or_higher_than(value, n, param_name, language):
+    """This function checks if a ``list`` (``value``) has len equals or higher than ``n``.
+
+    Parameters
+    ----------
+    value : ``list``
+        The list to check its length
+    n : ``int``
+        The minimum size that the list should have
+    param_name : ``str``
+        The original name of the parameter passed through the parameter ``value``.
+    language : ``str``
+        The language code
+
+    Notes
+    -----
+    The parameter ``value`` isn't checked if it is a ``list``.
+    The parameter ``n`` isn't checked if it is a ``int``.
+    The parameter ``param_name`` isn't checked if it is a ``str``.
+    The parameter ``language`` isn't checked if it is a ``str``.
+
+    Returns
+    -------
+    ``True`` if ``len(value) >= n``
+    Raises ``ValueError`` if ``len(value) < n``
+
+    """
+
+    if len(value) < n:
+        ### quering ###
+        func_name = "_check_list_length"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, language, func_name)
+        try:
+            raise ValueError(messages[1][0][0])
+        except ValueError:
+            general._display_one_line_attention(
+                        f"{messages[3][0][0]} '{param_name}' {messages[3][2][0]} '{n}' {messages[3][4][0]} '{len(value)}'"
+                                )
+            raise
+    return True
+
+
 
 
 # with tests, with text, with database

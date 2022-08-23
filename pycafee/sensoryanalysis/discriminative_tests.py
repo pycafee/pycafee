@@ -28,12 +28,18 @@ Sensitivity tests:
 
 ###### Standard ######
 from collections import namedtuple
+from datetime import datetime
+from math import ceil
 
 ###### Third part ######
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
+from openpyxl import Workbook
+from openpyxl.styles import Border, Side, Alignment, Font
 import scipy.stats as stats
+from tabulate import tabulate
+
+
 
 ###### Home made ######
 
@@ -641,6 +647,691 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
 
+    # with tests, with text, with database, with docstring
+    def make_protocol(self, test_code=None, prod_name=None, sample_A=None, sample_B=None, title=None, info=None,  code_text=None, recommendations=None, file_name=None):
+        """This function creates an excel protocol to prepare the Triangular test
+
+        Parameters
+        ----------
+        test_code : ``str``, optional
+            The code of the test
+        prod_name : ``str``, optional
+            The product name
+        sample_A : ``str``, optional
+            The name of the first sample (Sample A)
+        sample_B : ``str``, optional
+            The name of the second sample (Sample B)
+        title : ``str``, optional
+            The title of the test
+        info : ``str``, optional
+            Some information about the test
+        code_text : ``str``, optional
+            Some information about the test
+        recommendations: ``list`` of ``str``
+            A list with some recomendations to perform the test
+        file_name : ``str``, optional
+            The name of the file to export without its extension (default is ``"protocol_sheet"``)
+
+        Notes
+        -----
+        The method ``make_combinations`` must be called beforehand.
+
+
+        Examples
+        --------
+
+        >>> from pycafee.sensoryanalysis import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inpupt = tringular.make_combinations(36, seed=42)
+        >>> tringular.make_protocol()
+        The 'protocol_sheet.xlsx' file was exported!
+
+        .. image:: img/protocol_sheet.png
+           :alt: Image showing the protocol sheet
+           :align: center
+
+
+        >>> from pycafee.sensoryanalysis import TriangleTest
+        >>> tringular = TriangleTest(language="pt-br")
+        >>> result, inpupt = tringular.make_combinations(36, seed=42, reorder=True)
+        >>> tringular.make_protocol()
+        O arquivo 'planilha_protocolo.xlsx'  foi exportado!
+
+        .. image:: img/planilha_protocolo.png
+           :alt: Image showing the protocol sheet
+           :align: center
+
+
+
+        """
+
+        # ----- Cheking the parameters ---- #
+        # ----- quering ----- #
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+
+        if test_code is None:
+            test_code = "000"
+        else:
+            checkers._check_is_str(test_code, "test_code", self.language)
+        if title is None:
+            title = messages[4][2][0]
+        else:
+            checkers._check_is_str(title, "title", self.language)
+        if info is None:
+            info = messages[4][3][0]
+        else:
+            checkers._check_is_str(info, "info", self.language)
+        if prod_name is None:
+            prod_name = messages[4][4][0]
+        else:
+            checkers._check_is_str(prod_name, "prod_name", self.language)
+        if sample_A is None:
+            sample_A = messages[4][5][0]
+        else:
+            checkers._check_is_str(sample_A, "sample_A", self.language)
+        if sample_B is None:
+            sample_B = messages[4][6][0]
+        else:
+            checkers._check_is_str(sample_B, "sample_B", self.language)
+        if code_text is None:
+            code_text = messages[4][7][0]
+        else:
+            checkers._check_is_str(code_text, "code_text", self.language)
+        if recommendations is None:
+            recommendations = [messages[4][8][0], messages[4][9][0], messages[4][10][0], messages[4][11][0]]
+        else:
+            checkers._check_is_list(recommendations, "recommendations", self.language)
+            checkers._check_list_length_equal_or_higher_than(recommendations, 1, "recommendations", self.language)
+            for i in range(len(recommendations)):
+                checkers._check_is_str(recommendations[i], f"recommendations[{i}]", self.language)
+
+
+        date = messages[4][0][0]
+        text_code = messages[4][1][0]
+
+
+        # batizando o nome do arquivo
+        if file_name is None:
+            file_name = messages[1][6][0]
+        else:
+            checkers._check_is_str(file_name, 'file_name', self.language)
+            helpers._check_forbidden_character(file_name, "file_name", self.language)
+
+
+        # ----- creating the workbook ----- #
+        wb = Workbook()
+        ws = wb.active
+        # ------ worksheet name ----- #
+        ws.title = messages[1][0][0]
+
+        # ----- Header ----- #
+        # ----- ROW 1 ----- #
+        row = 1
+        # --- current date --- #
+        ws.merge_cells('A1:C1')
+        cell = ws.cell(row=row, column=1)
+        cell.value = f"{date}: {datetime.now().strftime('%Y/%m/%d')}"
+        cell.font = Font(size=10, bold=True,)
+
+        cell.alignment = Alignment(horizontal='left', vertical='center', indent=2)
+        general._openpyxl_border_corner(cell, canto="superior-esquerdo")
+
+        # --- test code --- #
+        ws.merge_cells('G1:I1')
+        cell = ws.cell(row=row, column=7)
+        cell.value = f'{text_code}: {test_code}'
+        cell.font = Font(size=10, bold=True,)
+        cell.alignment = Alignment(horizontal='right', vertical='center', indent=2)
+
+        cell = ws.cell(row=row, column=9)
+        general._openpyxl_border_corner(cell, canto="superior-direito")
+
+        # top
+        for i in range(2,9):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top")
+
+        # ----- Title ----- #
+        # ----- ROW 2 ----- #
+        row = 2
+        ws.merge_cells('A2:I2')
+        cell = ws.cell(row=row, column=1)
+        cell.value = title
+        cell.alignment = Alignment(horizontal='center', vertical='top')
+        cell.font = Font(size=12, bold=True,)
+        ws.row_dimensions[row].height = 25
+
+        cell = ws.cell(row=row, column=1)
+        general._openpyxl_border_corner(cell, canto="esquerdo")
+
+        cell = ws.cell(row=row, column=9)
+        general._openpyxl_border_corner(cell, canto="direito")
+
+        # --- ROW 3 --- #
+        row = 3
+        cell = ws.cell(row=row, column=1)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                left=Side(border_style='thick', color='FF000000'),
+                )
+        cell = ws.cell(row=row, column=9)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thick', color='FF000000'),
+                )
+
+        for i in range(2,9):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top-thin")
+
+        # ----- INFO ----- #
+        ws.merge_cells('A3:I3')
+        cell = ws.cell(row=row, column=1)
+        cell.value = info
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrapText=True)
+        cell.font = Font(size=11)
+        ws.row_dimensions[row].height = 40
+
+        # ----- ROW 4 ----- #
+        row = 4
+        cell = ws.cell(row=row, column=1)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                left=Side(border_style='thick', color='FF000000'),
+                )
+        cell = ws.cell(row=row, column=9)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thick', color='FF000000'),
+                )
+
+        for i in range(2,9):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top-thin")
+
+        # ----- PRODUCT NAME ----- #
+        ws.merge_cells('A4:I4')
+        cell = ws.cell(row=row, column=1)
+        cell.value = prod_name
+        cell.font = Font(size=12, bold=True)
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        ws.row_dimensions[row].height = 25
+
+        # ----- ROW 5 ----- #
+        row = 5
+        # ----- SAMPLE A INFO ----- #
+        ws.merge_cells(f'A{row}:I{row}')
+        cell = ws.cell(row=row, column=1)
+        cell.value = f"{messages[3][2][0]} A: {sample_A}"
+        cell.font = Font(size=11, )
+        cell.alignment = Alignment(horizontal='left', vertical='center', indent=1)
+        ws.row_dimensions[row].height = 20
+
+        # ----- ROW 6 ----- #
+        row = 6
+        # ----- SAMPLE B INFO ----- #
+        ws.merge_cells(f'A{row}:I{row}')
+        cell = ws.cell(row=row, column=1)
+        cell.value = f"{messages[3][2][0]} B: {sample_B}"
+        cell.font = Font(size=11, )
+        cell.alignment = Alignment(horizontal='left', vertical='center', indent=1)
+        ws.row_dimensions[row].height = 20
+
+        # --- Border for row 5 and 6 --- #
+        for i in range(5,7):
+            cell = ws.cell(row=i, column=1)
+            general._openpyxl_border_corner(cell, canto="esquerdo")
+
+            cell = ws.cell(row=i, column=9)
+            general._openpyxl_border_corner(cell, canto="direito")
+
+        # ----- ROW 7 ----- #
+        row = 7
+        cell = ws.cell(row=row, column=1)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                left=Side(border_style='thick', color='FF000000'),
+                )
+        cell = ws.cell(row=row, column=9)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thick', color='FF000000'),
+                )
+
+        for i in range(2,9):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top-thin")
+
+
+        # ----- adding the CODES ----- #
+
+        ws.merge_cells(f'A{row}:I{row}')
+        cell = ws.cell(row=row, column=1)
+        cell.value = code_text
+        cell.font = Font(size=11, )
+        cell.alignment = Alignment(horizontal='left', vertical='center', indent=1)
+        ws.row_dimensions[row].height = 20
+
+
+        # ----- ROW 8 ----- #
+        row += 1
+        # ----- getting the data ----- #
+        if self.df_table is None:
+            try:
+                error = messages[5][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_two_line_attention(
+                    messages[6][0][0],
+                    messages[6][1][0],
+                                    )
+                raise
+        df = self.df_table.copy()
+        # ----- ADDING HEADERS ----- #
+        general.insert_in_cell(ws.cell(row=row, column=1), df.columns[0])
+        general.insert_in_cell(ws.cell(row=row, column=2), df.columns[1])
+        general.insert_in_cell(ws.cell(row=row, column=3), df.columns[2])
+        general.insert_in_cell(ws.cell(row=row, column=4), df.columns[3])
+        general.insert_in_cell(ws.cell(row=row, column=6), df.columns[0])
+        general.insert_in_cell(ws.cell(row=row, column=7), df.columns[1])
+        general.insert_in_cell(ws.cell(row=row, column=8), df.columns[2])
+        general.insert_in_cell(ws.cell(row=row, column=9), df.columns[3])
+        ws.row_dimensions[row].height = 20
+
+
+        # --- finding the best way to split the data into two main columns --- #
+        # since the test bases has 6 options, lets split the data in multiples of 6 and find the next multiple of 6 after half size
+        def find_closest(value):
+            for i in range(1, 7):
+                if (value + i) % 6 == 0:
+                    return value + i
+
+        closest_position = find_closest(ceil(df.shape[0]/2))
+
+        # inserting each data into the excel file
+        for i in range(df.shape[0]):
+            # first main colun
+            if i < closest_position:
+                general.insert_in_cell(ws.cell(row=row + df[df.columns[0]].iloc[i], column=1), df[df.columns[0]].iloc[i])
+                general.insert_in_cell(ws.cell(row=row + df[df.columns[0]].iloc[i], column=2), df[df.columns[1]].iloc[i])
+                general.insert_in_cell(ws.cell(row=row + df[df.columns[0]].iloc[i], column=3), df[df.columns[2]].iloc[i])
+                general.insert_in_cell(ws.cell(row=row + df[df.columns[0]].iloc[i], column=4), df[df.columns[3]].iloc[i])
+
+            else: # first main colun
+                aux = row - closest_position #+ even_odd
+                general.insert_in_cell(ws.cell(row= aux + df[df.columns[0]].iloc[i], column=6), df[df.columns[0]].iloc[i])
+                general.insert_in_cell(ws.cell(row= aux + df[df.columns[0]].iloc[i], column=7), df[df.columns[1]].iloc[i])
+                general.insert_in_cell(ws.cell(row= aux + df[df.columns[0]].iloc[i], column=8), df[df.columns[2]].iloc[i])
+                general.insert_in_cell(ws.cell(row= aux + df[df.columns[0]].iloc[i], column=9), df[df.columns[3]].iloc[i])
+
+
+            # adding space when is multiple of 6
+            if (i + 1) % 6 == 0:
+                ws.row_dimensions[row + i + 1].height = 20
+
+
+
+        new_row = closest_position + row + 1
+
+        for i in range(row, new_row):
+            cell = ws.cell(row=i, column=1)
+            general._openpyxl_border_corner(cell, canto="esquerdo")
+
+            cell = ws.cell(row=i, column=9)
+            general._openpyxl_border_corner(cell, canto="direito")
+
+        row = new_row
+        cell = ws.cell(row=row, column=1)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                left=Side(border_style='thick', color='FF000000'),
+                )
+        cell = ws.cell(row=row, column=9)
+        cell.border = Border(
+                top=Side(border_style='thin', color='FF000000'),
+                right=Side(border_style='thick', color='FF000000'),
+                )
+
+        row = new_row
+        for i in range(2,9):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top-thin")
+
+        # ----- RECOMENDATIONS ----- #
+
+        ws.merge_cells(f'A{row}:I{row}')
+        cell = ws.cell(row=row, column=1)
+        cell.value = recommendations[0]
+        cell.font = Font(size=12, )
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        ws.row_dimensions[row].height = 25
+
+
+        for i in range(len(recommendations)):
+            if i == 0:
+                pass
+            else:
+                row += 1
+                ws.merge_cells(f'A{row}:I{row}')
+                cell = ws.cell(row=row, column=1)
+                cell.value = recommendations[i]
+                cell.font = Font(size=10)
+                cell.alignment = Alignment(horizontal='justify', vertical='center', indent=1)
+                ws.row_dimensions[row].height = 20*ceil(int(str(len(recommendations[i])))/100)
+                # ws.row_dimensions[row].height = 20
+
+                cell = ws.cell(row=row, column=1)
+                general._openpyxl_border_corner(cell, canto="esquerdo")
+
+                cell = ws.cell(row=row, column=9)
+                general._openpyxl_border_corner(cell, canto="direito")
+
+
+        row += 1
+        for i in range(1,10):
+            cell = ws.cell(row=row, column=i)
+            general._openpyxl_border_corner(cell, canto="top")
+
+        # ----- EXPORTING THE FILE ----- #
+
+        file = file_name + ".xlsx"
+        # cheking if the file already exists. If it does, ask the user if wants to replace the file
+        file_exists = helpers._check_file_exists(file)
+
+        func_name = "_export_to_csv"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, self.language, func_name)
+
+        # if the file already exists, create a new name for the file
+        if file_exists:
+            # warn that the file already exists
+            aviso = f"{messages[1][0][0]} '{file}' {messages[1][2][0]}"
+            i = 0
+            # try to create a new name by adding a number to the end of the name.
+            while file_exists:
+                i += 1
+                file = file_name + "_" + str(i) + ".xlsx"
+                file_exists = helpers._check_file_exists(file)
+            file_name = file
+            # warn the user the name of the file to be exported
+            texto = f"     ---> {messages[2][0][0]} '{file_name}'"
+            general._display_warn(aviso, texto)
+        else:
+            file_name = file_name + '.xlsx'
+
+
+        try:
+            wb.save(file_name)
+            general._display_one_line_success(
+                text = f"{messages[3][0][0]} '{file_name}' {messages[3][2][0]}"
+            )
+        except PermissionError:
+            # logging.error(traceback.format_exc())
+            general._display_two_line_attention(
+                text1 = f"{messages[4][0][0]} '{file_name}' {messages[4][2][0]}.",
+                text2 = f"{messages[5][0][0]} '{file_name}' {messages[5][2][0]}"
+                )
+            raise
+        except FileNotFoundError: # acredito que o problema com subfolder é resolvido com a proibição do /
+            # logging.error(traceback.format_exc())
+            general._display_two_line_attention(
+                text1 = f"{messages[4][0][0]} '{file_name}' {messages[4][2][0]}.",
+                text2 = f"{messages[6][0][0]}"
+                )
+            raise
+        wb.close()
+
+
+    # with tests, with text, with database, with docstring
+    def make_scoresheets(self, which=None, title=None, instructions_text=None, file_name=None):
+        """This function creates an excel scoresheet to perform the Triangular test
+
+        Parameters
+        ----------
+        which : ``str``, optional
+            Controls the number of scoresheet in each sheet.
+
+            * If ``which="full"`` (default), all scoresheet are created in a single worksheet.
+            * If ``which="two"``, multiple worksheet are created each containing two scoresheets.
+            * If ``which="one"``, multiple worksheet are created each containing one scoresheet.
+
+        title : ``str``, optional
+            The title of the test. Default is ``"Triangle Test"``
+        instructions_text : ``list`` of ``str``
+            A list with some recomendations to perform the test. Default is ``['Evaluate samples from left to rigth. Two are alike. Mark an "X" in the box from the sample which differs from the others. If no difference is apparent, you must guess.']``.
+        file_name : ``str``, optional
+            The name of the file to export without its extension. Default is ``"score_sheet"``
+
+
+        Notes
+        -----
+        The method ``make_combinations`` must be called beforehand.
+
+        Examples
+        --------
+
+        >>> from pycafee.sensoryanalysis import TriangleTest
+        >>> tringular = TriangleTest()
+        >>> result, inpupt = tringular.make_combinations(36, seed=42)
+        >>> tringular.make_scoresheets()
+        The 'score_sheet.xlsx' file was exported!
+
+        .. image:: img/score_sheet.png
+           :alt: Image showing the protocol sheet
+           :align: center
+
+
+        >>> from pycafee.sensoryanalysis import TriangleTest
+        >>> tringular = TriangleTest(language="pt-br")
+        >>> result, inpupt = tringular.make_combinations(36, seed=42)
+        >>> tringular.make_scoresheets(which="one")
+        O arquivo 'planilha_score.xlsx'  foi exportado!
+
+        .. image:: img/planilha_score.png
+           :alt: Image showing the protocol sheet
+           :align: center
+
+
+        """
+
+        # ----- Cheking the parameters ---- #
+        # ----- checking the WHICH parameter ----- #
+        if which == None or which == "full":
+            which = "full"
+        else:
+            checkers._check_is_str(which, "which", self.language)
+            if which == "two":
+                which = "two"
+            elif which == "one":
+                which = "one"
+            else:
+                # ----- quering ----- #
+                fk_id_function = management._query_func_id("generic")
+                messages = management._get_messages(fk_id_function, self.language, "generic")
+                try:
+                    error = messages[3][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    msg = [f"{messages[4][0][0]} 'which' {messages[4][2][0]}:"]
+                    values = ['full', 'two', 'one']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{which}'")
+                    general._display_n_line_attention(msg)
+                    raise
+
+
+        # ----- quering ----- #
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+        # ----- Title ----- #
+        if title is None:
+            title = messages[7][0][0]
+        else:
+            checkers._check_is_str(title, "title", self.language)
+        # ----- instructions_text ----- #
+        if instructions_text is None:
+            instructions_text = [messages[7][3][0]]
+        else:
+            checkers._check_is_list(instructions_text, "instructions_text", self.language)
+            checkers._check_list_length_equal_or_higher_than(instructions_text, 1, "instructions_text", self.language)
+            for i in range(len(instructions_text)):
+                checkers._check_is_str(instructions_text[i], f"instructions_text[{i}]", self.language)
+
+        # ----- date, name, instructions and remarks from database ----- #
+        date = messages[4][0][0]
+        name = messages[7][1][0]
+        instructions = messages[7][2][0]
+        remarks = messages[7][4][0]
+
+        # ----- file_name ----- #
+        if file_name is None:
+            file_name = messages[1][5][0]
+        else:
+            checkers._check_is_str(file_name, 'file_name', self.language)
+            helpers._check_forbidden_character(file_name, "file_name", self.language)
+
+        # ----- getting the data ----- #
+        if self.df_table is None:
+            try:
+                error = messages[5][0][0]
+                raise ValueError(error)
+            except ValueError:
+                general._display_two_line_attention(
+                    messages[6][0][0],
+                    messages[6][1][0],
+                                    )
+                raise
+        df = self.df_table.copy()
+
+        # ----- creating a new workbook ----- #
+        wb = Workbook()
+
+        # ----- first row ----- #
+        first_row = 1
+
+        # ----- create the scoresheet based on which param ----- #
+        if which == "full":
+            # ----- all scoresheets in one sheet ----- #
+            # ----- ativando a scoresheet ----- #
+            ws = wb.active
+            # ------ worksheet name ----- #
+            ws.title = title
+            # looping for each index to generate the scoresheet
+            for i in range(df.shape[0]):
+                first_sample = int(df[df.columns[1]].iloc[i][-3:])
+                second_sample = int(df[df.columns[2]].iloc[i][-3:])
+                third_sample = int(df[df.columns[3]].iloc[i][-3:])
+                panelist_name = f"{df.columns[0]} {df[df.columns[0]].iloc[i]}"
+                first_row = general._openpyxl_make_scoresheets(first_row, first_sample, second_sample, third_sample, ws, panel_name=panelist_name, messages=messages, name=name, date=date, instructions=instructions, instructions_text=instructions_text, remarks=remarks, title=title)
+                first_row += 3 # +3 to be nice to export to pdf
+
+        elif which == "two":
+            # aux values
+            aux = 0
+            count = 1
+            # looping for each index to generate the scoresheet
+            for i in range(df.shape[0]):
+                # every two scoresheets a new sheet must be created
+                if aux == 0:
+                    # se aux for zero, ativamos a sheet
+                    if i == 0:
+                        # caso seja a primeira sheet, precisa renomear
+                        ws = wb.active
+                        ws.title = f"sheet_{count}"
+                    else:
+                        # caso contrario, basta criar nova sheet
+                        ws = wb.create_sheet(f"sheet_{count}")
+                    first_sample = int(df[df.columns[1]].iloc[i][-3:])
+                    second_sample = int(df[df.columns[2]].iloc[i][-3:])
+                    third_sample = int(df[df.columns[3]].iloc[i][-3:])
+                    panelist_name = f"{df.columns[0]} {df[df.columns[0]].iloc[i]}"
+                    first_row = general._openpyxl_make_scoresheets(first_row, first_sample, second_sample, third_sample, ws, panel_name=panelist_name, messages=messages, name=name, date=date, instructions=instructions, instructions_text=instructions_text, remarks=remarks, title=title)
+                    first_row += 3
+                    aux += 1
+                else:
+
+                    count += 1
+                    aux = 0
+                    first_sample = int(df[df.columns[1]].iloc[i][-3:])
+                    second_sample = int(df[df.columns[2]].iloc[i][-3:])
+                    third_sample = int(df[df.columns[3]].iloc[i][-3:])
+                    panelist_name = f"{df.columns[0]} {df[df.columns[0]].iloc[i]}"
+                    first_row = general._openpyxl_make_scoresheets(first_row, first_sample, second_sample, third_sample, ws, panel_name=panelist_name, messages=messages, name=name, date=date, instructions=instructions, instructions_text=instructions_text, remarks=remarks, title=title)
+                    first_row = 1
+
+        else:
+            # looping for each index to generate the scoresheet
+            for i in range(df.shape[0]):
+                # we need to get the name first due to it is used as sheetname
+                panelist_name = f"{df.columns[0]} {df[df.columns[0]].iloc[i]}"
+                if i == 0:
+                    # caso seja a primeira sheet, precisa renomear
+                    ws = wb.active
+                    ws.title = panelist_name
+                else:
+                # caso contrario, basta criar nova sheet
+                    ws = wb.create_sheet(panelist_name)
+
+                first_sample = int(df[df.columns[1]].iloc[i][-3:])
+                second_sample = int(df[df.columns[2]].iloc[i][-3:])
+                third_sample = int(df[df.columns[3]].iloc[i][-3:])
+
+                first_row = general._openpyxl_make_scoresheets(first_row, first_sample, second_sample, third_sample, ws, panel_name=panelist_name, messages=messages, name=name, date=date, instructions=instructions, instructions_text=instructions_text, remarks=remarks, title=title)
+                first_row = 1
+
+        # ----- EXPORTING THE FILE ----- #
+
+        file = file_name + ".xlsx"
+        # cheking if the file already exists. If it does, ask the user if wants to replace the file
+        file_exists = helpers._check_file_exists(file)
+
+        func_name = "_export_to_csv"
+        fk_id_function = management._query_func_id(func_name)
+        messages = management._get_messages(fk_id_function, self.language, func_name)
+
+        # if the file already exists, create a new name for the file
+        if file_exists:
+            # warn that the file already exists
+            aviso = f"{messages[1][0][0]} '{file}' {messages[1][2][0]}"
+            i = 0
+            # try to create a new name by adding a number to the end of the name.
+            while file_exists:
+                i += 1
+                file = file_name + "_" + str(i) + ".xlsx"
+                file_exists = helpers._check_file_exists(file)
+            file_name = file
+            # warn the user the name of the file to be exported
+            texto = f"     ---> {messages[2][0][0]} '{file_name}'"
+            general._display_warn(aviso, texto)
+        else:
+            file_name = file_name + '.xlsx'
+
+
+        try:
+            wb.save(file_name)
+            general._display_one_line_success(
+                text = f"{messages[3][0][0]} '{file_name}' {messages[3][2][0]}"
+            )
+        except PermissionError:
+            # logging.error(traceback.format_exc())
+            general._display_two_line_attention(
+                text1 = f"{messages[4][0][0]} '{file_name}' {messages[4][2][0]}.",
+                text2 = f"{messages[5][0][0]} '{file_name}' {messages[5][2][0]}"
+                )
+            raise
+        except FileNotFoundError: # acredito que o problema com subfolder é resolvido com a proibição do /
+            # logging.error(traceback.format_exc())
+            general._display_two_line_attention(
+                text1 = f"{messages[4][0][0]} '{file_name}' {messages[4][2][0]}.",
+                text2 = f"{messages[6][0][0]}"
+                )
+            raise
+
+
+        wb.close()
 
 
 
