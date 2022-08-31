@@ -37,6 +37,7 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
 import scipy.stats as stats
+from scipy.stats import binom
 from tabulate import tabulate
 
 
@@ -253,7 +254,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
     # with tests, with text, with database, with docstring
-    def minimum_of_correct_responses(self, n_of_assessors, alfa=None, which=None):
+    def minimum_of_correct_responses(self, n_of_assessors, alfa=None):
         """This functions returns the minimum number of correct responses required for significance at the stated α level for the corresponding number of assessors.
 
         Parameters
@@ -271,13 +272,6 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             * ``0.001``;
 
 
-        which : ``str``, optional
-            A forma de obter o resultado.
-
-            * If ``"function"`` (default), the equation given in [1]_ is used;
-            * If ``"original"``, the tabulated values provided by [1]_ are used;
-
-
         Returns
         -------
         min_responses : ``int``
@@ -288,22 +282,17 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
         Notes
         -----
-        In cases where the original values are not available, the value is returned using ``which="function"`` instead of ``which="original"``.
+        The minimum number of correct answers is obtained from the Binomial distribution using function ``scipy.stats.binom.ppf()`` [1]_ as follows:
 
-        In a small number of combinations between the level of significance and the number of assessors, there are discrepancies between the original results and the respective calculated values. In all cases the difference is one less right answer, that is, the original values are more conservative than the values obtained with the equation.
+        .. code:: python
 
+            int(binom.ppf(1-alfa, n_of_assessors, 1/3) + 1)
 
-        The minimum number of correct answers is estimated using the following relationship:
-
-        .. math::
-                min = \\frac{n_{assessors + t_{\\infty} \\sqrt{2n_{assessors}}}}{3}
-
-        where :math:`t_{\\infty}` is the value of the one-sided student t distribution for infinite degrees of freedom (1000000) rounded to 2 decimal places. The value of t is obtained using ``stats.t.ppf(1-alfa, 1000000)``
 
 
         References
         ----------
-        .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
+        .. [1] SCIPY. scipy.stats.binom. Available at: `www.scipy.org <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binom.html>`_. Access on: 22 Jul. 2022.
 
 
         Examples
@@ -311,11 +300,11 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
         >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
         >>> tringular = TriangleTest()
-        >>> result = tringular.minimum_of_correct_responses(10)
+        >>> result, inputs = tringular.minimum_of_correct_responses(10)
         >>> print(result)
         TriangleTest(minimum_of_correct_responses=7)
         >>> print(inputs)
-        {'alpha': 0.05, 'which': 'original'}
+        {'alpha': 0.05, 'n_of_assessors': 10}
 
 
         >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
@@ -324,7 +313,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         >>> print(result)
         TesteTriangular(minimo_de_respostas_corretas=18)
         >>> print(inputs)
-        {'alfa': 0.05, 'which': 'original'}
+        {'alfa': 0.05, 'n_of_assessors': 36}
 
 
         >>> from pycafee.sensoryanalysis.discriminative_tests import TriangleTest
@@ -333,7 +322,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         >>> print(result)
         TriangleTest(minimum_of_correct_responses=20)
         >>> print(inputs)
-        {'alpha': 0.01, 'which': 'original'}
+        {'alpha': 0.01, 'n_of_assessors': 36}
 
 
         """
@@ -354,111 +343,16 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             helpers._raises_wrong_param("alfa", alloweds, alfa, self.language)
 
 
-
-        # ----- checking which value ----- #
-        if which is None:
-            which = "original"
-        else:
-            # --- should be str --- #
-            checkers._check_is_str(which, "which", self.language)
-            # --- must be in --- #
-            alloweds = ["function", "original"]
-            helpers._raises_wrong_param("which", alloweds, which, self.language)
-
-
-        # ----- getting the position for each alfa value ----- #
-        if alfa == 0.20:
-            position = 0
-        elif alfa == 0.10:
-            position = 1
-        elif alfa == 0.05:
-            position = 2
-        elif alfa == 0.01:
-            position = 3
-        else:
-            position = 4
-
-        # critical values
-        critical = {
-            6: [4, 5, 5, 6],
-            7: [4, 5, 5, 6, 7],
-            8: [5, 5, 6, 7, 8],
-            9: [5, 6, 6, 7, 8],
-            10: [6, 6, 7, 8, 9],
-            11: [6, 7, 7, 8, 10],
-            12: [6, 7, 8, 9, 10],
-            13: [7, 8, 8, 9, 11],
-            15: [8, 8, 9, 10, 12],
-            14: [7, 8, 9, 10, 11],
-            16: [8, 9, 9, 11, 12],
-            17: [8, 9, 10, 11, 13],
-            18: [9, 10, 10, 12, 13],
-            19: [9, 10, 11, 12, 14],
-            20: [9, 10, 11, 13, 14],
-            21: [10, 11, 12, 13, 15],
-            22: [10, 11, 12, 14, 15],
-            23: [11, 12, 12, 14, 16],
-            24: [11, 12, 13, 15, 16],
-            25: [11, 12, 13, 15, 17],
-            26: [12, 13, 14, 15, 17],
-            27: [12, 13, 14, 16, 18],
-            28: [12, 14, 15, 16, 18],
-            29: [13, 14, 15, 17, 19],
-            30: [13, 14, 15, 17, 19],
-            31: [14, 15, 16, 18, 20],
-            32: [14, 15, 16, 18, 20],
-            33: [14, 15, 17, 18, 21],
-            34: [15, 16, 17, 19, 21],
-            35: [15, 16, 17, 19, 22],
-            36: [15, 17, 18, 20, 22],
-            37: [16, 17, 18, 20, 22],
-            38: [16, 17, 19, 21, 23],
-            39: [16, 18, 19, 21, 23],
-            40: [17, 18, 19, 21, 24],
-            41: [17, 19, 20, 22, 24],
-            42: [18, 19, 20, 22, 25],
-            43: [18, 19, 20, 23, 25],
-            44: [18, 20, 21, 23, 26],
-            45: [19, 20, 21, 24, 26],
-            46: [19, 20, 22, 24, 27],
-            47: [19, 21, 22, 24, 27],
-            48: [20, 21, 22, 25, 27],
-            54: [22, 23, 25, 27, 30],
-            60: [24, 26, 27, 30, 33],
-            66: [26, 28, 29, 32, 35],
-            72: [28, 30, 32, 34, 38],
-            78: [30, 32, 34, 37, 40],
-            84: [33, 35, 36, 39, 43],
-            90: [35, 37, 38, 42, 45],
-            96: [37, 39, 41, 44, 48],
-            102: [39, 41, 43, 46, 50]
-        }
-
         fk_id_function = management._query_func_id("discriminative_tests")
         messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
 
-        # ----- grouping entries into a dictionary ----- #
+        # ----- getting critical value from binomial distribution with p=1/3 ----- #
+        min_responses = int(binom.ppf(1-alfa, n_of_assessors, 1/3) + 1)
+
         inputs = {
             messages[1][2][0]: alfa,
-            "which": which
+            "n_of_assessors": n_of_assessors,
         }
-
-        if which == "function":
-            min_responses = _min_responses(n_of_assessors, alfa)
-        else:
-            if n_of_assessors in critical.keys():
-                try:
-                    min_responses = critical[n_of_assessors][position]
-
-                except IndexError: # requeried due to n_of_assessors = 6 and alfa = 0.001 is missing
-                    min_responses = _min_responses(n_of_assessors, alfa)
-                    general._display_warn(messages[2][0][0], messages[2][1][0])
-                    inputs["which"] = "function"
-            else: # for missing n_of_assessors values
-                min_responses = _min_responses(n_of_assessors, alfa)
-                aviso = f"{messages[2][2][0]} {n_of_assessors}{messages[2][4][0]}"
-                general._display_warn(messages[2][0][0], aviso)
-                inputs["which"] = "function"
 
         result = namedtuple(messages[1][0][0], (messages[1][4][0],))
         return result(min_responses), inputs
@@ -610,8 +504,8 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         # ----- quering ----- #
         fk_id_function = management._query_func_id("discriminative_tests")
         messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
-        panelist = messages[3][0][0]
-        sample = messages[3][1][0]
+        panelist = messages[2][0][0]
+        sample = messages[2][1][0]
 
         # ----- making the DataFrame ----- #
         df = pd.DataFrame(columns=[panelist, f"{sample} 1", f"{sample} 2", f"{sample} 3"])
@@ -667,7 +561,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
             Some information about the test
         code_text : ``str``, optional
             Some information about the test
-        recommendations: ``list`` of ``str``
+        recommendations : ``list`` of ``str``
             A list with some recomendations to perform the test
         file_name : ``str``, optional
             The name of the file to export without its extension (default is ``"protocol_sheet"``)
@@ -863,7 +757,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         # ----- SAMPLE A INFO ----- #
         ws.merge_cells(f'A{row}:I{row}')
         cell = ws.cell(row=row, column=1)
-        cell.value = f"{messages[3][2][0]} A: {sample_A}"
+        cell.value = f"{messages[2][2][0]} A: {sample_A}"
         cell.font = Font(size=11, )
         cell.alignment = Alignment(horizontal='left', vertical='center', indent=1)
         ws.row_dimensions[row].height = 20
@@ -873,7 +767,7 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         # ----- SAMPLE B INFO ----- #
         ws.merge_cells(f'A{row}:I{row}')
         cell = ws.cell(row=row, column=1)
-        cell.value = f"{messages[3][2][0]} B: {sample_B}"
+        cell.value = f"{messages[2][2][0]} B: {sample_B}"
         cell.font = Font(size=11, )
         cell.alignment = Alignment(horizontal='left', vertical='center', indent=1)
         ws.row_dimensions[row].height = 20
@@ -1334,6 +1228,33 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         wb.close()
 
 
+    def fit(self, n_of_correct_answers, total_of_answers, alfa=None):
+        """
+        """
+
+        proportion_correct = n_of_correct_answers/total_of_answers
+
+        proportion_distinguishers = 1.5*proportion_correct - 0.5
+
+        sd_proportion_distinguishers = 1.5*np.sqrt(proportion_correct*(1 - proportion_correct)/total_of_answers)
+
+        if alfa == 0.10:
+            critical_z = 1.28
+        elif alfa == 0.05:
+            critical_z = 1.64
+        else:
+            critical_z = 2.33
+        lower_limit = proportion_distinguishers - sd_proportion_distinguishers*critical_z
+        upper_limit = proportion_distinguishers + sd_proportion_distinguishers*critical_z
+
+
+        print(upper_limit)
+        print(lower_limit)
+        if lower_limit < proportion_distinguishers < upper_limit:
+            print("iguais")
+        else:
+            print("diferentes")
+
 
 
 
@@ -1360,57 +1281,6 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
 
-
-
-# with tests, with docstring
-def _min_responses(n_assessors, alfa):
-    """This functions calculates the minimum number of correct responses based on the number of assessors and alfa value [1]_.
-
-    Parameters
-    ----------
-    n_assessors : ``int``
-        The number of assessors.
-    alfa : ``float``
-        The significance level.
-
-
-    Returns
-    -------
-    min_correct: ``int``
-        The minimum number of correct answers
-
-
-    Notes
-    -----
-    The minimum number of correct answers is estimated using the following relationship:
-
-    .. math::
-            min = \\frac{n_{assessors + t_{\\infty} \\sqrt{2n_{assessors}}}}{3}
-
-    where :math:`t_{\\infty}` is the value of the one-sided student t distribution for infinite degrees of freedom (1000000) rounded to 2 decimal places. The value of t is obtained using ``stats.t.ppf(1-alfa, 1000000)``
-
-
-    References
-    ----------
-    .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
-
-
-    Examples
-    --------
-
-    >>> from pycafee.sensoryanalysis.discriminative_tests import _min_responses
-    >>> result = _min_responses(48, 0.05)
-    >>> print(result)
-    22
-
-    """
-    # t values
-    t = round(stats.t.ppf(1-alfa, 1000000),2)
-    # calculating the minimum
-    min = (n_assessors/3) + t*np.sqrt(2*n_assessors)/3
-    # rounding to nearest whole number greater than min
-    min_correct = int(min + 0.5) + 1
-    return min_correct
 
 
 

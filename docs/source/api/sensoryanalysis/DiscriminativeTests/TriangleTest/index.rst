@@ -11,7 +11,7 @@ TriangleTest
    make_combinations
    make_protocol
    make_scoresheets
-   _min_responses
+
 
 |
 |
