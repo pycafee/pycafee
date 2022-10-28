@@ -64,9 +64,11 @@ from pycafee.database_management import management
 class TriangleTest(AlphaManagement, NDigitsManagement):
 
 
-    def __init__(self, name=None, alfa=None, language=None, n_digits=None, **kwargs):
+    def __init__(self, alfa=None, language=None, n_digits=None, **kwargs):
         super().__init__(alfa=alfa, language=language, n_digits=n_digits, **kwargs)
         self.df_table = None
+        self.conclusion = None
+
 
 
 
@@ -1228,9 +1230,172 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
         wb.close()
 
 
-    def fit(self, n_of_correct_answers, total_of_answers, alfa=None):
+    def fit(self, n_of_correct_answers, total_of_answers, alfa=None, details=None):
+        """This function applies the Triangular test [1]_
+
+        Parameters
+        ----------
+        n_of_correct_answers : ``int``, positive
+            The number of correct responses.
+        total_of_answers : ``int``, positive
+            The total number of assessors.
+        alfa : ``float``, optional
+            The level of significance (``ɑ``). Default is ``None`` which results in ``0.05`` (``ɑ = 5%``).
+        details : ``str``, optional
+            The ``details`` parameter determines the amount of information presented about the hypothesis test.
+
+            * If ``details = "short"`` (or ``None``, e.g, the default), a simplified version of the test result is returned.
+            * If ``details = "full"``, a detailed version of the hypothesis test result is returned.
+            * if ``details = "binary"``, the conclusion will be ``1`` (:math:`H_0` is rejected) or ``0`` (:math:`H_0` is accepted).
+
+        Returns
+        -------
+        result : ``tuple`` with
+            pd : ``float``
+                The proportion of distinguishers
+            pc : ``float``
+                The proportion correct answers
+            pd_std : ``float``
+                The standard deviation of the proportion of the distinguishers
+            pc_ic : ``float``
+                The confidence interval of the proportion of the distinguishers
+            ic_proportion_distinguishers : ``tuple`` with:
+                lower_limit : ``float``
+                    The lower confidence limit
+                upper_limit : ``float``
+                                        The upper confidence limit
+            critical_z : ``float``
+                The critical value of the Normal distribution (one-sided) corresponding to alpha;
+
+        conclusion : ``str``
+            The test conclusion (e.g, Samples are equal/not equal).
+
+        See Also
+        --------
+        pycafee.sensoryanalysis.discriminative_tests.TriangleTest.make_scoresheets
+        pycafee.sensoryanalysis.discriminative_tests.TriangleTest.make_protocol
+        pycafee.sensoryanalysis.discriminative_tests.TriangleTest.make_combinations
+        pycafee.sensoryanalysis.discriminative_tests.TriangleTest.minimum_of_correct_responses
+        pycafee.sensoryanalysis.discriminative_tests.TriangleTest.get_number_assessors
+
+
+        Notes
+        -----
+        The **Triangular Test** has the following premise:
+
+        .. admonition:: \u2615
+
+           :math:`H_0:` the two samples are equal.
+
+           :math:`H_1:` the two samples are different.
+
+
+        The proportion of correct answers (:math:`pc`) is estimated as follows:
+
+        .. math::
+
+                pc = \\frac{nc}{n}
+
+        where :math:`nc` is the number of correct responses (``n_of_correct_answers``) and :math:`n` is the total number of assessors (``total_of_answers``).
+
+        The proportion of judges who can differentiate the samples (:math:`pd`) is estimated as follows:
+
+        .. math::
+
+                pd = 1.5 pc - 0.5
+
+        The standard deviation of the proportion  (:math:`pd_{std}`) is estimated as follows:
+
+        .. math::
+
+                pd_{std} = 1.5\\sqrt{\\frac{pc(1-pc)}{n}}
+
+        The confidence interval of the proportion  (:math:`pd_{ic}`) is estimated as follows:
+
+        .. math::
+
+                pd_{ic} = Z \\times pd_{std}
+
+        where :math:`Z` is the critical value of the standard Normal distribution (one-sided). This value is obtained using ``stats.norm.ppf(1-alfa)``.
+
+
+
+        References
+        ----------
+        .. [1] Standard Test Method for Sensory Analysis—Triangle Test, Designation: E1885 − 04, 2011.
+
+
+        Examples
+        --------
+
+
+
         """
-        """
+
+        # ----- checking alpha value ----- #
+        if alfa is None:
+            alfa = self.alfa
+        else:
+            # --- should be float --- #
+            checkers._check_is_float(alfa, "alfa", self.language)
+            # --- should be in the range (0,1) --- #
+            checkers._check_data_in_range(alfa, "alfa", 0.0, 1.0, self.language)
+            # --- must be in --- #
+            alloweds = [0.20, 0.10, 0.05, 0.01, 0.001]
+            print(alfa)
+            helpers._raises_wrong_param("alfa", alloweds, alfa, self.language)
+            self.alfa = alfa
+
+        # --- cheking n_of_correct_answers --- #
+        checkers._check_is_integer(n_of_correct_answers, 'n_of_correct_answers', self.language)
+        checkers._check_is_positive(n_of_correct_answers, 'n_of_correct_answers', self.language)
+
+        # --- cheking total_of_answers --- #
+        checkers._check_is_integer(total_of_answers, 'total_of_answers', self.language)
+        checkers._check_is_positive(total_of_answers, 'total_of_answers', self.language)
+
+        fk_id_function = management._query_func_id("discriminative_tests")
+        messages = management._get_messages(fk_id_function, self.language, "discriminative_tests")
+
+        # --- comparing total_of_answers with n_of_correct_answers --- #
+        if total_of_answers < n_of_correct_answers:
+                try:
+                    error = messages[7][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    msg = [messages[7][1][0]]
+                    msg.append(f"'total_of_answers = '{total_of_answers}'")
+                    msg.append(f"'n_of_correct_answers = '{n_of_correct_answers}'")
+                    general._display_n_line_attention(msg)
+                    raise
+
+        ### checking the details parameter ###
+        if details == None:
+            details = "short"
+        else:
+            checkers._check_is_str(details, "details", self.language)
+            if details == "short":
+                details = "short"
+            elif details == "full":
+                details = "full"
+            elif details == "binary":
+                details = "binary"
+            else:
+                fk_id_function = management._query_func_id("generic")
+                messages = management._get_messages(fk_id_function, self.language, "generic")
+                try:
+                    error = messages[3][0][0]
+                    raise ValueError(error)
+                except ValueError:
+                    msg = [f"{messages[4][0][0]} 'details' {messages[4][2][0]}:"]
+                    values = ['short', 'full', 'binary']
+                    for item in values:
+                        msg.append(f"   --->    '{item}'")
+                    msg.append(f"{messages[4][4][0]}:")
+                    msg.append(f"   --->    '{details}'")
+                    general._display_n_line_attention(msg)
+                    raise
+
 
         proportion_correct = n_of_correct_answers/total_of_answers
 
@@ -1238,30 +1403,54 @@ class TriangleTest(AlphaManagement, NDigitsManagement):
 
         sd_proportion_distinguishers = 1.5*np.sqrt(proportion_correct*(1 - proportion_correct)/total_of_answers)
 
-        if alfa == 0.10:
-            critical_z = 1.28
-        elif alfa == 0.05:
-            critical_z = 1.64
+        critical_z = stats.norm.ppf(1- alfa)
+
+        ic_proportion_distinguishers = sd_proportion_distinguishers*critical_z
+        lower_limit = proportion_distinguishers - ic_proportion_distinguishers
+        upper_limit = proportion_distinguishers + ic_proportion_distinguishers
+
+        if lower_limit <= proportion_distinguishers <= upper_limit:
+            if details == 'short':
+                msg = f"{messages[8][0][0]} {100*(1-alfa)}{messages[8][2][0]}"
+            elif details == 'full':
+                msg = f"{messages[9][0][0]}{helpers._truncate(proportion_distinguishers, self.language, decs=self.n_digits)}{messages[9][2][0]}{helpers._truncate(lower_limit, self.language, decs=self.n_digits)}{messages[9][4][0]}{helpers._truncate(upper_limit, self.language, decs=self.n_digits)}{messages[9][6][0]} {(1-alfa)*100}{messages[9][8][0]}"
+            else:
+                msg = 0
         else:
-            critical_z = 2.33
-        lower_limit = proportion_distinguishers - sd_proportion_distinguishers*critical_z
-        upper_limit = proportion_distinguishers + sd_proportion_distinguishers*critical_z
+            if details == 'short':
+                msg = f"{messages[10][0][0]} {100*(1-alfa)}{messages[10][2][0]}"
+            elif details == 'full':
+                if proportion_distinguishers < lower_limit:
+                    msg = f"{messages[11][0][0]}{helpers._truncate(proportion_distinguishers, self.language, decs=self.n_digits)}{messages[11][2][0]}{helpers._truncate(lower_limit, self.language, decs=self.n_digits)}{messages[11][4][0]} {(1-alfa)*100}{messages[11][6][0]}"
+                else:
+                    msg = f"{messages[12][0][0]}{helpers._truncate(proportion_distinguishers, self.language, decs=self.n_digits)}{messages[12][2][0]}{helpers._truncate(upper_limit, self.language, decs=self.n_digits)}{messages[12][4][0]} {(1-alfa)*100}{messages[12][6][0]}"
+            else:
+                msg = 1
+
+        result = namedtuple(messages[13][0][0], (messages[13][1][0], messages[13][2][0], messages[13][3][0], messages[13][4][0],
+                            messages[13][5][0], messages[13][7][0]))
+        self.conclusion = msg
+
+        return result(proportion_distinguishers, proportion_correct, sd_proportion_distinguishers,
+                    ic_proportion_distinguishers, (lower_limit, upper_limit), critical_z), self.conclusion
 
 
-        print(upper_limit)
-        print(lower_limit)
-        if lower_limit < proportion_distinguishers < upper_limit:
-            print("iguais")
+
+
+    # with tests, with text, with database (Dixon), with docstring
+    def __str__(self):
+        if self.conclusion is None:
+            fk_id_function = management._query_func_id("generic")
+            messages = management._get_messages(fk_id_function, self.language, "generic")
+            return f"{messages[2][0][0]} TriangleTest {messages[2][2][0]}"
         else:
-            print("diferentes")
+            return self.conclusion
 
-
-
-
-
-
-
-
+    # with tests, with text, with database, with docstring
+    def __repr__(self):
+        fk_id_function = management._query_func_id("TriangularTest")
+        messages = management._get_messages(fk_id_function, self.language, "TriangularTest")
+        return messages[1][0][0]
 
 
 
